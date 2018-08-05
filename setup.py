@@ -37,8 +37,7 @@ REQUIREMENTS = ['pandas',
                 'rasterio',
                 'scikit-learn',
                 'scipy',
-                'matplotlib',
-                'collections'
+                'matplotlib'
                 ]
 
 TEST_REQUIREMENTS = ['pytest',

@@ -36,7 +36,7 @@ class MockSlicePredictor:
         return self.f(x, y)
 
     def predict(self, X):
-        z = map(self.predict_one_sample, X)
+        z = [self.predict_one_sample(x) for x in X]
         return np.array(z)
 
 def test_interpolate_slice():
@@ -62,7 +62,9 @@ def test_interpolate_slice():
 def test_height_coordinate_functor():
     z_index_for_ahd = z_index_for_ahd_functor(b=+100)
     assert z_index_for_ahd(-100) == 0
-    assert z_index_for_ahd(+50) == 151
+    assert z_index_for_ahd(-99) == 1
+    assert z_index_for_ahd(0) == 100
+    assert z_index_for_ahd(+50) == 150
 
 def test_burn_volume():
     dims = (3,4,5)
@@ -97,6 +99,6 @@ def test_burn_volume():
     assert np.isnan(burnt[2,2,2]) 
     assert np.isnan(burnt[2,2,3]) 
 
-
-# test_interpolate_slice()
-# test_burn_volume()
+#test_interpolate_slice()
+#test_burn_volume()
+#test_height_coordinate_functor()
