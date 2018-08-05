@@ -72,3 +72,7 @@ Then I use these commands, which you can join with `;` if you like, to keep the 
     python setup.py sdist
     pip install dist/ela-0.6.1.tar.gz    # Or whatever was the last version to build.
 
+Draft Notes
+-----------
+
+``conda install coveralls`` then ``conda install pytest-cov pytest-mpl``: this downgrades numpy a tad. Why? Trying ``conda update numpy`` but even odder outcome

@@ -1,2 +1,19 @@
-numpy>=1.9.0
-matplotlib>=1.4.3
+Cartopy>=0.16.0
+numpy>=1.14.3
+geopandas>=0.3.0
+matplotlib>=2.2.2
+# ipykernel>=4.8.2
+# ipywidgets>=7.2.1
+# jupyterlab>=0.32.1
+# jupyter>=1.0.0
+# jupyterlab-launcher>=0.10.5
+mayavi>=4.5.0
+nltk>=3.2.5
+pandas>=0.23.1
+PyQt5>=5.10.1
+rasterio>=0.36.0
+scikit-learn>=0.19.1
+scipy>=1.1.0
+# striplog
+# -e git+git@github.com:jmp75/striplog.git@7c6ae22a130ad2ba3d351c31574778ec121571d3#egg=striplog
+vtk>=8.1.0

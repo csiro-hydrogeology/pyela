@@ -1,4 +1,5 @@
 import string
+import sys
 import numpy as np
 import pandas as pd
 import scipy.stats.mstats as mstats
@@ -120,9 +121,11 @@ def v_word_tokenize(array):
         res.append(nltk.word_tokenize(y))
     return res
 
-# v_lower = np.vectorize(str.lower)
-# Given Python 2.7 we must use:
-v_lower = np.vectorize(unicode.lower)
+if(sys.version_info.major > 2):
+    v_lower = np.vectorize(str.lower)
+else:
+    # Given Python 2.7 we must use:
+    v_lower = np.vectorize(unicode.lower)
 
 def token_freq(tokens, n_most_common = 50):
     list_most_common=Counter(tokens).most_common(n_most_common)
