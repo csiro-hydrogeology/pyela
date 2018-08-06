@@ -39,95 +39,80 @@ DEM_ELEVATION_COL = 'DEM_elevation'
 
 WIN_SITE_ID_COL = 'WIN Site ID'
 
-def find_lithologies(df, lithologies):
-    '''
-    Look for specific lithologies in logs and rank based on their position in the sentence.
-    Results are stored in a numpy array "sentence_positions" (rows=records, columns=lithologies)
-    '''
-    number_of_lithologies=len(lithologies)
-    number_of_records=df.shape[0]
-    sentence_positions=np.empty([number_of_records,number_of_lithologies])
-    lithology_index=0
-    for lithology in lithologies:    
-        record_index=0
-        for index, row in df.iterrows():
-            sentence = row[LITHO_DESC_COL]
-            words = sentence.split(' ')
-            if lithology in words:
-                pos = words.index(lithology)
-            else:
-                pos=-1
-            sentence_positions[record_index,lithology_index]=pos
-            record_index += 1
-        lithology_index +=1
-    sentence_positions[sentence_positions == -1] = 'nan'
-    return sentence_positions
-
-# sentence_positions
-# sentence_positions[sentence_positions == -1] = 'nan'
-# sentence_positions[11]
-# 0 in sentence_positions[11]
-# all(np.isnan(i) for i in sentence_positions[11])
-# ranks = mstats.rankdata(np.ma.masked_invalid(sentence_positions[11]))
-# print(ranks)
-# ranks[ranks == 0] = np.nan
-# ranks -= 1
-# ranks
-# lithologies[np.where(ranks==1)[0][0]]
-# any(ranks==1)
-
-
-def find_lithologies_ranks(df, lithologies, sentence_positions):
-    '''
-     For each record, identify lithologies ranked in positions 1 & 2 and store in a new dataframe column
-    '''
-    lithologies_num=np.arange(0,len(lithologies),1)
-    record_index=0
-    for index, row in df.iterrows():    
-        if all(np.isnan(i) for i in sentence_positions[record_index]):
-            df.at[record_index,PRIMARY_LITHO_COL] = ''
-            df.at[record_index,SECONDARY_LITHO_COL] = ''
-            df.at[record_index,PRIMARY_LITHO_NUM_COL] = np.nan
-            df.at[record_index,SECONDARY_LITHO_NUM_COL] = np.nan
-        else:
-            ranks = mstats.rankdata(np.ma.masked_invalid(sentence_positions[record_index]))
-            ranks[ranks == 0] = np.nan
-            ranks -= 1
-            df.at[record_index,PRIMARY_LITHO_COL] = lithologies[np.where(ranks==0)[0][0]]
-            df.at[record_index,PRIMARY_LITHO_NUM_COL] = lithologies_num[np.where(ranks==0)[0][0]]
-            if any(ranks==1):
-                df.at[record_index,SECONDARY_LITHO_COL] = lithologies[np.where(ranks==1)[0][0]]
-                df.at[record_index,SECONDARY_LITHO_NUM_COL] = lithologies_num[np.where(ranks==1)[0][0]]
-            else:
-                df.at[record_index,SECONDARY_LITHO_COL] = ''
-                df.at[record_index,SECONDARY_LITHO_NUM_COL] = np.nan
-        record_index += 1
-
 
 
 def v_find_primary_lithology(v_tokens, lithologies_dict):
+    """Vectorised function to find a primary lithology in a list of tokenised sentences.
+
+    Args:
+        v_tokens (iterable of iterable of str): the list of tokenised sentences.
+        lithologies_dict (dict): dictionary, where keys are exact markers as match for lithologies. Keys are the lithology classes. 
+
+    Returns:
+        list: list of primary lithologies if dectected. empty string for none.
+
+    """
     return [find_primary_lithology(x, lithologies_dict) for x in v_tokens]
 
 def v_find_secondary_lithology(v_tokens, prim_litho, lithologies_adjective_dict, lithologies_dict):
+    """Vectorised function to find a secondary lithology in a list of tokenised sentences.
+
+    Args:
+        v_tokens (iterable of iterable of str): the list of tokenised sentences.
+        prim_litho (list of str): the list of primary lithologies already detected for v_tokens. The secondary lithology cannot be the same as the primary.
+        lithologies_adjective_dict (dict): dictionary, where keys are exact, "clear" markers for secondary lithologies (e.g. 'clayey'). Keys are the lithology classes. 
+        lithologies_dict (dict): dictionary, where keys are exact markers as match for lithologies. Keys are the lithology classes.
+
+    Returns:
+        list: list of secondary lithologies if dectected. empty string for none.
+
+    """
     if len(v_tokens) != len(prim_litho):
         raise Error('marker lithology tokens and their primary lithologies must be of same length')
     tokens_and_primary = [(v_tokens[i], prim_litho[i]) for i in range(len(prim_litho))]
     return [find_secondary_lithology(x, lithologies_adjective_dict, lithologies_dict) for x in tokens_and_primary]
 
 
-def v_word_tokenize(array): 
-    res = []
-    for y in array:
-        res.append(nltk.word_tokenize(y))
-    return res
+def v_word_tokenize(descriptions): 
+    """Vectorised tokenisation of lithology descriptions.
+
+    Args:
+        descriptions (iterable of str): lithology descriptions.
+
+    Returns:
+        list: list of lists of tokens in the NLTK.
+
+    """
+    return [nltk.word_tokenize(y) for y in descriptions]
+
+v_lower = None
+"""vectorised, unicode version to lower case strings
+
+"""
 
 if(sys.version_info.major > 2):
     v_lower = np.vectorize(str.lower)
+    """vectorised, unicode version to lower case strings
+
+    """
 else:
     # Given Python 2.7 we must use:
     v_lower = np.vectorize(unicode.lower)
+    """vectorised, unicode version to lower case strings
+
+    """
 
 def token_freq(tokens, n_most_common = 50):
+    """Gets the most frequent (counts) tokens 
+
+    Args:
+        tokens (iterable of str): the list of tokens to analyse for frequence.
+        n_most_common (int): subset to the this number of most frequend tokens
+
+    Returns:
+        pandas DataFrame: columns=["token","frequency"]
+
+    """
     list_most_common=Counter(tokens).most_common(n_most_common)
     return pd.DataFrame(list_most_common, columns=["token","frequency"])
 
@@ -190,6 +175,16 @@ DEFAULT_LITHOLOGIES_DICT['ironstone'] = 'sandstone' # ??
 DEFAULT_LITHOLOGIES_DICT['topsoil'] = 'soil' # ??
 
 def find_primary_lithology(tokens, lithologies_dict):
+    """Find a primary lithology in a tokenised sentence.
+
+    Args:
+        v_tokens (iterable of iterable of str): the list of tokenised sentences.
+        lithologies_dict (dict): dictionary, where keys are exact markers as match for lithologies. Keys are the lithology classes. 
+
+    Returns:
+        list: list of primary lithologies if dectected. empty string for none.
+
+    """
     keys = lithologies_dict.keys()
     for x in tokens:
         if x in keys:
@@ -207,6 +202,17 @@ DEFAULT_LITHOLOGIES_ADJECTIVE_DICT = {
 }
 
 def find_secondary_lithology(tokens_and_primary, lithologies_adjective_dict, lithologies_dict):
+    """Find a secondary lithology in a tokenised sentence.
+
+    Args:
+        tokens_and_primary (tuple ([str],str): tokens and the primary lithology
+        lithologies_adjective_dict (dict): dictionary, where keys are exact, "clear" markers for secondary lithologies (e.g. 'clayey'). Keys are the lithology classes. 
+        lithologies_dict (dict): dictionary, where keys are exact markers as match for lithologies. Keys are the lithology classes.
+
+    Returns:
+        str: secondary lithology if dectected. empty string for none.
+
+    """
     tokens, prim_litho = tokens_and_primary
     if prim_litho == '': # cannot have a secondary lithology if no primary
         return ''

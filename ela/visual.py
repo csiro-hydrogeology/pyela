@@ -14,8 +14,21 @@ from ela.classification import KNN_WEIGHTING
 DEFAULT_LITHOLOGY_COLORNAMES = ['sandybrown','gold','chocolate','yellow','lightsteelblue','dimgray','darkgoldenrod']
 DEFAULT_LITHOLOGY_COLORNAMES_WITH_UNCLASSIFIED = ['black', 'sandybrown','gold','chocolate','yellow','lightsteelblue','dimgray','darkgoldenrod']
 #set an intuitive colormap for further plotting
-# lithology_cmap = colors.ListedColormap(lithology_colornames)
 
+
+
+def cartopy_color_settings(lithology_color_names, lithology_numeric_classes = None):
+    lithology_cmap = colors.ListedColormap(lithology_color_names)
+    if lithology_numeric_classes is None:
+        bounds =  [0] + [(x + 0.9) for x in range(len(lithology_color_names))]
+    else:
+        raise Error('custom lithology numeric class codes is not yet supported')
+    norm = colors.BoundaryNorm(bounds, lithology_cmap.N)
+    return {
+        'cmap': lithology_cmap,
+        'bounds': bounds,
+        'norm': norm
+    }
 
 class LithologiesClassesVisual(object):
     def __init__(self, class_names, color_names, missing_value_color_name):
@@ -37,12 +50,11 @@ def to_rgb(color_name):  # because anaconda2 seems stuck with Matplotlib 1.5 and
 
 def to_rgb_255(colorname):
     rgb = to_rgb(colorname)
-    return map(lambda x: int(x * 255), rgb)
+    return [int(x * 255) for x in rgb]
 
 def to_rgba_255(colorname, alpha = 255):
     rgb = to_rgb_255(colorname)
     return [rgb[0], rgb[1], rgb[2], alpha]
-
 
 
 def plot_lithologydata_slice_points_redo(df, 

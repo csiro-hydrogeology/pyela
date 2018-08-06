@@ -1,12 +1,15 @@
-ela 
+ela
 ========
 
 Python package for exploratory lithology analysis
 
-Analysing driller’s logs is tedious and repetitive task in many groundwater modelling projects. Automating the process of extracting useful information from driller's logs would allow spending less time on data management and more time on its interpretation.
+Analysing driller’s logs is a tedious and repetitive task in many groundwater modelling projects. Automating the process of extracting useful information from driller's logs allows spending less time on manual data wrangling, more time on its interpretation, and enhances the reproducibility of the analysis.
 
-This workflow combines natural language processing and supervised machine learning to pre-process and subsequently interpolate verbal descriptions of lithology, as they typically appear in driller's logs. 
+This packages combines features to: 
 
+    * perform natural language processing lithology descriptions in the logs, to detect primary and secondary lithologies
+    * apply supervised machine learning to interpolate lithologies across a 3D grid
+    * visualise interactively the 3D data 
 
 Docs
 ----

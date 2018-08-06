@@ -143,7 +143,7 @@ class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
         x_dem, y_dem, z_dem = dem_mesh
         vol_x, vol_y, vol_z, vol_s = vol_mesh
         bore_x, bore_y, bore_z, bore_s = bore_data
-        mlab.figure(size=(1200, 800))
+        f = mlab.figure(size=(1200, 800))
         p3d = mlab.points3d(bore_x, bore_y, bore_z, bore_s, colormap='spectral', scale_factor = points_scale_factor, scale_mode='none')
         self.set_litho_class_colormap_with_unclassified(get_colorscale_lut(p3d))
         mlab.outline()
@@ -159,6 +159,7 @@ class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
         # iso_surface.actor.property.color = (0.0, 1.0, 0.0)
         # iso_surface.actor.property.opacity = 0.0881
         # iso_surface.actor.property.representation = 'wireframe'
+        return f
 
     def view_overlay(self, litho_class_value, lithology_3d_array):
         litho_class_index = int(litho_class_value)
@@ -166,7 +167,7 @@ class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
         class_name = self.class_names[litho_class_index]
         s = extract_single_lithology_class_3d(lithology_3d_array, litho_class_value)
         vol_mesh = (self.xxx, self.yyy, self.zzz, s)
-        self.overlay_bore_classes(self.dem_mesh, vol_mesh, self.bore_data, vol_colorname, z_label='AHD x 50', points_scale_factor=self.POINTS_SCALE_FACTOR, title='Lithology class: ' + class_name)
+        return self.overlay_bore_classes(self.dem_mesh, vol_mesh, self.bore_data, vol_colorname, z_label='AHD x 50', points_scale_factor=self.POINTS_SCALE_FACTOR, title='Lithology class: ' + class_name)
 
 def get_colorscale_lut(vis_widget):
     # not sure this is valid for all mayavi things...

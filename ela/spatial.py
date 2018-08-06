@@ -161,8 +161,8 @@ def create_meshgrid(geo_pd, grid_res):
 
 def vstacked_points(xx, yy):
     g = (xx, yy)
-    m=map(np.ravel, g)
-    points=np.vstack(m)
+    m = [np.ravel(pt) for pt in g]
+    points = np.vstack(m)
     return points
 
 def surface_array(raster, x_min, y_min, x_max, y_max, grid_res):
