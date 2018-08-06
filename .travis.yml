@@ -10,6 +10,7 @@ before_install:
   - pip install coveralls
   - pip install pytest-cov
   - pip install pytest-mpl
+  - pip install cython
 
 install:
   - pip install -r requirements.txt

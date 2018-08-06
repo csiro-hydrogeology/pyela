@@ -1,6 +1,10 @@
 ela
 ========
 
+.. image:: https://img.shields.io/travis/jmp75/pyela.svg
+    :target: https://travis-ci.org/jmp75/pyela
+    :alt: Travis build status
+
 Python package for exploratory lithology analysis
 
 Analysing driller’s logs is a tedious and repetitive task in many groundwater modelling projects. Automating the process of extracting useful information from driller's logs allows spending less time on manual data wrangling, more time on its interpretation, and enhances the reproducibility of the analysis.
