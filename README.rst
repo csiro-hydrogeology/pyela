@@ -18,8 +18,7 @@ This packages combines features to:
 Docs
 ----
 
-* Placeholder
-
+* Placeholder for introductory material such as tutorials
 
 Dependencies
 ------------
@@ -28,7 +27,6 @@ Most are best installed with Anaconda, see **Install**, below.
 
 * `NumPy <http://www.numpy.org/>`_
 * `matplotlib <http://matplotlib.org/>`_
-
 
 Install
 -------
@@ -67,8 +65,8 @@ Development: running the bleeding edge
 
 To run the latest version of the code, you should be on the `develop` branch:
 
-    git clone https://github.com/jmp75/ela.git
-    cd ela
+    git clone https://github.com/jmp75/pyela.git
+    cd pyela
     git checkout develop
     
 You probably want to continue in your virtual environment (see above).

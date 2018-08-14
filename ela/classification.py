@@ -52,7 +52,7 @@ def lithologydata_slice_depth(df, slice_depth):
     df_slice=df.loc[(df[DEPTH_FROM_AHD_COL] >= slice_depth) & (df[DEPTH_TO_AHD_COL] <= slice_depth)]
     return df_slice
 
-def get_lithology_observations_for_depth(df, slice_depth, lithology_column_name = PRIMARY_LITHO_COL):
+def get_lithology_observations_for_depth(df, slice_depth, column_name ):
     '''
     Subset data frame with entries at a specified AHD coordinate, and with valid lithology information.
 
@@ -69,7 +69,7 @@ def get_lithology_observations_for_depth(df, slice_depth, lithology_column_name 
     :rtype: a (view of a) data frame
     '''
     df_slice=lithologydata_slice_depth(df, slice_depth)
-    df_1=df_slice[df_slice[lithology_column_name] != ""]
+    df_1=df_slice[np.isnan(df_slice[column_name]) == False]
     return df_1
 
 
@@ -84,14 +84,14 @@ def extract_bore_primary_litho_class_num(bore_log_df):
     zz_to = bore_log_df[DEPTH_TO_AHD_COL].values
     return xx, yy, zz_from, zz_to, ss
 
-def make_training_set(observations):
+def make_training_set(observations, column_name):
     X = observations.as_matrix(columns=[EASTING_COL, NORTHING_COL])
-    y = np.array(observations[PRIMARY_LITHO_NUM_COL])
+    y = np.array(observations[column_name])
     return (X, y)
 
-def get_knn_model(df, slice_depth, n_neighbours):
-    df_1 = get_lithology_observations_for_depth(df, slice_depth)
-    X, y = make_training_set(df_1)
+def get_knn_model(df, column_name, slice_depth, n_neighbours):
+    df_1 = get_lithology_observations_for_depth(df, slice_depth, column_name)
+    X, y = make_training_set(df_1, column_name)
     if n_neighbours > len(df_1):
         return None
     else:
@@ -122,7 +122,7 @@ def interpolate_over_meshgrid(predicting_algorithm, mesh_grid):
         predicted = predicted.reshape(xx.shape)
     return predicted
 
-def interpolate_lithologydata_slice_depth(df, slice_depth, n_neighbours, mesh_grid):
+def interpolate_lithologydata_slice_depth(df, column_name, slice_depth, n_neighbours, mesh_grid):
     '''
     Interpolate lithology data
 
@@ -142,10 +142,10 @@ def interpolate_lithologydata_slice_depth(df, slice_depth, n_neighbours, mesh_gr
     :rtype: numpy array
 
     '''
-    knn = get_knn_model(df, slice_depth, n_neighbours)
+    knn = get_knn_model(df, column_name, slice_depth, n_neighbours)
     return interpolate_over_meshgrid(knn, mesh_grid)
 
-def interpolate_lithologydata_slice_depth_bbox(df, slice_depth, n_neighbours, geo_pd, grid_res = 100):
+def interpolate_lithologydata_slice_depth_bbox(df, column_name, slice_depth, n_neighbours, geo_pd, grid_res = 100):
     '''
     Interpolate lithology data
 
@@ -169,12 +169,12 @@ def interpolate_lithologydata_slice_depth_bbox(df, slice_depth, n_neighbours, ge
 
     '''
     mesh_grid = create_meshgrid(geo_pd, grid_res)
-    return interpolate_lithologydata_slice_depth(df, slice_depth, n_neighbours, mesh_grid)
+    return interpolate_lithologydata_slice_depth(df, column_name, slice_depth, n_neighbours, mesh_grid)
 
 
-def class_probability_estimates_depth(df, slice_depth, n_neighbours, mesh_grid, func_training_set=None):
-    df_1 = get_lithology_observations_for_depth(df, slice_depth)
-    X, y = make_training_set(df_1)
+def class_probability_estimates_depth(df, column_name, slice_depth, n_neighbours, mesh_grid, func_training_set=None):
+    df_1 = get_lithology_observations_for_depth(df, slice_depth, column_name)
+    X, y = make_training_set(df_1, column_name)
     if not (func_training_set is None):
         X, y = func_training_set(X, y)
     knn = neighbors.KNeighborsClassifier(n_neighbours, weights = KNN_WEIGHTING).fit(X, y)
@@ -187,17 +187,17 @@ def class_probability_estimates_depth(df, slice_depth, n_neighbours, mesh_grid, 
         probs.append(p)
     return probs
 
-def class_probability_estimates_depth_bbox(df, slice_depth, n_neighbours, geo_pd, grid_res = 100, func_training_set=None):
-    xx, yy = create_meshgrid(geo_pd, grid_res)
-    return class_probability_estimates_depth(df, slice_depth, n_neighbours, mesh_grid, func_training_set)
+def class_probability_estimates_depth_bbox(df, column_name, slice_depth, n_neighbours, geo_pd, grid_res = 100, func_training_set=None):
+    mesh_grid = create_meshgrid(geo_pd, grid_res)
+    return class_probability_estimates_depth(df, column_name, slice_depth, n_neighbours, mesh_grid, func_training_set)
 
-def interpolate_volume(volume, df, z_ahd_coords, n_neighbours, mesh_grid):
+def interpolate_volume(volume, df, column_name, z_ahd_coords, n_neighbours, mesh_grid):
     dim_x,dim_y = mesh_grid[0].shape
     dim_z = len(z_ahd_coords)
     if volume.shape[0] != dim_x or volume.shape[1] != dim_y or volume.shape[2] != dim_z:
         raise Error("Incompatible dimensions in arguments")
     for index,ahd_height in enumerate(z_ahd_coords):
-        surface = interpolate_lithologydata_slice_depth(df, ahd_height, n_neighbours, mesh_grid)
+        surface = interpolate_lithologydata_slice_depth(df, column_name, ahd_height, n_neighbours, mesh_grid)
         volume[:,:,index]=surface
 
 

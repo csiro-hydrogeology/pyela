@@ -11,6 +11,25 @@ from ela.textproc import EASTING_COL, NORTHING_COL, DEPTH_FROM_AHD_COL, DEPTH_FR
 def create_colormap_lut(color_names):
     return np.array([np.array(to_rgba_255(c), dtype=np.uint8) for c in color_names])
 
+# Below a couple of attempts to programmatically custom plot attributes. Frustrating.
+
+def mlab_title(text):
+    t = mlab.title(text)
+    t.actor.width = 0.5
+    t.width = 0.5
+    t.actor.position2 = array([ 0.5,  1. ])
+    t.actor.position = array([ 0.25,  0.8 ])
+    t.actor.position = array([ 0.25,  0.8 ])
+    t.x_position = 0.25
+    t.actor.minimum_size = array([10, 10])
+    t.actor.position2 = array([ 0.5,  1. ])
+    t.actor.position = array([ 0.25,  0.9 ])
+    t.y_position = 0.9
+
+def mlab_label(label_func, text, label_format=''):
+    axis = label_func(text)
+    axis.axes.label_format = label_format
+
 #@mlab.draw?
 def set_custom_colormap(lut, color_names):
     '''
@@ -186,11 +205,10 @@ def prep_proba_for_contour(lithology_3d_proba):
     xp[:,:,-1] = other_value
     return xp
 
-
 @mlab.show
 def render_proba_contour(prob_volume, color_name, proba_level = 0.5, title=None):
     s = prep_proba_for_contour(prob_volume)
-    mlab.figure(size=(800, 800))
+    f = mlab.figure(size=(800, 800))
     mlab.contour3d(s, contours=[proba_level], color=to_rgb(color_name))
     mlab.outline()
     mlab.xlabel(EASTING_COL)
@@ -198,3 +216,4 @@ def render_proba_contour(prob_volume, color_name, proba_level = 0.5, title=None)
     mlab.zlabel('mAHD')
     if not title is None:
         mlab.title(title)
+    return f
