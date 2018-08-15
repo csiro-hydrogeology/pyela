@@ -73,13 +73,13 @@ def get_lithology_observations_for_depth(df, slice_depth, column_name ):
     return df_1
 
 
-def extract_bore_primary_litho_class_num(bore_log_df):
+def extract_bore_class_num(bore_log_df, column_name):
     '''
     Gets the columns easting, northing, primary lithology class number, AHD depth 'from' and 'to' from a bore data log
     '''
     xx = bore_log_df[EASTING_COL].values
     yy = bore_log_df[NORTHING_COL].values
-    ss = bore_log_df[PRIMARY_LITHO_NUM_COL].values
+    ss = bore_log_df[column_name].values
     zz_from = bore_log_df[DEPTH_FROM_AHD_COL].values
     zz_to = bore_log_df[DEPTH_TO_AHD_COL].values
     return xx, yy, zz_from, zz_to, ss
@@ -220,8 +220,7 @@ def pad_training_set_functor(classes):
     return pad_training_set
 
 
-
-def get_lithology_classes_probabilities(lithologies, shape, df, z_ahd_coords, n_neighbours, mesh_grid):
+def get_lithology_classes_probabilities(lithologies, shape, df, column_name, z_ahd_coords, n_neighbours, mesh_grid):
     dim_x,dim_y,dim_z = shape
     vol_template=np.empty((dim_x,dim_y,dim_z))
     classprob_3d_arrays=[vol_template.copy() for i in lithologies]
@@ -229,7 +228,7 @@ def get_lithology_classes_probabilities(lithologies, shape, df, z_ahd_coords, n_
     pad_training_set = pad_training_set_functor(lithologies)
     # iterate over all slices
     for z_index,ahd_height in enumerate(z_ahd_coords):
-        result=class_probability_estimates_depth(df, ahd_height, n_neighbours, mesh_grid, func_training_set = pad_training_set)
+        result=class_probability_estimates_depth(df, column_name, ahd_height, n_neighbours, mesh_grid, func_training_set = pad_training_set)
         for i in range(n_classes):
             classprob_3d_arrays[i][:,:,z_index]=result[i]
     return classprob_3d_arrays

@@ -2,7 +2,7 @@ import numpy as np
 
 from mayavi import mlab
 
-from ela.classification import extract_single_lithology_class_3d, extract_bore_primary_litho_class_num
+from ela.classification import extract_single_lithology_class_3d, extract_bore_class_num
 from ela.utils import flip
 from ela.visual import to_rgba_255, to_rgb, LithologiesClassesVisual
 from ela.textproc import EASTING_COL, NORTHING_COL, DEPTH_FROM_AHD_COL, DEPTH_FROM_COL, DEPTH_TO_AHD_COL, DEPTH_TO_COL, PRIMARY_LITHO_NUM_COL, GEOMETRY_COL
@@ -13,22 +13,18 @@ def create_colormap_lut(color_names):
 
 # Below a couple of attempts to programmatically custom plot attributes. Frustrating.
 
-def mlab_title(text):
-    t = mlab.title(text)
-    t.actor.width = 0.5
-    t.width = 0.5
-    t.actor.position2 = array([ 0.5,  1. ])
-    t.actor.position = array([ 0.25,  0.8 ])
-    t.actor.position = array([ 0.25,  0.8 ])
-    t.x_position = 0.25
-    t.actor.minimum_size = array([10, 10])
-    t.actor.position2 = array([ 0.5,  1. ])
-    t.actor.position = array([ 0.25,  0.9 ])
-    t.y_position = 0.9
+def mlab_title(text, height = 0.9, size= 0.5):
+    t = mlab.title(text=text, height=height, size=size)
+    # May customize later on further with eg.:
+    # t.width = 0.5
+    # t.x_position = 0.25
+    # t.y_position = 0.9
+    return t
 
 def mlab_label(label_func, text, label_format=''):
     axis = label_func(text)
     axis.axes.label_format = label_format
+    return axis
 
 #@mlab.draw?
 def set_custom_colormap(lut, color_names):
@@ -70,9 +66,9 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         y_cut=self.create_plane_cut(s, plane_orientation='y_axes')
         z_cut=self.create_plane_cut(s, plane_orientation='z_axes')
         mlab.outline()
-        mlab.xlabel(EASTING_COL)
-        mlab.ylabel(NORTHING_COL)
-        mlab.zlabel('mAHD')
+        mlab_label(mlab.xlabel, text=EASTING_COL)
+        mlab_label(mlab.ylabel, text=NORTHING_COL)
+        mlab_label(mlab.zlabel, text='mAHD')
         mlab.scalarbar(nb_labels=self.nb_labels())
 
     @mlab.show
@@ -85,10 +81,10 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         s = single_litho
         mlab.contour3d(s, contours=[class_value-0.5], color=to_rgb(color_name))
         mlab.outline()
-        mlab.xlabel(EASTING_COL)
-        mlab.ylabel(NORTHING_COL)
-        mlab.zlabel('mAHD')
-        mlab.title(class_name)
+        mlab_label(mlab.xlabel, text=EASTING_COL)
+        mlab_label(mlab.ylabel, text=NORTHING_COL)
+        mlab_label(mlab.zlabel, text='mAHD')
+        mlab_title(class_name)
 
     @mlab.show
     def render_proba_class(self, prob_volume, title):
@@ -100,10 +96,10 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         y_cut=self.create_plane_cut(s, plane_orientation='y_axes', colormap=colormap)
         z_cut=self.create_plane_cut(s, plane_orientation='z_axes', colormap=colormap)
         mlab.outline()
-        mlab.xlabel(EASTING_COL)
-        mlab.ylabel(NORTHING_COL)
-        mlab.zlabel('mAHD')
-        mlab.title(title)
+        mlab_label(mlab.xlabel, text=EASTING_COL)
+        mlab_label(mlab.ylabel, text=NORTHING_COL)
+        mlab_label(mlab.zlabel, text='mAHD')
+        mlab_title(title)
         mlab.scalarbar(nb_labels=11)
 
 def scale_z_bore_pos_points(x, y, z, s, z_scaling):
@@ -128,10 +124,10 @@ def scale_z_bore_pos_points(x, y, z, s, z_scaling):
 #######################
 
 class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
-    def __init__(self, class_names, color_names, missing_value_color_name, dem_array_data, z_coords, z_scaling, litho_df):
+    def __init__(self, class_names, color_names, missing_value_color_name, dem_array_data, z_coords, z_scaling, litho_df, column_name):
         super(LithologiesClassesOverlayVisual3d, self).__init__(class_names, color_names, missing_value_color_name)
         # 1D georeferenced data (bore primary litho data)
-        x, y, z_from, z_to, s = extract_bore_primary_litho_class_num(litho_df)
+        x, y, z_from, z_to, s = extract_bore_class_num(litho_df, column_name)
         self.bore_data = scale_z_bore_pos_points(x, y, z_to, s, z_scaling)
         # 2d data: DEM
         xg, yg = dem_array_data['mesh_xy']
@@ -156,6 +152,7 @@ class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
         for zi in z_coords:
             self.zzz[:,:,zi]= zi * z_scaling
         self.POINTS_SCALE_FACTOR = 150
+        self.title_prefix = 'Lithology class: ' 
 
     @mlab.show
     def overlay_bore_classes(self, dem_mesh, vol_mesh, bore_data, vol_colorname, z_label='AHD x 50', points_scale_factor=150.0, title=None):
@@ -166,15 +163,15 @@ class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
         p3d = mlab.points3d(bore_x, bore_y, bore_z, bore_s, colormap='spectral', scale_factor = points_scale_factor, scale_mode='none')
         self.set_litho_class_colormap_with_unclassified(get_colorscale_lut(p3d))
         mlab.outline()
-        mlab.xlabel(EASTING_COL)
-        mlab.ylabel(NORTHING_COL)
-        mlab.zlabel(z_label)
+        mlab_label(mlab.xlabel, text=EASTING_COL)
+        mlab_label(mlab.ylabel, text=NORTHING_COL)
+        mlab_label(mlab.zlabel, text=z_label)
         surface = mlab.surf(x_dem, y_dem, z_dem, colormap='terrain')
         surface.enable_contours = True
         surface.contour.number_of_contours = 20
         iso_surface = mlab.contour3d(vol_x, vol_y, vol_z, vol_s, color=to_rgb(vol_colorname))
         if not title is None:
-            mlab.title(title)
+            mlab_title(title)
         # iso_surface.actor.property.color = (0.0, 1.0, 0.0)
         # iso_surface.actor.property.opacity = 0.0881
         # iso_surface.actor.property.representation = 'wireframe'
@@ -186,7 +183,7 @@ class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
         class_name = self.class_names[litho_class_index]
         s = extract_single_lithology_class_3d(lithology_3d_array, litho_class_value)
         vol_mesh = (self.xxx, self.yyy, self.zzz, s)
-        return self.overlay_bore_classes(self.dem_mesh, vol_mesh, self.bore_data, vol_colorname, z_label='AHD x 50', points_scale_factor=self.POINTS_SCALE_FACTOR, title='Lithology class: ' + class_name)
+        return self.overlay_bore_classes(self.dem_mesh, vol_mesh, self.bore_data, vol_colorname, z_label='AHD x 50', points_scale_factor=self.POINTS_SCALE_FACTOR, title=self.title_prefix + class_name)
 
 def get_colorscale_lut(vis_widget):
     # not sure this is valid for all mayavi things...
@@ -211,9 +208,9 @@ def render_proba_contour(prob_volume, color_name, proba_level = 0.5, title=None)
     f = mlab.figure(size=(800, 800))
     mlab.contour3d(s, contours=[proba_level], color=to_rgb(color_name))
     mlab.outline()
-    mlab.xlabel(EASTING_COL)
-    mlab.ylabel(NORTHING_COL)
-    mlab.zlabel('mAHD')
+    mlab_label(mlab.xlabel, text=EASTING_COL)
+    mlab_label(mlab.ylabel, text=NORTHING_COL)
+    mlab_label(mlab.zlabel, text='mAHD')
     if not title is None:
-        mlab.title(title)
+        mlab_title(title)
     return f
