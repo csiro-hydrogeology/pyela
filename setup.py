@@ -8,9 +8,9 @@ from setuptools import setup
 import re
 # To use a consistent encoding
 from codecs import open
-from os import path
+import os
 
-here = path.abspath(path.dirname(__file__))
+here = os.path.abspath(os.path.dirname(__file__))
 
 verstr = 'unknown'
 VERSIONFILE = "ela/_version.py"
@@ -23,10 +23,21 @@ if mo:
 else:
     raise RuntimeError("Unable to find version string in %s." % (VERSIONFILE,))
 
-# Get the long description from the README file
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
-    long_description = f.read()
 
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+    long_description = long_description.replace("\r","") # Do not forget this line
+except:
+    print("Pandoc not found. Long_description conversion failure.")
+    # Get the long description from the README file
+    with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
+        long_description = f.read()
+
+
+
+# with open(os.path.join(os.path.dirname(__file__), "requirements.txt"), "r") as f:
+#     REQUIREMENTS = f.read().splitlines()
 
 REQUIREMENTS = ['pandas',
                 'geopandas',
@@ -70,10 +81,14 @@ setup(
     keywords='lithology analysis',
     packages=['ela'],
     install_requires=REQUIREMENTS,
+    extras_require={
+        ':python_version >= "3.6"': [
+            'PyQt5',
+        ]
     # extras_require={  # Optional
     #     'dev': ['check-manifest'],
     #     'test': ['coverage'],
-    # },
+    },
 
     # If there are data files included in your packages that need to be
     # installed, specify them here.
