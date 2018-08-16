@@ -12,6 +12,7 @@ nltk>=3.2.5
 pandas>=0.23.1
 # PyQt5 is required for mayavi viz at runtime as a backend but is only available for Python3, I think. Not sure anymore how things worked out on Win+Py2.7.
 # PyQt5>=5.10.1
+PyQt5>=5.10.1; python_version >= '3.5'
 rasterio>=0.36.0
 scikit-learn>=0.19.1
 scipy>=1.1.0
