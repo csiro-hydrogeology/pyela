@@ -13,8 +13,16 @@ before_install:
   - pip install pytest-mpl
   - pip install cython
   - sudo apt-get -qq update
-  - sudo apt-get install -y libproj-dev proj-bin proj-data   # for cartopy
-
+  # trusty does not seem to have a recent enough proj4; if using:
+  # - sudo apt-get install -y libproj-dev proj-bin proj-data   # for cartopy
+  # then:
+  # Proj4 version 4.8.0 is installed, but cartopy requires at least version 4.9.0.
+  # So trying from inference from https://github.com/laszukdawid/MapViz/blob/master/.travis.yml
+  - sudo apt-get install -y libc6
+  - wget http://es.archive.ubuntu.com/ubuntu/pool/universe/p/proj/libproj9_4.9.2-2_amd64.deb 
+  - sudo dpkg -i libproj9_4.9.2-2_amd64.deb 
+  - wget http://es.archive.ubuntu.com/ubuntu/pool/universe/p/proj/libproj-dev_4.9.2-2_amd64.deb
+  - sudo dpkg -i libproj-dev_4.9.2-2_amd64.deb
 install:
   - pip install -r requirements.txt
 
