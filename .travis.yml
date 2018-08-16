@@ -8,10 +8,6 @@ python:
   # - 3.6
 
 before_install:
-  - pip install coveralls
-  - pip install pytest-cov
-  - pip install pytest-mpl
-  - pip install cython
   - sudo apt-get -qq update
   # trusty does not seem to have a recent enough proj4; if using:
   # - sudo apt-get install -y libproj-dev proj-bin proj-data   # for cartopy
@@ -19,14 +15,20 @@ before_install:
   # Proj4 version 4.8.0 is installed, but cartopy requires at least version 4.9.0.
   # So trying from inference from https://github.com/laszukdawid/MapViz/blob/master/.travis.yml
   - sudo apt-get install -y libc6  
-  - wget http://es.archive.ubuntu.com/ubuntu/pool/universe/p/proj/proj-data_4.9.3-2_all.deb
+  - wget http://en.archive.ubuntu.com/ubuntu/pool/universe/p/proj/proj-data_4.9.3-2_all.deb
   - sudo dpkg -i proj-data_4.9.3-2_all.deb
-  - wget http://es.archive.ubuntu.com/ubuntu/pool/universe/p/proj/proj-bin_4.9.3-2_amd64.deb
+  - wget http://en.archive.ubuntu.com/ubuntu/pool/universe/p/proj/libproj12_4.9.3-2_amd64.deb
+  - sudo dpkg -i libproj12_4.9.3-2_amd64.deb
+  - wget http://en.archive.ubuntu.com/ubuntu/pool/universe/p/proj/proj-bin_4.9.3-2_amd64.deb
   - sudo dpkg -i proj-bin_4.9.3-2_amd64.deb
-  - wget http://es.archive.ubuntu.com/ubuntu/pool/universe/p/proj/libproj9_4.9.3-2_amd64.deb 
+  - wget http://en.archive.ubuntu.com/ubuntu/pool/universe/p/proj/libproj9_4.9.3-2_amd64.deb 
   - sudo dpkg -i libproj9_4.9.3-2_amd64.deb
-  - wget http://es.archive.ubuntu.com/ubuntu/pool/universe/p/proj/libproj-dev_4.9.3-2_amd64.deb
+  - wget http://en.archive.ubuntu.com/ubuntu/pool/universe/p/proj/libproj-dev_4.9.3-2_amd64.deb
   - sudo dpkg -i libproj-dev_4.9.3-2_amd64.deb
+  - pip install coveralls
+  - pip install pytest-cov
+  - pip install pytest-mpl
+  - pip install cython
 install:
   - pip install -r requirements.txt
 
