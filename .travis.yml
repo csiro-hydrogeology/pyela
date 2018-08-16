@@ -1,17 +1,19 @@
+dist: trusty
 # sudo: false
 
 language: python
 
 python:
   - 2.7
-  - 3.6
+  # - 3.6
 
 before_install:
-  - sudo apt-get install libproj-dev
   - pip install coveralls
   - pip install pytest-cov
   - pip install pytest-mpl
   - pip install cython
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libproj-dev proj-bin proj-data   # for cartopy
 
 install:
   - pip install -r requirements.txt
