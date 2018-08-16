@@ -16,5 +16,6 @@ rasterio>=0.36.0
 scikit-learn>=0.19.1
 scipy>=1.1.0
 # striplog
--e git+git@github.com:jmp75/striplog.git@7c6ae22a130ad2ba3d351c31574778ec121571d3#egg=striplog
+-e https://github.com/jmp75/striplog/archive/devel.zip
+# -e git+git@github.com:jmp75/striplog.git@7c6ae22a130ad2ba3d351c31574778ec121571d3#egg=striplog
 vtk>=8.1.0
