@@ -21,8 +21,8 @@ before_install:
   - sudo dpkg -i libproj12_4.9.3-2_amd64.deb
   - wget http://en.archive.ubuntu.com/ubuntu/pool/universe/p/proj/proj-bin_4.9.3-2_amd64.deb
   - sudo dpkg -i proj-bin_4.9.3-2_amd64.deb
-  - wget http://en.archive.ubuntu.com/ubuntu/pool/universe/p/proj/libproj9_4.9.3-2_amd64.deb 
-  - sudo dpkg -i libproj9_4.9.3-2_amd64.deb
+  - wget http://en.archive.ubuntu.com/ubuntu/pool/universe/p/proj/libproj9_4.9.2-2_amd64.deb 
+  - sudo dpkg -i libproj9_4.9.2-2_amd64.deb
   - wget http://en.archive.ubuntu.com/ubuntu/pool/universe/p/proj/libproj-dev_4.9.3-2_amd64.deb
   - sudo dpkg -i libproj-dev_4.9.3-2_amd64.deb
   - pip install coveralls
