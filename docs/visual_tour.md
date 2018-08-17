@@ -24,6 +24,8 @@ For a given conductivity class, it is possible with 'ela' to get a field of prob
 ![Hydraulic conductivity class - Overlay bore data, terrain and interpolated class](https://drive.google.com/uc?id=1cvdUaQ6bc6AmePNaAG-OIieboMazmvvf "Hydraulic conductivity class - Overlay bore data, terrain and interpolated class")
 <!-- NOTE: see https://about.gitlab.com/handbook/product/technical-writing/markdown-guide/#display-other-videos -->
 
+Below is an embedded video of this overlay visualisation; you may click on [this link](https://drive.google.com/file/d/1pWsqPYdb9s_u7-y4wl6RqH2BJcxYH76C/preview) if the embeded figure does not render in your browser.
+
 <!-- blank line -->
 <figure class="video_container">
   <iframe src="https://drive.google.com/file/d/1pWsqPYdb9s_u7-y4wl6RqH2BJcxYH76C/preview" frameborder="0" allowfullscreen="true" width="1200" height="757"> </iframe>
@@ -36,4 +38,7 @@ Part of ela is about the extraction of lithology terms from bore data. It has fa
 
 ![Word frequency in lithology descriptions - terms derived from 'clay'](https://drive.google.com/uc?id=1dookOYjLNUiy9RafRGY2Hlw_W-kvqKCG "Hydraulic conductivity class - Overlay bore data, terrain and interpolated class")
 
-Placeholder for a visual with cartopy
+## TODO
+
+* Placeholder for a visual with cartopy
+* wordcloud from lithology descriptions?

@@ -59,7 +59,7 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         return cut
 
     @mlab.show
-    def render_classes_planar(self, volume):
+    def render_classes_planar(self, volume, title):
         mlab.figure(size=(800, 800))
         s = volume
         x_cut=self.create_plane_cut(s, plane_orientation='x_axes')
@@ -70,6 +70,7 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         mlab_label(mlab.ylabel, text=NORTHING_COL)
         mlab_label(mlab.zlabel, text='mAHD')
         mlab.scalarbar(nb_labels=self.nb_labels())
+        mlab_title(title)
 
     @mlab.show
     def render_class(self, volume_lithologies, class_value):
