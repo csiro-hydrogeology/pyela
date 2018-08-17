@@ -1,7 +1,12 @@
-Cartopy>=0.16.0
-numpy>=1.14.3
-geopandas>=0.3.0
+# ImportError: Cython 0.15.1+ is required to install cartopy.
+cython>=0.15.1
+numpy>=1.6   # NumPy 1.6+ is required to install cartopy
+pandas>=0.23.1
+scipy>=1.1.0
+scikit-learn>=0.19.1
 matplotlib>=2.2.2
+geopandas>=0.3.0
+Cartopy>=0.16.0
 # ipykernel>=4.8.2
 # ipywidgets>=7.2.1
 # jupyterlab>=0.32.1
@@ -9,11 +14,12 @@ matplotlib>=2.2.2
 # jupyterlab-launcher>=0.10.5
 mayavi>=4.5.0
 nltk>=3.2.5
-pandas>=0.23.1
-PyQt5>=5.10.1
+# PyQt5 is required for mayavi viz at runtime as a backend but is only available for Python3, I think. Not sure anymore how things worked out on Win+Py2.7.
+# PyQt5>=5.10.1
+PyQt5>=5.10.1; python_version >= '3.5'
 rasterio>=0.36.0
-scikit-learn>=0.19.1
-scipy>=1.1.0
 # striplog
--e git+git@github.com:jmp75/striplog.git@7c6ae22a130ad2ba3d351c31574778ec121571d3#egg=striplog
+# https://github.com/jmp75/striplog/archive/devel.zip
+# -e git+git@github.com:jmp75/striplog.git@7c6ae22a130ad2ba3d351c31574778ec121571d3#egg=striplog
+-e git+https://github.com/jmp75/striplog@master#egg=striplog
 vtk>=8.1.0
