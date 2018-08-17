@@ -11,13 +11,13 @@ The most likely conductivity class over a 3D gridded volume can be visualised pr
 
 ![Hydraulic conductivity class - planar transect](https://drive.google.com/uc?id=10d4nTykp9BwBl1jt7RQ1m9PrlsrH_YLm "Hydraulic conductivity class - planar transect")
 
-![Hydraulic conductivity class - volume rendering of the most likely class](https://drive.google.com/uc?id=1gEQuBSqtSB4O4q_xNruw6RgVViEoa7Wn "Hydraulic conductivity class - volume rendering of the most likely class")
+![Hydraulic conductivity class - volume rendering of the most likely class](https://drive.google.com/uc?id=1SUnAK_OVX4EEPyCHkSxkn1i5b4-t6cFi "Hydraulic conductivity class - volume rendering of the most likely class")
 
 For a given conductivity class, it is possible with 'ela' to get a field of probability, resulting from the supervised machine learning with 'scikit'. Again volumetric planar transect and volumetric rendering.
 
 ![Hydraulic conductivity class - planar transect of probabilities](https://drive.google.com/uc?id=1C0gmxvIto2g3RqFByBxXYbh5R5ineHI_ "Hydraulic conductivity class - planar transect of probabilities")
 
-![Hydraulic conductivity class - Isosurface of a probability field for a class](https://drive.google.com/uc?id=1SUnAK_OVX4EEPyCHkSxkn1i5b4-t6cFi "Hydraulic conductivity class - Isosurface of a probability field for a class")
+![Hydraulic conductivity class - Isosurface of a probability field for a class](https://drive.google.com/uc?id=1gEQuBSqtSB4O4q_xNruw6RgVViEoa7Wn "Hydraulic conductivity class - Isosurface of a probability field for a class")
 
 'ela' has custom facilities built on top of mayavi to overlay geometrically heterogeneous but spatially related data: elevation raster, volume of classes, and information from the bore data:
 
