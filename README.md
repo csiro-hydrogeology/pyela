@@ -19,6 +19,11 @@ This packages combines features to:
 * apply supervised machine learning to interpolate lithologies across a 3D grid
 * visualise interactively the 3D data
 
+## Related Geoscience packages
+
+'ela' aims to complement other Python packages for geoscience, in particular for handling bore data . It depends on the package ['striplog'](https://github.com/agile-geoscience/striplog) and is likely to depend on ['lasio'](https://github.com/kinverarity1/lasio) in the future.
+
+
 ## Documentation
 
 A [quick tour of a workflow with pyela](https://localhost:80)
