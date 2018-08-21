@@ -5,8 +5,7 @@ import datetime as dt
 import sys
 from datetime import datetime
 
-ela_pkg_dir = os.path.join(os.path.dirname(__file__),'..')
-pkg_dir = os.path.join(ela_pkg_dir,'..')
+pkg_dir = os.path.join(os.path.dirname(__file__),'..')
 
 sys.path.append(pkg_dir)
 
@@ -99,6 +98,43 @@ def test_burn_volume():
     assert np.isnan(burnt[2,2,2]) 
     assert np.isnan(burnt[2,2,3]) 
 
+def test_slice_volume():
+    dims = (3,4,5)
+    dim_x,dim_y,dim_z = dims
+    x = np.arange(0.0, dim_x*dim_y*dim_z, 1.0)
+    test_vol = np.reshape(x, dims)
+    dem = np.empty((3, 4))
+    z_index_for_ahd = z_index_for_ahd_functor(b=+1) # z = 0 is datum height -1, z = 4 is datum height 3
+    dem[0,0] = -2.0
+    dem[0,1] = +5.0
+    dem[0,2] = -1.0
+    dem[0,3] = -1.0
+    dem[1,0] = -1.0
+    dem[1,1] = -1.0
+    dem[1,2] = -1.0
+    dem[1,3] = -1.0
+    dem[2,0] = -1.0
+    dem[2,1] = -1.0
+    dem[2,2] = np.nan
+    dem[2,3] = -1.0
+
+    def f(x, y):
+        return drill_volume(test_vol, dem, z_index_for_ahd, x, y)
+
+    assert np.isnan(f(0,0))
+    assert np.isnan(f(0,1))
+    assert f(0,2) == test_vol[0,2,0]
+    assert f(0,3) == test_vol[0,3,0]
+    assert f(1,0) == test_vol[1,0,0]
+    assert f(1,1) == test_vol[1,1,0]
+    assert f(1,2) == test_vol[1,2,0]
+    assert f(1,3) == test_vol[1,3,0]
+    assert f(2,0) == test_vol[2,0,0]
+    assert f(2,1) == test_vol[2,1,0]
+    assert np.isnan(f(2,2))
+    assert f(2,3) == test_vol[2,3,0]
+
+test_slice_volume()
 #test_interpolate_slice()
 #test_burn_volume()
 #test_height_coordinate_functor()

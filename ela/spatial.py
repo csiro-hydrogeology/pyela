@@ -84,6 +84,32 @@ def burn_volume_func(func_below, func_above, volume, surface_raster, height_to_z
                         zh_nan = min(z_index_max, max(0.0, zh_nan))
                     func_above(volume, x, y, zh_nan)
 
+def drill_volume(volume, slice_surface, height_to_z, x, y):
+    dim_z=volume.shape[2]
+    z_index_max = dim_z-1
+    slice_height = slice_surface[x,y]
+    def to_int(x):  # may be custom later
+        return int(np.floor(x))
+    if np.isnan(slice_height):
+        return np.nan
+    else:
+        z_height = to_int(height_to_z(slice_height))
+        if z_height < 0:
+            return np.nan
+        elif z_height > z_index_max:
+            return np.nan
+        else:
+            z = z_height
+            return volume[x,y,z]
+
+def slice_volume(volume, slice_surface, height_to_z):
+    dim_x,dim_y,dim_z=volume.shape
+    # TODO if surface_raster.shape[0] != dim_x or surface_raster.shape[1] != dim_y 
+    result = np.empty((dim_x,dim_y))
+    for x in np.arange(0,dim_x,1):
+        for y in np.arange(0,dim_y,1):
+            result[x,y] = drill_volume(volume, slice_surface, height_to_z, x, y)
+    return result
 
 def burn_volume(volume, surface_raster, height_to_z, below=False, ignore_nan=False, inclusive=False):
     '''
