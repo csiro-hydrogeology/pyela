@@ -72,7 +72,6 @@ def get_lithology_observations_for_depth(df, slice_depth, column_name ):
     df_1=df_slice[np.isnan(df_slice[column_name]) == False]
     return df_1
 
-
 def extract_bore_class_num(bore_log_df, column_name):
     '''
     Gets the columns easting, northing, primary lithology class number, AHD depth 'from' and 'to' from a bore data log
@@ -85,7 +84,8 @@ def extract_bore_class_num(bore_log_df, column_name):
     return xx, yy, zz_from, zz_to, ss
 
 def make_training_set(observations, column_name):
-    X = observations.as_matrix(columns=[EASTING_COL, NORTHING_COL])
+    # X = observations.as_matrix(columns=[EASTING_COL, NORTHING_COL])
+    X = observations[[EASTING_COL, NORTHING_COL]].values
     y = np.array(observations[column_name])
     return (X, y)
 

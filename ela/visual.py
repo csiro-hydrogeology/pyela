@@ -176,7 +176,8 @@ def plot_lithologydata_slice_depth(df, slice_depth, n_neighbours, extent, data_p
     plt.title('KNN facies classification at %s m AHD (neighbours=%s)'%(slice_depth,n_neighbours), fontsize=20, weight='bold')
 
     df_1=df_slice[df_slice.Lithology_1 != ""]
-    X = df_1.as_matrix(columns=[EASTING_COL, NORTHING_COL])
+    # X = df_1.as_matrix(columns=[EASTING_COL, NORTHING_COL])
+    X = df_1[[EASTING_COL, NORTHING_COL]].values
     y = np.array(df_1[PRIMARY_LITHO_NUM_COL])
     knn = neighbors.KNeighborsClassifier(n_neighbours, weights = KNN_WEIGHTING).fit(X, y)
     grid_res=100

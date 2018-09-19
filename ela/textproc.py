@@ -17,27 +17,27 @@ def remove_punctuations(text):
     return text
 
 
-LITHO_DESC_COL = 'Lithological Description'
+LITHO_DESC_COL = u'Lithological Description'
 
-PRIMARY_LITHO_COL = 'Lithology_1'
-SECONDARY_LITHO_COL = 'Lithology_2'
-PRIMARY_LITHO_NUM_COL = 'Lithology_1_num'
-SECONDARY_LITHO_NUM_COL = 'Lithology_2_num'
+PRIMARY_LITHO_COL = u'Lithology_1'
+SECONDARY_LITHO_COL = u'Lithology_2'
+PRIMARY_LITHO_NUM_COL = u'Lithology_1_num'
+SECONDARY_LITHO_NUM_COL = u'Lithology_2_num'
 
-DEPTH_FROM_COL = 'Depth From (m)'
-DEPTH_TO_COL = 'Depth To (m)'
-DEPTH_FROM_AHD_COL = 'Depth From (AHD)'
-DEPTH_TO_AHD_COL = 'Depth To (AHD)'
+DEPTH_FROM_COL = u'Depth From (m)'
+DEPTH_TO_COL = u'Depth To (m)'
+DEPTH_FROM_AHD_COL = u'Depth From (AHD)'
+DEPTH_TO_AHD_COL = u'Depth To (AHD)'
 
-EASTING_COL = 'Easting'
-NORTHING_COL = 'Northing'
+EASTING_COL = u'Easting'
+NORTHING_COL = u'Northing'
 
-DISTANCE_COL = 'distance'
-GEOMETRY_COL = 'geometry'
+DISTANCE_COL = u'distance'
+GEOMETRY_COL = u'geometry'
 
-DEM_ELEVATION_COL = 'DEM_elevation'
+DEM_ELEVATION_COL = u'DEM_elevation'
 
-WIN_SITE_ID_COL = 'WIN Site ID'
+WIN_SITE_ID_COL = u'WIN Site ID'
 
 
 
@@ -143,7 +143,7 @@ def v_split_with_term(xlist):
 
 def clean_lithology_descriptions(description_series, lex):
     expanded_descs = description_series.apply(lex.expand_abbreviations)
-    y = expanded_descs.as_matrix()    
+    y = expanded_descs.values
     y = v_lower(y)
     y = v_split_with_term(y)
     return y
