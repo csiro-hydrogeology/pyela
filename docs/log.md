@@ -1,5 +1,59 @@
 # Log
 
+## 2018-09-16
+
+Idea: consider using "binder" for interactive tut. See [spaCy doc](https://spacy.io/)
+
+```cmd
+call C:\Users\XXXYYY\AppData\Local\Continuum\anaconda3\Scripts\activate.bat
+set my_env_name=ELA3
+conda create --name %my_env_name% python=3.6
+REM later : conda install --name %my_env_name% xarray netCDF4 rasterio cartopy jupyterlab ipywidgets jupyter geopandas pandas scikit-learn scikit-image matplotlib python=3.6
+conda install --name %my_env_name% jupyterlab ipywidgets jupyter pandas scikit-learn matplotlib python=3.6
+conda activate %my_env_name%
+conda install --name %my_env_name% spaCy
+python -m ipykernel install --user --name %my_env_name% --display-name "Python3 (ELA)"
+python -m spacy download en
+```
+
+```cmd
+py3env.bat
+activate ELA3
+python -m spacy download en
+```
+
+```txt
+python -m spacy download en
+Installing collected packages: en-core-web-sm
+  Running setup.py install for en-core-web-sm ... done
+Successfully installed en-core-web-sm-2.0.0
+You are using pip version 10.0.1, however version 18.0 is available.
+You should consider upgrading via the 'python -m pip install --upgrade pip' command.
+
+    Error: Couldn't link model to 'en'
+    Creating a symlink in spacy/data failed. Make sure you have the required
+    permissions and try re-running the command as admin, or use a
+    virtualenv. You can still import the model as a module and call its
+    load() method, or create the symlink manually.
+```
+
+```cmd
+cd C:\src\github_jm\pyela\trials
+py3env.bat
+activate ELA3
+jupyter-lab
+```
+
+`nlp = spacy.load('en_core_web_sm')` or `nlp = spacy.load('en')` still fail.
+
+### Troubleshoot
+
+TIL:
+
+If you launch a kernel from jupyter but you do not get the right environment, you may have registered the kernel from the incorrect env.. Check e.g. C:\Users\XXXYYY\AppData\Roaming\jupyter\kernels\ela3\kernel.json:
+
+`"C:\\Users\\XXXYYY\\AppData\\Local\\Continuum\\anaconda3\\python.exe"` where you would need `"C:\\Users\\XXXYYY\\AppData\\Local\\Continuum\\anaconda3\\envs\\ELA3\\python.exe"`
+
 ## 2018-08-16
 
 TIL, and a rant.
@@ -7,7 +61,7 @@ Trying to document the installation of pyela using conda, creating a supposedly 
 
 ```python
 >>> sys.path
-['', '/home/per202/anaconda3/envs/ELA_TEST/lib/python36.zip', '/home/per202/anaconda3/envs/ELA_TEST/lib/python3.6', '/home/per202/anaconda3/envs/ELA_TEST/lib/python3.6/lib-dynload', '/home/per202/.local/lib/python3.6/site-packages', '/home/per202/src/github_jm/spotpy/build/lib', '/home/per202/src/github_jm/striplog', '/home/per202/anaconda3/envs/ELA/lib/python3.6/site-packages/python_dateutil-2.7.3-py3.6.egg', '/home/per202/anaconda3/envs/ELA/lib/python3.6/site-packages/cycler-0.10.0-py3.6.egg', '/home/per202/anaconda3/envs/ELA/lib/python3.6/site-packages/affine-2.2.1-py3.6.egg', '/home/per202/anaconda3/envs/ELA/lib/python3.6/site-packages/munch-2.3.2-py3.6.egg', '/home/per202/anaconda3/envs/ELA/lib/python3.6/site-packages', '/home/per202/anaconda3/envs/ELA_TEST/lib/python3.6/site-packages']
+['', '/home/XXXYYY/anaconda3/envs/ELA_TEST/lib/python36.zip', '/home/XXXYYY/anaconda3/envs/ELA_TEST/lib/python3.6', '/home/XXXYYY/anaconda3/envs/ELA_TEST/lib/python3.6/lib-dynload', '/home/XXXYYY/.local/lib/python3.6/site-packages', '/home/XXXYYY/src/github_jm/spotpy/build/lib', '/home/XXXYYY/src/github_jm/striplog', '/home/XXXYYY/anaconda3/envs/ELA/lib/python3.6/site-packages/python_dateutil-2.7.3-py3.6.egg', '/home/XXXYYY/anaconda3/envs/ELA/lib/python3.6/site-packages/cycler-0.10.0-py3.6.egg', '/home/XXXYYY/anaconda3/envs/ELA/lib/python3.6/site-packages/affine-2.2.1-py3.6.egg', '/home/XXXYYY/anaconda3/envs/ELA/lib/python3.6/site-packages/munch-2.3.2-py3.6.egg', '/home/XXXYYY/anaconda3/envs/ELA/lib/python3.6/site-packages', '/home/XXXYYY/anaconda3/envs/ELA_TEST/lib/python3.6/site-packages']
 >>>
 ```
 
