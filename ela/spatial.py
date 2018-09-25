@@ -51,6 +51,26 @@ def z_index_for_ahd_functor(a=1, b=50):
         return a * ahd + b
     return z_index_for_ahd
 
+def average_slices(slices):
+    """Gets the average values over numeric slices
+    
+    Args:
+        slices (list of 2D np arrays): slices to average
+    
+    """
+
+    # TODO there are ways to make this more efficient, e.g. if we get a volume instead of a list of slices
+    # my_volume
+    # my_sub_volume = my_volume[:,:,from:to:by] or something like that
+    # the_average = np.average(my_sub_volume, axis=2).shape
+    # for now:
+    if len(slices) < 1:
+        raise ZeroDivisionError("There must be at least one slice to average over")
+    summed = np.empty(slices[0].shape)
+    summed = 0.0
+    for i in range(len(slices)):
+        summed = summed + slices[i]
+    return summed / len(slices)
 
 
 def burn_volume_func(func_below, func_above, volume, surface_raster, height_to_z, below=False, ignore_nan=False, inclusive=False):
