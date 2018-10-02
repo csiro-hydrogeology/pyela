@@ -4,8 +4,8 @@
 
 ![status](https://img.shields.io/badge/status-alpha-orange.svg)
 [![license](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/jmp75/pyela/blob/devel/LICENSE.txt)
-[![build](https://img.shields.io/travis/jmp75/pyela.svg?branch=devel)](https://travis-ci.org/jmp75/pyela)
-[![coverage](https://coveralls.io/repos/github/jmp75/pyela/badge.svg?branch=devel)](https://coveralls.io/github/jmp75/pyela?branch=devel)
+[![build](https://img.shields.io/travis/jmp75/pyela.svg?branch=master)](https://travis-ci.org/jmp75/pyela)
+[![coverage](https://coveralls.io/repos/github/jmp75/pyela/badge.svg?branch=master)](https://coveralls.io/github/jmp75/pyela?branch=master)
 
 <!-- [![Docker Build](https://img.shields.io/docker/build/kinverarity/ela.svg)](https://hub.docker.com/r/kinverarity/ela/)
 [![Build status](https://ci.appveyor.com/api/projects/status/csr7bg8urkbtbq4n?svg=true)](https://ci.appveyor.com/project/kinverarity1/ela)
@@ -24,25 +24,17 @@ This packages combines features to:
 * apply supervised machine learning to interpolate lithologies across a 3D grid
 * visualise interactively the 3D data
 
+## License
+
+MIT (see [License.txt](./LICENSE.txt))
+
 ## Documentation
 
 Get a [quick tour of the visualisation part of 'ela'](./docs/visual_tour.md)
 
 _Placeholder section for other introductory material such as tutorials_
+
 <!-- See here for the [complete ela package documentation](https://ela.readthedocs.io/en/latest/). -->
-
-## Related Geoscience packages
-
-'ela' aims to complement other Python packages for geoscience, in particular for handling bore data . It depends on the package ['striplog'](https://github.com/agile-geoscience/striplog) and is likely to depend on ['lasio'](https://github.com/kinverarity1/lasio) in the future.
-
-
-<!-- Draft Notes
------------
-``conda install coveralls`` then ``conda install pytest-cov pytest-mpl``: this downgrades numpy a tad. Why? Trying ``conda update numpy`` but even odder outcome -->
-
-## Known issues
-
-As of 2018-08, using mayavi 4.6 on python 3.6 is [buggy, a VTK issue it seems](https://github.com/enthought/mayavi/issues/656). Python 2.7 with mayavi 4.5 via Anaconda2 is known to work.
 
 ## Installation
 
@@ -112,9 +104,16 @@ For Python 2.7.x pyqt5 is not available:
 conda create --name  ${my_env_name} python=2.7 mayavi rasterio cartopy geopandas pandas nltk scikit-learn scikit-image matplotlib vtk
 ```
 
-## License
+## Related Geoscience packages
 
-MIT
+'ela' aims to complement other Python packages for geoscience, in particular for handling bore data . It depends on the package ['striplog'](https://github.com/agile-geoscience/striplog) and is likely to depend on ['lasio'](https://github.com/kinverarity1/lasio) in the future.
+
+<!-- Draft Notes-----------
+``conda install coveralls`` then ``conda install pytest-cov pytest-mpl``: this downgrades numpy a tad. Why? Trying ``conda update numpy`` but even odder outcome -->
+
+## Known issues
+
+As of 2018-08, using mayavi 4.6 on python 3.6 is [buggy, a VTK issue it seems](https://github.com/enthought/mayavi/issues/656). Python 2.7 with mayavi 4.5 via Anaconda2 is known to work.
 
 ## Troubleshooting
 
