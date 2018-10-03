@@ -46,7 +46,7 @@ def v_find_primary_lithology(v_tokens, lithologies_dict):
 
     Args:
         v_tokens (iterable of iterable of str): the list of tokenised sentences.
-        lithologies_dict (dict): dictionary, where keys are exact markers as match for lithologies. Keys are the lithology classes. 
+        lithologies_dict (dict): dictionary, where keys are exact markers as match for lithologies. Values are the lithology classes. 
 
     Returns:
         list: list of primary lithologies if dectected. empty string for none.
@@ -61,7 +61,7 @@ def v_find_secondary_lithology(v_tokens, prim_litho, lithologies_adjective_dict,
         v_tokens (iterable of iterable of str): the list of tokenised sentences.
         prim_litho (list of str): the list of primary lithologies already detected for v_tokens. The secondary lithology cannot be the same as the primary.
         lithologies_adjective_dict (dict): dictionary, where keys are exact, "clear" markers for secondary lithologies (e.g. 'clayey'). Keys are the lithology classes. 
-        lithologies_dict (dict): dictionary, where keys are exact markers as match for lithologies. Keys are the lithology classes.
+        lithologies_dict (dict): dictionary, where keys are exact markers as match for lithologies. Values are the lithology classes.
 
     Returns:
         list: list of secondary lithologies if dectected. empty string for none.
