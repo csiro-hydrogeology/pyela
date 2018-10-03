@@ -22,38 +22,53 @@ LITHOLOGIES = ['sand','sandstone','clay','limestone','shale','basalt','coffee']
 
 
 def to_litho_class_num(lithology, kv):
+    """Get a numeric code for a lithology, or NaN if not in the dictionary mapping lithologies to numeric code
+            
+        Args:
+            lithology (str): Name of the lithology
+            kv (dict[str,float]): lithologies keywords to numeric code
+    """
     if lithology in kv.keys():
         return kv[lithology]
     else:
         return np.nan
 
 def v_to_litho_class_num(lithologies, kv):
+    """Get numeric codes for lithologies, or NaN if not in the dictionary mapping lithologies to numeric code
+            
+        Args:
+            lithologies (iterable of str): Name of the lithologies
+            kv (dict[str,float]): lithologies keywords to numeric code
+    """
     return np.array([to_litho_class_num(x, kv) for x in lithologies])
 
-def create_numeric_classes(my_lithologies):
-    my_lithologies_numclasses = dict([(my_lithologies[i], i) for i in range(len(my_lithologies))])
+def create_numeric_classes(lithologies):
+    """Creates a dictionary mapping lithologies to numeric code
+            
+        Args:
+            lithologies (iterable of str): Name of the lithologies
+    """
+    my_lithologies_numclasses = dict([(lithologies[i], i) for i in range(len(lithologies))])
     return my_lithologies_numclasses
 
 
-def lithologydata_slice_depth(df, slice_depth):
-    '''
+def lithologydata_slice_depth(df, slice_depth, depth_from_colname=DEPTH_FROM_AHD_COL, depth_to_colname=DEPTH_TO_AHD_COL):
+    """
     Subset data frame with entries at a specified AHD coordinate
 
-    :df: bore lithology data  
-    :type: pandas data frame 
+        Args:
+            df (pandas data frame): bore lithology data  
+            slice_depth (float): AHD coordinate at which to slice the data frame for lithology observations 
     
-    :slice_depth: AHD coordinate at which to slice the data frame for lithology observations 
-    :type: double  
-    
-    :return: a subset of the input data frame, entries intersecting with the specified slice depth
-    :rtype: a (view of a) data frame
-
-    '''
-    df_slice=df.loc[(df[DEPTH_FROM_AHD_COL] >= slice_depth) & (df[DEPTH_TO_AHD_COL] <= slice_depth)]
+        Returns:
+            a (view of a) data frame, a subset of the input data frame, 
+            entries intersecting with the specified slice depth
+    """
+    df_slice=df.loc[(df[depth_from_colname] >= slice_depth) & (df[depth_to_colname] <= slice_depth)]
     return df_slice
 
 def get_lithology_observations_for_depth(df, slice_depth, column_name ):
-    '''
+    """
     Subset data frame with entries at a specified AHD coordinate, and with valid lithology information.
 
     :df: bore lithology data  
@@ -62,20 +77,20 @@ def get_lithology_observations_for_depth(df, slice_depth, column_name ):
     :slice_depth: AHD coordinate at which to slice the data frame for lithology observations 
     :type: double 
 
-    :lithology_column_name: name of the column with string information to use to strip entries with missing lithology information
+    :column_name: name of the column with string information to use to strip entries with missing lithology information
     :type: string 
     
     :return: a subset of the input data frame, entries intersecting with the specified slice depth
     :rtype: a (view of a) data frame
-    '''
+    """
     df_slice=lithologydata_slice_depth(df, slice_depth)
     df_1=df_slice[np.isnan(df_slice[column_name]) == False]
     return df_1
 
 def extract_bore_class_num(bore_log_df, column_name):
-    '''
+    """
     Gets the columns easting, northing, primary lithology class number, AHD depth 'from' and 'to' from a bore data log
-    '''
+    """
     xx = bore_log_df[EASTING_COL].values
     yy = bore_log_df[NORTHING_COL].values
     ss = bore_log_df[column_name].values
@@ -99,7 +114,7 @@ def get_knn_model(df, column_name, slice_depth, n_neighbours):
         return knn
 
 def interpolate_over_meshgrid(predicting_algorithm, mesh_grid):
-    '''
+    """
     Interpolate lithology data
 
     :predicting_algorithm: algorithm such as KNN
@@ -111,7 +126,7 @@ def interpolate_over_meshgrid(predicting_algorithm, mesh_grid):
     :return: predicted values over the grid
     :rtype: numpy array
 
-    '''
+    """
     xx, yy = mesh_grid
     if predicting_algorithm is None:
         # the training set was too small and prediction cannot be made (odd that scikit would have let us train still)
@@ -123,7 +138,7 @@ def interpolate_over_meshgrid(predicting_algorithm, mesh_grid):
     return predicted
 
 def interpolate_lithologydata_slice_depth(df, column_name, slice_depth, n_neighbours, mesh_grid):
-    '''
+    """
     Interpolate lithology data
 
     :df: bore lithology data  
@@ -141,12 +156,12 @@ def interpolate_lithologydata_slice_depth(df, column_name, slice_depth, n_neighb
     :return: predicted values over the grid
     :rtype: numpy array
 
-    '''
+    """
     knn = get_knn_model(df, column_name, slice_depth, n_neighbours)
     return interpolate_over_meshgrid(knn, mesh_grid)
 
 def interpolate_lithologydata_slice_depth_bbox(df, column_name, slice_depth, n_neighbours, geo_pd, grid_res = 100):
-    '''
+    """
     Interpolate lithology data
 
     :df: bore lithology data  
@@ -167,7 +182,7 @@ def interpolate_lithologydata_slice_depth_bbox(df, column_name, slice_depth, n_n
     :return: predicted values over the grid
     :rtype: numpy array
 
-    '''
+    """
     mesh_grid = create_meshgrid(geo_pd, grid_res)
     return interpolate_lithologydata_slice_depth(df, column_name, slice_depth, n_neighbours, mesh_grid)
 

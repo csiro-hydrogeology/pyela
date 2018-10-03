@@ -28,9 +28,9 @@ def mlab_label(label_func, text, label_format=''):
 
 #@mlab.draw?
 def set_custom_colormap(lut, color_names):
-    '''
+    """
     Reference: http://docs.enthought.com/mayavi/mayavi/auto/example_custom_colormap.html 
-    '''
+    """
     my_lut = create_colormap_lut(color_names)
     lut.number_of_colors = len(my_lut)
     lut.table = my_lut

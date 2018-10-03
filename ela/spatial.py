@@ -74,9 +74,9 @@ def average_slices(slices):
 
 
 def burn_volume_func(func_below, func_above, volume, surface_raster, height_to_z, below=False, ignore_nan=False, inclusive=False):
-    '''
+    """
     Reusable function, not for end user. Process parts of a xyz volume given a surface, below or above the intersection of the volume with the surface
-    '''
+    """
     dim_x,dim_y,dim_z=volume.shape
     z_index_max = dim_z-1
     # TODO if surface_raster.shape[0] != dim_x or surface_raster.shape[1] != dim_y 
@@ -132,7 +132,7 @@ def slice_volume(volume, slice_surface, height_to_z):
     return result
 
 def burn_volume(volume, surface_raster, height_to_z, below=False, ignore_nan=False, inclusive=False):
-    '''
+    """
     "burn out" parts of a xyz volume given a surface, below or above the intersection of the volume with the surface
 
     :volume: volume to modify
@@ -152,7 +152,7 @@ def burn_volume(volume, surface_raster, height_to_z, below=False, ignore_nan=Fal
 
     :inclusive: is the cell in the volume cut by the surface included in the burning out (i.e. set to NaN) or its value kept?
     :type: bool    
-    '''
+    """
     def nan_below_z(volume, x, y, z):
         volume[x, y,0:z]=np.nan
 
@@ -163,7 +163,7 @@ def burn_volume(volume, surface_raster, height_to_z, below=False, ignore_nan=Fal
 
 
 def set_at_surface_boundary(volume, surface_raster, height_to_z, value=0.0, ignore_nan=False):
-    '''
+    """
     "burn out" parts of a xyz volume given a surface, below or above the intersection of the volume with the surface
 
     :volume: volume to modify
@@ -183,7 +183,7 @@ def set_at_surface_boundary(volume, surface_raster, height_to_z, value=0.0, igno
 
     :inclusive: is the cell in the volume cut by the surface included in the burning out (i.e. set to NaN) or its value kept?
     :type: bool    
-    '''
+    """
     def set_at_z(volume, x, y, z):
         volume[x, y,z]=value
 
