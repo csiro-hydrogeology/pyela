@@ -67,7 +67,7 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         cut.module_manager.scalar_lut_manager.lut.nan_color = 0, 0, 0, 0
         return cut
 
-    @mlab.show
+    # @mlab.show
     def render_classes_planar(self, volume, title):
         mlab.figure(size=(800, 800))
         s = volume

@@ -11,7 +11,8 @@ sys.path.append(pkg_dir)
 
 from ela.visual3d import *
 
-def test_blah():
+# def do_not_test_yet_ui():
+def test_mlab_ui():
     class_names = [
         'class_1',
         'class_2',
