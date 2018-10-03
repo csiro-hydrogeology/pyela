@@ -32,6 +32,8 @@ before_install:
   - pip install pytest-cov
   - pip install pytest-mpl
   - pip install cython
+  # - pip install vtk # otherwise mayavi pkg ModuleNotFoundError: No module named 'vtk'
+
 install:
   - pip install -r requirements.txt
 

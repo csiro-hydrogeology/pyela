@@ -24,5 +24,9 @@ rasterio>=0.36.0
 # https://github.com/jmp75/striplog/archive/devel.zip
 # -e git+git@github.com:jmp75/striplog.git@7c6ae22a130ad2ba3d351c31574778ec121571d3#egg=striplog
 -e git+https://github.com/jmp75/striplog@master#egg=striplog
-vtk>=8.1.0
-mayavi>=4.5.0
+# vtk>=8.1.0
+# mayavi>=4.5.0
+# 2018-10 disable mayavi. Otherwise barfs with:
+# running gen_docs
+# qt.qpa.screen: QXcbConnection: Could not connect to display
+# Could not connect to any X display.
