@@ -105,6 +105,17 @@ def make_training_set(observations, column_name):
     return (X, y)
 
 def get_knn_model(df, column_name, slice_depth, n_neighbours):
+    """Train a K-nearest neighbours model for a given plane 
+
+    Args:
+        df (data frame): 
+        column_name (str): 
+        slice_depth (numeric): 
+        n_neighbours (int): 
+
+    Returns:
+        KNeighborsClassifier: trained classifier.
+    """
     df_1 = get_lithology_observations_for_depth(df, slice_depth, column_name)
     X, y = make_training_set(df_1, column_name)
     if n_neighbours > len(df_1):
@@ -188,6 +199,18 @@ def interpolate_lithologydata_slice_depth_bbox(df, column_name, slice_depth, n_n
 
 
 def class_probability_estimates_depth(df, column_name, slice_depth, n_neighbours, mesh_grid, func_training_set=None):
+    """Subset data frame with entries at a specified AHD coordinate
+
+        Args:
+            df (pandas data frame): bore lithology data  
+            slice_depth (float): AHD coordinate at which to slice the data frame for lithology observations
+            n_neighbours (int): number of nearest neighbours 
+            mesh_grid (tuple): coordinate matrices to interpolate over (numpy.meshgrid)
+            func_training_set (callable):  a function to processing the training set (e.g. completing dummy with dummy classes, other not present in the trainining set)
+
+        Returns:
+            a list of numpy arrays, shaped like the meshgrid.
+    """
     df_1 = get_lithology_observations_for_depth(df, slice_depth, column_name)
     X, y = make_training_set(df_1, column_name)
     if not (func_training_set is None):

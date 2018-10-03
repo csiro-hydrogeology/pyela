@@ -32,5 +32,3 @@ def test_litho_marker_detection():
     assert seconds[0] == 1
     assert seconds[1] == 1 # clayey, not choc
 
-
-test_litho_marker_detection()

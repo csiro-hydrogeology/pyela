@@ -20,14 +20,6 @@ def test_create_meshgrid():
     assert yy.shape[0] == 3
     assert yy.shape[1] == 2
 
-def test_make_training_set():
-    obs_colname = 'fake_obs'
-    mock_obs = pd.DataFrame({EASTING_COL:np.array([.0, 1., 1., 0.]), NORTHING_COL:np.array([2., 2., 3., 3.]), obs_colname: np.array([.1, .2, .3, .4])})
-    X, y = make_training_set(mock_obs, obs_colname)
-    assert X.shape[0] == 4
-    assert X.shape[1] == 2
-    assert y.shape[0] == 4
-
 class MockSlicePredictor:
     def __init__(self, a, b, c):
         self.a = a
