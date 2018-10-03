@@ -37,6 +37,15 @@ def set_custom_colormap(lut, color_names):
 
 
 class LithologiesClassesVisual3d(LithologiesClassesVisual):
+    """Visual information to map to rendering 3D lithologies
+
+    A helper class with lithology classes and color scheme information to apply to data in a set of custom visual rendering using Mayavi
+
+    Attributes:
+        class_names (str):
+        color_names (str):
+        color_names_with_missing (str):
+    """
     def __init__(self, class_names, color_names, missing_value_color_name):
         super(LithologiesClassesVisual3d, self).__init__(class_names, color_names, missing_value_color_name)
 

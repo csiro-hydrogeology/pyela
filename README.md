@@ -90,6 +90,10 @@ pip install pyqt5
 pip install mayavi
 ```
 
+### Windows
+
+Placeholder section. As of Sept 2018 it may be possible to install upon Python 3.6+ with Anaconda 3, and then including mayavi from pip.
+
 ### Installation of pyela
 
 ```sh

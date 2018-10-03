@@ -133,3 +133,13 @@ def test_rgba_conversions():
     assert rgba[2] == 0
     assert rgba[3] == 255
 
+
+# solely for UT coverage, basically is it running...
+def test_legend_fig():
+    k_legend_display_info = [
+        (None, 'class_one', 'gray'),
+        (None, 'class_two', 'blue'),
+        (None, 'class_three', 'red')
+    ]
+    fig = legend_fig(k_legend_display_info)
+
