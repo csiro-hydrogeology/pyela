@@ -12,6 +12,8 @@ Cartopy>=0.16.0
 # jupyterlab>=0.32.1
 # jupyter>=1.0.0
 # jupyterlab-launcher>=0.10.5
+# need pillow otherwise travis: ImportError while importing test module 'jmp75/pyela/tests/test_visual.py'.
+pillow>=5.1.0
 mayavi>=4.5.0
 nltk>=3.2.5
 # PyQt5 is required for mayavi viz at runtime as a backend but is only available for Python3, I think. Not sure anymore how things worked out on Win+Py2.7.

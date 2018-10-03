@@ -4,8 +4,11 @@ dist: trusty
 language: python
 
 python:
-  - 2.7
   - 3.6
+
+branches:
+  only:
+  - master
 
 before_install:
   - sudo apt-get -qq update
