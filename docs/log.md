@@ -11,8 +11,8 @@ conda create --name %my_env_name% python=3.6
 REM later : conda install --name %my_env_name% xarray netCDF4 rasterio cartopy jupyterlab ipywidgets jupyter geopandas pandas scikit-learn scikit-image matplotlib python=3.6
 conda install --name %my_env_name% jupyterlab ipywidgets jupyter pandas scikit-learn matplotlib python=3.6
 conda activate %my_env_name%
-conda install --name %my_env_name% spaCy
 python -m ipykernel install --user --name %my_env_name% --display-name "Python3 (ELA)"
+conda install --name %my_env_name% spaCy
 python -m spacy download en
 ```
 
