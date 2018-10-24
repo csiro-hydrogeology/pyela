@@ -67,21 +67,39 @@ def lithologydata_slice_depth(df, slice_depth, depth_from_colname=DEPTH_FROM_AHD
     df_slice=df.loc[(df[depth_from_colname] >= slice_depth) & (df[depth_to_colname] <= slice_depth)]
     return df_slice
 
+# The following was spurred by trying to get more data in KNN cross-validation, but this may be dubious method to increase the data pool. Park.
+# def get_lithology_observations_between(df, bottom_ahd, top_ahd, column_name ):
+#     """
+#     Subset data frame with entries at a specified AHD coordinate, and with valid lithology information.
+
+#         Args:
+#             df (pandas data frame): bore lithology data  
+#             bottom_ahd (float): bottom AHD coordinate of the slice to subset
+#             top_ahd (float): top AHD coordinate of the slice 
+#             column_name (str): name of the column with string information to use to strip entries with missing lithology information
+    
+#         Returns:
+#             a (view of a) data frame; a subset of the input data frame, 
+#             entries intersecting with the specified slice depth
+#     """
+#     depth_from_colname=DEPTH_FROM_AHD_COL
+#     depth_to_colname=DEPTH_TO_AHD_COL
+#     df_slice=df.loc[(df[depth_from_colname] >= top_ahd) & (df[depth_to_colname] <= slice_depth)] # CAREFUL HERE about order and criteria... trickier than 2D slicing.
+#     df_1=df_slice[np.isnan(df_slice[column_name]) == False]
+#     return df_1
+
 def get_lithology_observations_for_depth(df, slice_depth, column_name ):
     """
     Subset data frame with entries at a specified AHD coordinate, and with valid lithology information.
 
-    :df: bore lithology data  
-    :type: pandas data frame 
+        Args:
+            df (pandas data frame): bore lithology data  
+            slice_depth (float): AHD coordinate at which to slice the data frame for lithology observations 
+            column_name (str): name of the column with string information to use to strip entries with missing lithology information
     
-    :slice_depth: AHD coordinate at which to slice the data frame for lithology observations 
-    :type: double 
-
-    :column_name: name of the column with string information to use to strip entries with missing lithology information
-    :type: string 
-    
-    :return: a subset of the input data frame, entries intersecting with the specified slice depth
-    :rtype: a (view of a) data frame
+        Returns:
+            a (view of a) data frame; a subset of the input data frame, 
+            entries intersecting with the specified slice depth
     """
     df_slice=lithologydata_slice_depth(df, slice_depth)
     df_1=df_slice[np.isnan(df_slice[column_name]) == False]
@@ -102,6 +120,9 @@ def make_training_set(observations, column_name):
     # X = observations.as_matrix(columns=[EASTING_COL, NORTHING_COL])
     X = observations[[EASTING_COL, NORTHING_COL]].values
     y = np.array(observations[column_name])
+    #NOTE: should I also do e.g.:
+    #shuffle_index = np.random.permutation(len(y))
+    #X, y = X[shuffle_index], y[shuffle_index]   
     return (X, y)
 
 def get_knn_model(df, column_name, slice_depth, n_neighbours):

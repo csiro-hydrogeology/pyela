@@ -50,3 +50,22 @@ class GeotiffExporter:
         x_dataset.write(g, 2)
         x_dataset.write(b, 3)
         x_dataset.close()
+
+    def export_geotiff(self, matrix, full_filename, classes_cmap):
+        """Save a matrix of numeric classes to an image, using a color to convert numeric values to colors
+
+        Args:
+            matrix (ndarray): numpy array, 2 dims
+            full_filename (str): Full file name to save the GeoTiff image to.
+            classes_cmap (dict): color map with keys as zero based numeric integers and values RGBA tuples.
+
+        """
+        x_dataset = rasterio.open(full_filename, 'w', driver='GTiff',
+                                height=matrix.shape[0], width=matrix.shape[1],
+                                count=1, dtype= 'float64',
+                                crs=self.crs, transform=self.transform)
+        x_dataset.write(matrix, 1)
+        # Tried to write a colormap by inference from https://github.com/mapbox/rasterio/blob/master/tests/test_colormap.py but seems not to improve things. 
+        # the api doc is woefully insufficient: https://rasterio.readthedocs.io/en/latest/api/rasterio.io.html#rasterio.io.BufferedDatasetWriter.write_colormap
+        # x_dataset.write_colormap(1, classes_cmap)
+        x_dataset.close()
