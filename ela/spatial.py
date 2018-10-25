@@ -6,6 +6,12 @@ from ela.textproc import EASTING_COL, NORTHING_COL, DEPTH_FROM_AHD_COL, DEPTH_FR
 
 
 def read_raster_value(dem,band_1,easting,northing):
+    """Read a value in a raster grid given easting/northing
+    
+    Args:
+        dem (rasterio dataset): dem
+    
+    """
     row, col = dem.index(easting,northing)
     # dem.index seems to return floats and this causes a but to index its numpy array. 
     # something used to work (who knows which package version soup) and does not anymore. At runtime. Dynamic typing...
@@ -36,15 +42,16 @@ def add_ahd(lithology_df, data_raster, drop_na=False):
         df = df[pd.notna(df[DEPTH_TO_AHD_COL])]
     return df
 
-def slice_above(lithology_df, lower_bound_raster, drop_na=True):
-    df = lithology_df.copy(deep=True)
-    data_grid = lower_bound_raster.read(1)
-    lower_bound_values = raster_drill_df(df, lower_bound_raster, data_grid)
-    if drop_na:
-        df = df[pd.notna(lower_bound_values)]
-        lower_bound_values = lower_bound_values[pd.notna(lower_bound_values)]
-    df_slice=df.loc[(df[DEPTH_FROM_AHD_COL] >= lower_bound_values) & (df[DEPTH_TO_AHD_COL] >= lower_bound_values)]
-    return df_slice
+# Remove if indeed redundant/superseded
+# def slice_above(lithology_df, lower_bound_raster, drop_na=True):
+#     df = lithology_df.copy(deep=True)
+#     data_grid = lower_bound_raster.read(1)
+#     lower_bound_values = raster_drill_df(df, lower_bound_raster, data_grid)
+#     if drop_na:
+#         df = df[pd.notna(lower_bound_values)]
+#         lower_bound_values = lower_bound_values[pd.notna(lower_bound_values)]
+#     df_slice=df.loc[(df[DEPTH_FROM_AHD_COL] >= lower_bound_values) & (df[DEPTH_TO_AHD_COL] >= lower_bound_values)]
+#     return df_slice
 
 def z_index_for_ahd_functor(a=1, b=50):
     def z_index_for_ahd(ahd):

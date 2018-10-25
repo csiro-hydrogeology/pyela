@@ -134,8 +134,60 @@ def test_slice_volume():
     assert np.isnan(f(2,2))
     assert f(2,3) == test_vol[2,3,0]
 
+def get_test_bore_df():
+    x_min = 383200
+    y_max = 6422275
+    return pd.DataFrame({
+        EASTING_COL:np.array([x_min-.5,x_min+.5,x_min+1.1,x_min+1.1]), 
+        NORTHING_COL:np.array([y_max-0.1,y_max-0.1,y_max-0.9,y_max-1.1]), 
+        'fake_obs': np.array([.1, .2, .3, .4]),
+        DEPTH_FROM_COL: np.array([1.11, 2.22, 3.33, 4.44]),
+        DEPTH_TO_COL: np.array(  [2.22, 3.33, 4.44, 5.55])
+        })
+
+def test_raster_drill():
+    # crs = rasterio.crs.CRS({'proj': 'utm', 'zone': 50, 'south': True, 'ellps': 'GRS80', 'units': 'm', 'no_defs': True})
+    # # Upper left hand corner is at (x_min, y_max), and in raster terms this is the origin.
+    # x_min = 383200
+    # y_max = 6422275
+    # grid_res = 1
+    # from rasterio.transform import from_origin
+    # transform = from_origin(x_min, y_max, grid_res, grid_res)
+    # ge = GeotiffExporter(crs, transform)
+    # x = np.array([[1.0, 2.0],[3.0, 4.0]])
+    # ge.export_geotiff(x, 'c:/tmp/test_raster_drill.tif', None)
+    x_min = 383200
+    y_max = 6422275
+    df = get_test_bore_df()
+    dem = rasterio.open(os.path.join(pkg_dir, 'tests', 'data', 'test_raster_drill.tif'))
+    raster_grid = dem.read(1)
+    heights = raster_drill_df(df, dem, raster_grid)
+    assert np.isnan(heights[0])
+    assert heights[1] == 1.0
+    assert heights[2] == 2.0
+    assert heights[3] == 4.0
+
+def test_add_ahd():
+    x_min = 383200
+    y_max = 6422275
+    df = get_test_bore_df()
+    dem = rasterio.open(os.path.join(pkg_dir, 'tests', 'data', 'test_raster_drill.tif'))
+    df_ahd = add_ahd(df, dem)
+    from_ahd = df_ahd[DEPTH_FROM_AHD_COL]
+    to_ahd = df_ahd[DEPTH_TO_AHD_COL]
+    assert np.isnan(from_ahd[0])
+    assert from_ahd[1] == 1.0 - 2.22
+    assert from_ahd[2] == 2.0 - 3.33
+    assert from_ahd[3] == 4.0 - 4.44
+    assert np.isnan(to_ahd[0])
+    assert to_ahd[1] == 1.0 - 3.33
+    assert to_ahd[2] == 2.0 - 4.44
+    assert to_ahd[3] == 4.0 - 5.55
+
 # test_slice_volume()
 # test_interpolate_slice()
 # test_burn_volume()
 # test_height_coordinate_functor()
 # test_make_training_set()
+# test_raster_drill()
+
