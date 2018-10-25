@@ -87,19 +87,16 @@ def v_word_tokenize(descriptions):
 
 v_lower = None
 """vectorised, unicode version to lower case strings
-
 """
 
 if(sys.version_info.major > 2):
     v_lower = np.vectorize(str.lower)
     """vectorised, unicode version to lower case strings
-
     """
 else:
     # Given Python 2.7 we must use:
     v_lower = np.vectorize(unicode.lower)
     """vectorised, unicode version to lower case strings
-
     """
 
 def token_freq(tokens, n_most_common = 50):
@@ -123,6 +120,16 @@ def plot_freq(dataframe, y_log = False, x='token', figsize=(15,10), fontsize=14)
     return p
 
 def find_word_from_root(tokens, root):
+    """Filter token (words) to retain only those containing a root term 
+
+    Args:
+        tokens (iterable of str): the list of tokens.
+        root (str): regular expression for the root term, to look for (e.g 'clay' or 'cl(a|e)y'), which will be padded with '[a-z]*' for searching
+
+    Returns:
+        a list: terms matching the root term.
+
+    """
     regex = re.compile('[a-z]*'+root+'[a-z]*')
     xx = list(filter(regex.search, tokens))
     return xx
@@ -132,7 +139,17 @@ def plot_freq_for_root(tokens, root, y_log=True):
     xf = token_freq(sand_terms, len(sand_terms))
     return plot_freq(xf, y_log=y_log)
 
-def split_composite_term(x, joint_re):
+def split_composite_term(x, joint_re = 'with'):
+    """Break terms that are composites padding several words without space. This has been observed in one case study but may not be prevalent.
+
+    Args:
+        x (str): the term to split if matching, e.g. 'claywithsand' to 'clay with sand'
+        joint_re (str): regular expression for the word used as fusing join, typically 'with' 
+
+    Returns:
+        split wording (str): tokens split from the joining term.
+
+    """
     return re.sub("([a-z]+)(" + joint_re + ")([a-z]+)", r"\1 \2 \3", x, flags=re.DOTALL)
 
 def split_with_term(x):
@@ -142,8 +159,22 @@ def v_split_with_term(xlist):
     return [split_with_term(x) for x in xlist]
 
 def clean_lithology_descriptions(description_series, lex):
-    expanded_descs = description_series.apply(lex.expand_abbreviations)
-    y = expanded_descs.values
+    """Preparatory cleanup of lithology descriptions for further analysis: 
+    replace abbreviations and misspelling according to a lexicon, 
+    and transform to lower case
+
+    Args:
+        description_series (iterable of str, or pd.Series): lithology descriptions 
+        lex (striplog.Lexicon): an instance of striplog's Lexicon
+
+    Returns:
+        (iterable of str): processed descriptions.
+    """
+    if isinstance(description_series, list):
+        y = [lex.expand_abbreviations(x) for x in description_series]
+    else:
+        expanded_descs = description_series.apply(lex.expand_abbreviations)
+        y = expanded_descs.values
     y = v_lower(y)
     y = v_split_with_term(y)
     return y
@@ -152,6 +183,15 @@ def find_litho_markers(tokens, regex):
     return list(filter(regex.search, tokens))
 
 def v_find_litho_markers(v_tokens, regex):
+    """Find lithology lithology terms that match a regular expression
+
+    Args:
+        v_tokens (iterable of iterable of str): the list of tokenised sentences.
+        regex (regex): compiles regular expression  e.g. re.compile('sand|clay')
+
+    Returns:
+        (iterable of iterable of str): tokens found to be matching the expression
+    """
     return [find_litho_markers(t,regex) for t in v_tokens]
 
 
