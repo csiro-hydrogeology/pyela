@@ -138,6 +138,50 @@ def slice_volume(volume, slice_surface, height_to_z):
             result[x,y] = drill_volume(volume, slice_surface, height_to_z, x, y)
     return result
 
+class SliceOperation:
+    """
+    Attributes:
+        crs (str, dict, or CRS): The coordinate reference system.
+        transform (Affine instance): Affine transformation mapping the pixel space to geographic space.
+    """
+    def __init__(self, dem_array_zeroes_infill, z_index_for_ahd):
+        """initialize this with a coordinate reference system object and an affine transform. See rasterio.
+        
+        Args:
+        """
+        self.dem_array_zeroes_infill = dem_array_zeroes_infill
+        self.z_index_for_ahd = z_index_for_ahd
+
+    @staticmethod
+    def arithmetic_average(slices):
+        k_average = np.empty(slices[0].shape)
+        k_average = 0.0
+        for i in range(len(slices)):
+            k_average = k_average + slices[i]
+        k_average = k_average / len(slices)
+        return k_average
+
+    @staticmethod
+    def arithmetic_average_int(slices):
+        return np.round(SliceOperation.arithmetic_average(slices))
+
+    def reduce_slices_at_depths(self, volume, from_depth, to_depth, reduce_func):
+        slices = [slice_volume(volume, self.dem_array_zeroes_infill - depth, self.z_index_for_ahd) for depth in range(from_depth, to_depth+1)]
+        return reduce_func(slices)
+
+    def from_ahd_to_depth_below_ground_level(self, volume, from_depth, to_depth):
+        # Note: may not be the most computationally efficient, but deal later.
+        depths = range(from_depth, to_depth+1)
+        slices = [slice_volume(volume, self.dem_array_zeroes_infill - depth, self.z_index_for_ahd) for depth in depths]
+        nx, ny, _ = volume.shape
+        nz = len(depths)
+        result = np.empty([nx, ny, nz])
+        for i in range(nz):
+            ii = (nz-1) - i 
+            result[:,:,i] = slices[ii]
+        return result
+
+
 def burn_volume(volume, surface_raster, height_to_z, below=False, ignore_nan=False, inclusive=False):
     """
     "burn out" parts of a xyz volume given a surface, below or above the intersection of the volume with the surface

@@ -52,6 +52,90 @@ def create_numeric_classes(lithologies):
     return my_lithologies_numclasses
 
 
+class ClassMapper:
+    """ClassMapper
+
+    Attributes:
+    """
+    def __init__(self, mapping, lithology_names):
+        """initialize this with a coordinate reference system object and an affine transform. See rasterio.
+        
+        Args:
+            lithologies (iterable of str): Name of the lithologies
+            mapping (dict): 
+        """
+        self.mapping = mapping
+        self.litho_numeric_mapper = np.empty((len(lithology_names), len(lithology_names)))
+        for i in np.arange(0, len(lithology_names), 1):
+            for j in np.arange(0, len(lithology_names), 1):
+                self.litho_numeric_mapper[i,j] = self.class_code(lithology_names[i], lithology_names[j])
+        self.lithology_names = lithology_names
+    @staticmethod
+    def create_full_litho_desc(df):
+        p1 = df[PRIMARY_LITHO_COL].values
+        p2 = df[SECONDARY_LITHO_COL].values
+        return ['/'.join([p1[i], p2[i]]) for i in range(len(p1))]
+    def _mapping_class(self, litho_class):
+        keys = self.mapping.keys()
+        if litho_class in keys:
+            return self.mapping[litho_class]
+        else:
+            return np.nan
+    def _to_int(self, f):
+        if np.isnan(f): return f
+        return int(round(f))
+    def map_classes(self, litho_classes):
+        return [self._mapping_class(x) for x in litho_classes]
+    def litho_class_label(self, primary_litho_class, secondary_litho_class):
+        if isinstance(primary_litho_class, float):
+            if np.isnan(primary_litho_class): return np.nan
+            primary_litho_class = self._to_int(primary_litho_class)
+        if isinstance(secondary_litho_class, float):
+            if np.isnan(secondary_litho_class): 
+                secondary_litho_class = ''
+            else:
+                secondary_litho_class = self._to_int(secondary_litho_class)
+        if isinstance(primary_litho_class, int): primary_litho_class = self.lithology_names[primary_litho_class]
+        if isinstance(secondary_litho_class, int): secondary_litho_class = self.lithology_names[secondary_litho_class]
+        litho_class = '/'.join([primary_litho_class, secondary_litho_class])
+        return litho_class
+    def class_code(self, primary_litho_class, secondary_litho_class):
+        return self._mapping_class(self.litho_class_label(primary_litho_class, secondary_litho_class))
+    def bivariate_mapper(self, primary_litho_code, secondary_litho_code):
+        if np.isnan(primary_litho_code):
+            return np.nan
+        if np.isnan(secondary_litho_code): 
+            return self.litho_numeric_mapper[self._to_int(primary_litho_code), self._to_int(primary_litho_code)]
+        return self.litho_numeric_mapper[self._to_int(primary_litho_code), self._to_int(secondary_litho_code)]
+    def map_classes(self, primary_lithology_3d_array, secondary_lithology_3d_array):
+        three_k_classes = primary_lithology_3d_array.copy()
+        dim_x,dim_y,dim_z = three_k_classes.shape
+        for i in np.arange(0, dim_x, 1):
+            for j in np.arange(0, dim_y, 1):
+                for k in np.arange(0, dim_z, 1):
+                    three_k_classes[i,j,k] = self.bivariate_mapper(primary_lithology_3d_array[i,j,k], secondary_lithology_3d_array[i,j,k])    
+        return three_k_classes
+    def get_frequencies(self, mask_2d, primary_lithology_3d_array, secondary_lithology_3d_array):
+        result = np.zeros([len(self.lithology_names), len(self.lithology_names)])
+        ## TODO should check on dimensions...
+        dim_x,dim_y,dim_z = secondary_lithology_3d_array.shape
+        for i in np.arange(0, dim_x, 1):
+            for j in np.arange(0, dim_y, 1):
+                if mask_2d[i,j]:
+                    for k in np.arange(0, dim_z, 1):
+                        prim_litho_ind = self._to_int(primary_lithology_3d_array[i,j,k])
+                        if np.isnan(prim_litho_ind) == False:
+                            sec_litho_ind = self._to_int(secondary_lithology_3d_array[i,j,k])
+                            if np.isnan(sec_litho_ind): 
+                                sec_litho_ind = prim_litho_ind
+                            result[prim_litho_ind,sec_litho_ind] = result[prim_litho_ind,sec_litho_ind] + 1
+        return result
+    def data_frame_frequencies(self, freq_table):
+        ## TODO should check on dimensions...
+        x = [(self.litho_class_label(i, j), freq_table[i,j]) for i in range(len(self.lithology_names)) for j in range(len(self.lithology_names))]
+        return pd.DataFrame(x, columns=["token","frequency"])
+
+
 def lithologydata_slice_depth(df, slice_depth, depth_from_colname=DEPTH_FROM_AHD_COL, depth_to_colname=DEPTH_TO_AHD_COL):
     """
     Subset data frame with entries at a specified AHD coordinate
