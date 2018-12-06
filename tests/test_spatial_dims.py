@@ -13,6 +13,7 @@ from ela.textproc import *
 from ela.spatial import *
 from ela.classification import *
 from ela.io import GeotiffExporter
+from ela.utils import flip
 
 def test_create_meshgrid():
     xx, yy = create_meshgrid_cartesian(x_min=0.0, x_max=1.1, y_min=1.0, y_max=1.51, grid_res = 0.5)
@@ -240,6 +241,18 @@ def test_surface_array():
     assert surf_dem[1,0] == 80 + 4.0
     assert surf_dem[1,1] == 80 + -4 * 10.0 + 4.0
 
+
+def test_flip():
+    m = np.zeros([2,3,4])
+    m[1,2,3] = 3.14
+    assert flip(m, 0)[0,2,3] == 3.14
+    assert flip(m, 1)[1,0,3] == 3.14
+    assert flip(m, 2)[1,2,0] == 3.14
+    # assert flip(m, (1,2))[0,0,3] == 3.14
+    flip(flip(m, 1),2)[0,0,3] == 3.14
+    # assert flip(m, (1,3))[0,2,0] == 3.14
+
+# test_flip()
 # test_surface_array()
 # test_average_slices()
 # test_slice_volume()

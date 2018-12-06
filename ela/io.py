@@ -2,14 +2,16 @@ import numpy as np
 import rasterio
 from ela.visual import to_color_image, get_color_component, to_carto
 
-# note on generic slicing: something like the following. For now assume some things in the rgba mapping to image interms of dims
-# https://stackoverflow.com/a/37729566/2752565
-def simple_slice(arr, inds, axis):
-    # this does the same as np.take() except only supports simple slicing, not
-    # advanced indexing, and thus is much faster
-    sl = [slice(None)] * arr.ndim
-    sl[axis] = inds
-    return arr[sl]
+
+# TOCHECK: appears unused. What was the intent?
+# # note on generic slicing: something like the following. For now assume some things in the rgba mapping to image interms of dims
+# # https://stackoverflow.com/a/37729566/2752565
+# def simple_slice(arr, inds, axis):
+#     # this does the same as np.take() except only supports simple slicing, not
+#     # advanced indexing, and thus is much faster
+#     sl = [slice(None)] * arr.ndim
+#     sl[axis] = inds
+#     return arr[sl]
 
 class GeotiffExporter:
     """Helper class to save matrices into georeferenced, GeoTiff images
