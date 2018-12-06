@@ -45,4 +45,6 @@ script:
 
 after_success:
   # - coveralls
-  - codecov
+  # - codecov
+  # trying by inference from https://hackernoon.com/integrating-travis-ci-and-codecov-into-a-python-based-project-6f658074ff63  
+  - bash <(curl -s https://codecov.io/bash)
