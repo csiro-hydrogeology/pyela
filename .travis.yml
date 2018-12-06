@@ -30,6 +30,7 @@ before_install:
   - sudo dpkg -i libproj-dev_4.9.3-2_amd64.deb
   # - pip install coveralls
   - pip install codecov
+  - pip install coverage
   - pip install pytest-cov
   - pip install pytest-mpl
   - pip install cython
