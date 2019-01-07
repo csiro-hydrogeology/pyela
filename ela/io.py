@@ -2,14 +2,16 @@ import numpy as np
 import rasterio
 from ela.visual import to_color_image, get_color_component, to_carto
 
-# note on generic slicing: something like the following. For now assume some things in the rgba mapping to image interms of dims
-# https://stackoverflow.com/a/37729566/2752565
-def simple_slice(arr, inds, axis):
-    # this does the same as np.take() except only supports simple slicing, not
-    # advanced indexing, and thus is much faster
-    sl = [slice(None)] * arr.ndim
-    sl[axis] = inds
-    return arr[sl]
+
+# TOCHECK: appears unused. What was the intent?
+# # note on generic slicing: something like the following. For now assume some things in the rgba mapping to image interms of dims
+# # https://stackoverflow.com/a/37729566/2752565
+# def simple_slice(arr, inds, axis):
+#     # this does the same as np.take() except only supports simple slicing, not
+#     # advanced indexing, and thus is much faster
+#     sl = [slice(None)] * arr.ndim
+#     sl[axis] = inds
+#     return arr[sl]
 
 class GeotiffExporter:
     """Helper class to save matrices into georeferenced, GeoTiff images
@@ -69,3 +71,26 @@ class GeotiffExporter:
         # the api doc is woefully insufficient: https://rasterio.readthedocs.io/en/latest/api/rasterio.io.html#rasterio.io.BufferedDatasetWriter.write_colormap
         # x_dataset.write_colormap(1, classes_cmap)
         x_dataset.close()
+
+
+# TODO: consider if refactor the following, using also ela.spatial.SliceOperation
+# def export_avg_at_depth(classes, outdir, fname, from_depth, to_depth, class_cmap):
+#     slices = [slice_volume(classes, dem_array_zeroes_infill - depth, z_index_for_ahd) for depth in range(from_depth, to_depth+1)]
+#     k_average = np.empty(slices[0].shape)
+#     k_average = 0.0
+#     for i in range(len(slices)):
+#         k_average = k_average + slices[i]
+#     k_average = k_average / len(slices)
+#     x = to_carto(k_average)
+#     ge.export_geotiff(x, os.path.join(outdir, fname), class_cmap)
+
+# def export_avg_rgb_at_depth(classes, outdir, fname, from_depth, to_depth, class_cmap):
+#     slices = [slice_volume(classes, dem_array_zeroes_infill - depth, z_index_for_ahd) for depth in range(from_depth, to_depth+1)]
+#     k_average = np.empty(slices[0].shape)
+#     k_average = 0.0
+#     for i in range(len(slices)):
+#         k_average = k_average + slices[i]
+#     k_average = k_average / len(slices)
+#     x = to_carto(k_average)
+#     ge.export_rgb_geotiff(x, os.path.join(outdir, fname), class_cmap)
+

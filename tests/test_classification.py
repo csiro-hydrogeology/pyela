@@ -113,3 +113,86 @@ def test_class_probability_estimates_depth():
     probas = class_probability_estimates_depth(df, obs_colname, slice_depth, n_neighbours, mesh_grid, func_training_set=pad_training_set)
     assert len(probas) == len(all_classes)
 
+
+def test_class_mapping():
+    lithology_names = ['sand','clay','limestone']
+    sand_code = 0
+    clay_code = 1
+    limestone_code = 2
+    fast = 0
+    medium = 1
+    slow = 2
+    mapping = {
+        'sand/':fast,
+        'sand/sand':fast,
+        'sand/clay':fast,
+        'sand/limestone':fast,
+        'clay/':slow,
+        'clay/clay':slow,
+        'clay/sand':medium,
+        'clay/limestone':medium,
+        'limestone/':fast,
+        'limestone/limestone':fast,
+        'limestone/sand':fast,
+        'limestone/clay':medium,
+    }
+    mapper = ClassMapper(mapping, lithology_names)
+    assert mapper.class_code('sand','')  == fast
+    assert mapper.class_code('sand','sand')  == fast
+    assert mapper.class_code('sand',np.nan)  == fast
+    assert mapper.class_code(sand_code,sand_code)  == fast
+    assert mapper.class_code(sand_code,'')  == fast
+    assert mapper.class_code(clay_code,np.nan)  == slow
+    assert np.isnan(mapper.class_code('unknown_thing',np.nan))
+
+    assert mapper.bivariate_mapper(sand_code,sand_code)  == fast
+    assert mapper.bivariate_mapper(sand_code,np.nan)  == fast
+    assert mapper.bivariate_mapper(clay_code,np.nan)  == slow
+
+    primary_lithology_3d_array = np.empty([3,4,5])
+    secondary_lithology_3d_array = np.empty([3,4,5])
+    mask_2d = np.empty([3,4], dtype=np.bool)
+    mask_2d[:,:] = True
+    primary_lithology_3d_array[:,:,:] = float(sand_code)
+    secondary_lithology_3d_array[:,:,:] = float(limestone_code)
+    primary_lithology_3d_array[0,:,:] = float(clay_code)
+    secondary_lithology_3d_array[:,:,0] = float(clay_code)
+    secondary_lithology_3d_array[2,2,:] = np.nan
+    mask_2d[0,:] = False
+    freq_table = mapper.get_frequencies(mask_2d, primary_lithology_3d_array, secondary_lithology_3d_array)
+    assert freq_table[sand_code, sand_code] == 5 # where secondary_lithology_3d_array is np.nan
+    assert freq_table[sand_code, clay_code] == (3-1) * 4 * (5-4) - 1 # lowest 2ndary slice all clay, but x=0 is out of the mask, and one cell x=2,y=2 is nan
+    assert freq_table[sand_code, limestone_code] == ((3-1) * 4 * (5-1) - 4*1) # all but the lowest slice in secondary are all limestone, but x=0 is out of the mask. 4 cells x=2,y=2 are nan
+    freq_df = mapper.data_frame_frequencies(freq_table)
+    assert freq_df.iloc[0]["frequency"] == 5 # where secondary_lithology_3d_array is np.nan
+    assert freq_df.iloc[1]["frequency"] == (3-1) * 4 * (5-4) - 1 # lowest 2ndary slice all clay, but x=0 is out of the mask, and one cell x=2,y=2 is nan
+    assert freq_df.iloc[2]["frequency"] == ((3-1) * 4 * (5-1) - 4*1) # all but the lowest slice in secondary are all limestone, but x=0 is out of the mask. 4 cells x=2,y=2 are nan
+    df = pd.DataFrame([('sand','clay'),('loam','')], columns=[PRIMARY_LITHO_COL, SECONDARY_LITHO_COL])
+    litho_keys = mapper.create_full_litho_desc(df)
+    assert litho_keys[0] == 'sand/clay'
+    assert litho_keys[1] == 'loam/'
+    assert np.isnan(mapper.class_code('sand','martian rock'))
+
+
+def test_extract_single_lithology_class_3d():
+    x = np.empty([3,4,5])
+    class_value = 1.0
+    x[:,:,:] = class_value
+    x[1,:,:] = class_value + 2
+    x[:,2,:] = class_value + 3
+    x[:,:,3] = class_value + 4
+    y = extract_single_lithology_class_3d(x, class_value)
+    other_val = class_value - 1
+    assert (y[1,:,:] == other_val).all()
+    assert (y[:,2,:] == other_val).all()
+    assert (y[:,:,3] == other_val).all()
+    assert (y[0,:,:] == other_val).all()
+    assert (y[:,0,:] == other_val).all()
+    assert (y[:,:,0] == other_val).all()
+    assert (y[-1,:,:] == other_val).all()
+    assert (y[:,-1,:] == other_val).all()
+    assert (y[:,:,-1] == other_val).all()
+
+
+# test_class_mapping()
+# test_extract_single_lithology_class_3d()

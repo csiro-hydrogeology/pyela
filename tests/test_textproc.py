@@ -11,6 +11,23 @@ sys.path.append(pkg_dir)
 
 from ela.textproc import *
 
+# To avoit failing test on Travis:
+
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
+
+# try:
+#     nltk.data.find('tokenizers/averaged_perceptron_tagger')
+# except LookupError:
+#     nltk.download('averaged_perceptron_tagger')
+
+# try:
+#     nltk.data.find('tokenizers/stopwords')
+# except LookupError:
+#     nltk.download('stopwords')
+
 def test_litho_marker_detection():
     prim_classes = {
         'sand': 0,
