@@ -24,15 +24,25 @@ else:
     raise RuntimeError("Unable to find version string in %s." % (VERSIONFILE,))
 
 
-try:
-    import pypandoc
-    long_description = pypandoc.convert('README.md', 'rst')
-    long_description = long_description.replace("\r","") # Do not forget this line
-except:
-    print("Pandoc not found. Long_description conversion failure.")
-    # Get the long description from the README file
-    with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
-        long_description = f.read()
+# try:
+#     import pypandoc
+#     long_description = pypandoc.convert('README.md', 'rst')
+#     long_description = long_description.replace("\r","") # Do not forget this line
+#     long_description_content_type='text/markdown'
+# except:
+#     print("Pandoc not found. Long_description conversion failure.")
+#     # Get the long description from the README file
+#     with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
+#         long_description = f.read()
+#         long_description_content_type='text/markdown'
+
+# with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
+#     long_description = f.read()
+#     long_description_content_type='text/markdown'
+
+with open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
+    long_description = f.read()
+    long_description_content_type='text/x-rst'
 
 
 
@@ -48,6 +58,7 @@ REQUIREMENTS = ['pandas',
                 'rasterio',
                 'scikit-learn',
                 'scipy',
+                'striplog',  # NOTE should be git+https://github.com/jmp75/striplog@master#egg=striplog for 2.7, I think.
                 'matplotlib'
                 ]
 
@@ -63,7 +74,7 @@ CLASSIFIERS = ['Development Status :: 3 - Alpha',
                 'License :: OSI Approved :: MIT License',
                 'Operating System :: OS Independent',
                 'Programming Language :: Python',
-                'Programming Language :: Python :: 2.7',
+                # 'Programming Language :: Python :: 2.7',  # see striplog caveat above
                 'Programming Language :: Python :: 3.6'
                 ]
 # Arguments marked as "Required" below must be included for upload to PyPI.
@@ -78,7 +89,7 @@ setup(
     author='Jean-Michel Perraud, Juan Castilla',
     author_email='per202@csiro.au',
     classifiers=CLASSIFIERS,
-    keywords='lithology analysis',
+    keywords='lithology geophysics groundwater data-mining',
     packages=['ela'],
     install_requires=REQUIREMENTS,
     extras_require={
