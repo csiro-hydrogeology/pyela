@@ -15,11 +15,11 @@ This package combines features to:
 
 ## License
 
-MIT (see [License.txt](./LICENSE.txt))
+MIT (see [License.txt](https://github.com/jmp75/pyela/blob/master/LICENSE.txt))
 
 ## Documentation
 
-Get a [quick tour of the visualisation part of 'ela'](./docs/visual_tour.md)
+Get a [quick tour of the visualisation part of 'ela'](https://github.com/jmp75/pyela/blob/master/docs/visual_tour.md)
 
 ## Installation
 
