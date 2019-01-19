@@ -9,7 +9,7 @@ Analysing driller’s logs is a tedious and repetitive task in many groundwater 
 
 This package combines features to:
 
-* perform natural language processing lithology descriptions in the logs, to detect primary and secondary lithologies
+* perform natural language processing on lithology descriptions in the logs, to detect primary and secondary lithologies
 * apply supervised machine learning to interpolate lithologies across a 3D grid
 * visualise interactively the 3D data
 
@@ -23,13 +23,15 @@ Get a [quick tour of the visualisation part of 'ela'](https://github.com/jmp75/p
 
 ## Installation
 
-Note that 'ela' relies on several external packages, and some can be fiddly to install depending on the version of Python and packages. Below are fairly prescriptive instructions, given in the hope of limiting the risk of issues.
+'ela' relies on several external packages, and some can be fiddly to install depending on the version of Python and these external packages. This section thus has fairly prescriptive instructions, given in the hope of limiting the risk of issues.
+
+The first part of this section is focused on Linux.
 
 ### Debian packages for spatial projections
 
 `cartopy` and possibly other python packages require `proj4` version 4.9+ to be installed (libproj-dev). If your debian/ubuntu repo does not suffice (older versions) you may try:
 
-```sh
+```bash
 sudo apt-get install -y libc6  
 wget http://en.archive.ubuntu.com/ubuntu/pool/universe/p/proj/proj-data_4.9.3-2_all.deb
 sudo dpkg -i proj-data_4.9.3-2_all.deb
@@ -43,17 +45,17 @@ wget http://en.archive.ubuntu.com/ubuntu/pool/universe/p/proj/libproj-dev_4.9.3-
 sudo dpkg -i libproj-dev_4.9.3-2_amd64.deb
 ```
 
-### Installation of python dependencies with conda
+### Installation of python packages dependencies
 
 You may want to install [Anaconda](http://docs.continuum.io/anaconda/install) to install dependencies. Note that I recommend to **not** let anaconda change your startup file and change the `PATH` environment. To activate Anaconda you first need: `source ~/anaconda3/bin/activate`. Then choose a conda environment name.
 
 Optionally you may want to do `conda update -n base conda` and `conda update -n base anaconda-navigator`
 
-```sh
+```bash
 my_env_name=ELA
 ```
 
-```sh
+```bash
 conda create --name ${my_env_name} python=3.6
 conda activate  ${my_env_name}
 conda install --name ${my_env_name} rasterio cartopy geopandas pandas nltk scikit-learn scikit-image matplotlib vtk
@@ -61,16 +63,18 @@ conda install --name ${my_env_name} rasterio cartopy geopandas pandas nltk sciki
 
 As of writing (2018-08) conda does not have pyqt5, and a suitable version of mayavi for python3. We use `pip`
 
-```sh
+```bash
 pip install --upgrade pip
 ```
 
-```sh
-pip search pyqt5
+For Python 3.x one needs to install pyqt5 for mayavi, as per [these instructions](https://docs.enthought.com/mayavi/mayavi/installation.html). As of Jan 2019 be aware that there is a [known issue in mayavi visual rendering with pyqt5 as a backend](https://github.com/enthought/mayavi/issues/656) and 'ela' is affected by this. Nevertheless this is not a commplete blocker for most 'ela' features so installation instructions are kept here.
+
+```bash
+pip search pyqt5 | sort -g
 pip search mayavi
 ```
 
-```sh
+```bash
 pip install pyqt5
 pip install mayavi
 ```
@@ -81,16 +85,18 @@ Placeholder section. As of Sept 2018 it may be possible to install upon Python 3
 
 ### Installation of pyela
 
-```sh
-pip install -r requirements.txt
-python setup.py install
+As of January 2019 [ela is on pypi](https://pypi.org/project/ela/)
+
+```bash
+pip search ela
+pip install ela
 ```
 
-For Python 2.7.x pyqt5 is not available:
+Alternatively, from source:
 
-```sh
-# Note: not sure if conda-forge needed: conda config --add channels conda-forge
-conda create --name  ${my_env_name} python=2.7 mayavi rasterio cartopy geopandas pandas nltk scikit-learn scikit-image matplotlib vtk
+```bash
+pip install -r requirements.txt
+python setup.py install
 ```
 
 ## Related Geoscience packages
@@ -111,7 +117,7 @@ ModuleNotFoundError: No module named 'pip._internal'
 
 consider:
 
-```sh
+```bash
 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 python3 get-pip.py --force-reinstall
 ```

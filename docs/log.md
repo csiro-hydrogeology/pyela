@@ -4,52 +4,52 @@
 
 Dry run for submission to pypi. Bank on learnings from [releasing refcount](https://github.com/jmp75/didactique/blob/master/doc/know_how.md#python-packaging-for-pypi)
 
-```sh
+```bash
 cd ~/src/github_jm/pyela
 ```
 
-```sh
+```bash
 source ~/anaconda3/bin/activate
 my_env_name=ELA
 ```
 
-```sh
+```bash
 conda activate ${my_env_name}
 conda install wheel twine six pytest
 ```
 
-```sh
+```bash
 conda activate ${my_env_name}
 cd ~/src/github_jm/pyela
-# rm dist/*
+rm dist/*
 python3 setup.py sdist bdist_wheel
 ```
 
 Importantly to not end up with incorrect display of the readme:
 
-```sh
+```bash
 twine check dist/*
 ```
 
-```sh
+```bash
 twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 ```
 
 Then and only then:
 
-```sh
+```bash
 twine upload dist/*
 ```
 
 ## Troubleshooting
 
-```sh
+```bash
 pandoc -f markdown -t rst README.md  > README.rst
 ```
 
 Can view with the `retext` program (did not find VScode RST extensions working, or giving out blank output if not, perhaps)
 
-```sh
+```bash
 python setup.py check --restructuredtext
 ```
 
@@ -152,17 +152,17 @@ blah/anaconda3/envs/ELA/lib/python3.6/site-packages
 
 So, lesson, I think: beware of doing `python setup.py install --user` and/or with pip, from a conda environment. I think that is what messes things up.
 
-```sh
+```bash
 # Note: not sure if conda-forge needed: conda config --add channels conda-forge
 conda config --show-sources
 conda config --remove channels conda-forge
 ```
 
-```sh
+```bash
 my_env_name=ELA
 ```
 
-```sh
+```bash
 conda env remove --name ${my_env_name}
 ```
 
