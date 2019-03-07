@@ -1,24 +1,13 @@
 # ela
 
-**Python package for Exploratory Lithology Analysis**
+Exploratory Lithology Analysis
 
-[![build](https://img.shields.io/travis/jmp75/pyela.svg?branch=master)](https://travis-ci.org/jmp75/pyela)
-[![license](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/jmp75/pyela/blob/devel/LICENSE.txt)
-![status](https://img.shields.io/badge/status-alpha-blue.svg)
+[![license](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/jmp75/pyela/blob/devel/LICENSE.txt) ![status](https://img.shields.io/badge/status-alpha-blue.svg) master: [![build](https://img.shields.io/travis/jmp75/pyela.svg?branch=master)](https://travis-ci.org/jmp75/pyela)
 [![coverage](https://coveralls.io/repos/github/jmp75/pyela/badge.svg?branch=master)](https://coveralls.io/github/jmp75/pyela?branch=master)
-
-<!-- [![Docker Build](https://img.shields.io/docker/build/kinverarity/ela.svg)](https://hub.docker.com/r/kinverarity/ela/)
-[![Build status](https://ci.appveyor.com/api/projects/status/csr7bg8urkbtbq4n?svg=true)](https://ci.appveyor.com/project/kinverarity1/ela)
-[![Python versions](https://img.shields.io/pypi/pyversions/ela.svg)](https://www.python.org/downloads/) -->
-<!-- [![Version](http://img.shields.io/pypi/v/ela.svg)](https://pypi.python.org/pypi/ela/) -->
-
-<!-- .. image:: https://img.shields.io/codacy/ad9af103cba14d33abd5b327727ff644.svg 
-    :target: https://www.codacy.com/app/matt/striplog/dashboard
-    :alt: Codacy code review -->
 
 Analysing driller’s logs is a tedious and repetitive task in many groundwater modelling projects. Automating the process of extracting useful information from driller's logs allows spending less time on manual data wrangling, more time on its interpretation, and enhances the reproducibility of the analysis.
 
-This packages combines features to:
+This package combines features to:
 
 * perform natural language processing lithology descriptions in the logs, to detect primary and secondary lithologies
 * apply supervised machine learning to interpolate lithologies across a 3D grid
@@ -31,10 +20,6 @@ MIT (see [License.txt](./LICENSE.txt))
 ## Documentation
 
 Get a [quick tour of the visualisation part of 'ela'](./docs/visual_tour.md)
-
-_Placeholder section for other introductory material such as tutorials_
-
-<!-- See here for the [complete ela package documentation](https://ela.readthedocs.io/en/latest/). -->
 
 ## Installation
 
@@ -112,9 +97,6 @@ conda create --name  ${my_env_name} python=2.7 mayavi rasterio cartopy geopandas
 
 'ela' aims to complement other Python packages for geoscience, in particular for handling bore data . It depends on the package ['striplog'](https://github.com/agile-geoscience/striplog) and is likely to depend on ['lasio'](https://github.com/kinverarity1/lasio) in the future.
 
-<!-- Draft Notes-----------
-``conda install coveralls`` then ``conda install pytest-cov pytest-mpl``: this downgrades numpy a tad. Why? Trying ``conda update numpy`` but even odder outcome -->
-
 ## Known issues
 
 As of 2018-08, using mayavi 4.6 on python 3.6 is [buggy, a VTK issue it seems](https://github.com/enthought/mayavi/issues/656). Python 2.7 with mayavi 4.5 via Anaconda2 is known to work.
@@ -123,7 +105,7 @@ As of 2018-08, using mayavi 4.6 on python 3.6 is [buggy, a VTK issue it seems](h
 
 If in a conda environment trying to use `pip` you get:
 
-```txt
+```text
 ModuleNotFoundError: No module named 'pip._internal'
 ```
 
