@@ -95,7 +95,7 @@ class ClassMapper:
     def _to_int(self, f):
         if np.isnan(f): return f
         return int(round(f))
-    def map_classes(self, litho_classes):
+    def numeric_for_litho_classes(self, litho_classes):
         """Get the numeric class for primary+secondary lithologies
 
             Args:
