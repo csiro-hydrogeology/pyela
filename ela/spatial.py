@@ -245,6 +245,20 @@ def get_bbox(geo_pd):
     return (geo_pd.total_bounds[0], geo_pd.total_bounds[1], geo_pd.total_bounds[2], geo_pd.total_bounds[3])
 
 def create_meshgrid_cartesian(x_min, x_max, y_min, y_max, grid_res):
+    """Create a 2D meshgrid to be used with numpy for vectorized operations and Mayavi visualisation.
+    
+    Args:
+        x_min (numeric): lower x coordinate
+        x_max (numeric): upper x coordinate
+        y_min (numeric): lower y coordinate
+        y_max (numeric): upper y coordinate
+        grid_res (numeric): x and y resolution of the grid we create
+
+    Return:
+        (list of 2 2dim numpy.ndarray): 2-D coordinate arrays for vectorized evaluations of 2-D scalar/vector fields. 
+            The arrays are ordered such that the first dimension relates to the X coordinate and the second the Y coordinate. This is done such that 
+            the 2D coordinate arrays work as-is with visualisation with Mayavi without unnecessary transpose operations. 
+    """
     # The use of indexing='ij' deserves an explanation, as it is counter intuitive. The nupmy doc states
     # https://docs.scipy.org/doc/numpy/reference/generated/numpy.meshgrid.html
     # In the 2D case with inputs of length M and N, the outputs are of shame N, M for 'xy' indexing and M, N for 'ij' indexing
@@ -253,6 +267,17 @@ def create_meshgrid_cartesian(x_min, x_max, y_min, y_max, grid_res):
     return np.meshgrid(np.arange(x_min, x_max, grid_res),np.arange(y_min, y_max, grid_res), indexing='ij')
 
 def create_meshgrid(geo_pd, grid_res):
+    """Create a 2D meshgrid to be used with numpy for vectorized operations and Mayavi visualisation.
+    
+    Args:
+        geo_pd (geopandas): shape from which we can get the bounding box as a basis for the extend of the meshgrid
+        grid_res (numeric): x and y resolution of the grid we create
+
+    Return:
+        (list of 2 2dim numpy.ndarray): 2-D coordinate arrays for vectorized evaluations of 2-D scalar/vector fields. 
+            The arrays are ordered such that the first dimension relates to the X coordinate and the second the Y coordinate. This is done such that 
+            the 2D coordinate arrays work as-is with visualisation with Mayavi without unnecessary transpose operations. 
+    """
     x_min, y_min, x_max, y_max = get_bbox(geo_pd)
     return create_meshgrid_cartesian(x_min, x_max, y_min, y_max, grid_res)
 
