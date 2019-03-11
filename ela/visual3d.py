@@ -155,12 +155,12 @@ class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
         self.zzz=vol.copy()
         xcoord = xg[:,0]
         for xi in np.arange(self.dim_x):
-            self.xxx[xi,:,:]= xcoord[xi]
+            self.xxx[xi,:,:] = xcoord[xi]
         ycoord = yg[0,:]
         for yi in np.arange(self.dim_y):
-            self.yyy[:,yi,:]= ycoord[yi]
-        for zi in z_coords:
-            self.zzz[:,:,zi]= zi * z_scaling
+            self.yyy[:,yi,:] = ycoord[yi]
+        for zi in np.arange(self.dim_z):
+            self.zzz[:,:,zi] = z_coords[zi] * z_scaling
         self.POINTS_SCALE_FACTOR = 150
         self.title_prefix = 'Lithology class: ' 
 
