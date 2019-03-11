@@ -42,6 +42,79 @@ def add_ahd(lithology_df, data_raster, drop_na=False):
         df = df[pd.notna(df[DEPTH_TO_AHD_COL])]
     return df
 
+def get_coords_from_gpd_shape(shp, colname='geometry'):
+    p = shp[[colname]]
+    pts = p.values.flatten()
+    c = [(pt.x, pt.y) for pt in pts]
+    return pd.DataFrame(c, columns=["x","y"])
+
+
+class HeightDatumConverter:
+    """
+    Attributes:
+        crs (str, dict, or CRS): The coordinate reference system.
+        transform (Affine instance): Affine transformation mapping the pixel space to geographic space.
+    """
+    def __init__(self, dem_raster):
+        """Initialize this with a coordinate reference system object and an affine transform. See rasterio.
+        
+        Args:
+        """
+        self.dem_raster = dem_raster
+        self.data_grid = self.dem_raster.read(1)
+
+    def _raster_drill(self, row, easting_col, northing_col):
+        easting=row[easting_col]
+        northing=row[northing_col]
+
+    def _raster_drill_df(self, df, easting_col, northing_col):
+        x = df[easting_col].values
+        y = df[northing_col].values
+        v = np.empty_like(x)
+        for i in range(len(x)):
+            v[i] = read_raster_value(self.dem_raster, self.data_grid, x[i], y[i])
+        return v
+
+    def add_height(self, lithology_df, 
+        depth_from_col=DEPTH_FROM_COL, depth_to_col=DEPTH_TO_COL, 
+        depth_from_ahd_col=DEPTH_FROM_AHD_COL, depth_to_ahd_col=DEPTH_TO_AHD_COL, 
+        easting_col=EASTING_COL, northing_col=NORTHING_COL,
+        drop_na=False):
+        df = lithology_df.copy(deep=True)
+        nd = self.dem_raster.nodata
+        ahd = self._raster_drill_df(df, easting_col, northing_col)
+        ahd[ahd==nd] = np.nan
+        df[depth_from_ahd_col]=ahd-df[depth_from_col]
+        df[depth_to_ahd_col]=ahd-df[depth_to_col]
+        if drop_na:
+            df = df[pd.notna(df[depth_to_ahd_col])]
+        return df
+
+    def raster_value_at(self, easting, northing):
+        return read_raster_value(self.dem_raster, self.data_grid, easting, northing)
+
+class DepthsRounding:
+
+    def __init__(self, depth_from_col=DEPTH_FROM_COL, depth_to_col=DEPTH_TO_COL):
+        self.depth_from_col = depth_from_col
+        self.depth_to_col = depth_to_col
+
+    def round_to_metre_depths(self, df, func=np.round, remove_collapsed=False):
+        depth_from_rounded =df[self.depth_from_col].apply(func)
+        depth_to_rounded =df[self.depth_to_col].apply(func)
+        df_1 = df.copy(deep=True)
+        df_1[self.depth_from_col] = depth_from_rounded
+        df_1[self.depth_to_col] = depth_to_rounded
+        collapsed = (df_1[self.depth_from_col] == df_1[self.depth_to_col])
+        if remove_collapsed:
+            df_1 = df_1[~collapsed]
+        return df_1
+
+    def assess_num_collapsed(self, df, func=np.round):
+        tmp = self.round_to_metre_depths(df, func)
+        collapsed = (tmp[self.depth_from_col] == tmp[self.depth_to_col])
+        return collapsed.sum()
+
 # Remove if indeed redundant/superseded
 # def slice_above(lithology_df, lower_bound_raster, drop_na=True):
 #     df = lithology_df.copy(deep=True)

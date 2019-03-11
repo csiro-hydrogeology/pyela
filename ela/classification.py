@@ -407,6 +407,8 @@ def class_probability_estimates_depth_bbox(df, column_name, slice_depth, n_neigh
     mesh_grid = create_meshgrid(geo_pd, grid_res)
     return class_probability_estimates_depth(df, column_name, slice_depth, n_neighbours, mesh_grid, func_training_set)
 
+
+
 def interpolate_volume(volume, df, column_name, z_ahd_coords, n_neighbours, mesh_grid):
     dim_x,dim_y = mesh_grid[0].shape
     dim_z = len(z_ahd_coords)
@@ -415,6 +417,91 @@ def interpolate_volume(volume, df, column_name, z_ahd_coords, n_neighbours, mesh
     for index,ahd_height in enumerate(z_ahd_coords):
         surface = interpolate_lithologydata_slice_depth(df, column_name, ahd_height, n_neighbours, mesh_grid)
         volume[:,:,index]=surface
+
+class GridInterpolation:
+
+    def __init__(self, easting_col=EASTING_COL, northing_col=NORTHING_COL):
+        self.easting_col = easting_col
+        self.northing_col = northing_col
+
+    def interpolate_volume(self, volume, df, column_name, z_ahd_coords, n_neighbours, mesh_grid):
+        dim_x,dim_y = mesh_grid[0].shape
+        dim_z = len(z_ahd_coords)
+        if volume.shape[0] != dim_x or volume.shape[1] != dim_y or volume.shape[2] != dim_z:
+            raise Error("Incompatible dimensions in arguments")
+        for index,ahd_height in enumerate(z_ahd_coords):
+            surface = self.interpolate_lithologydata_slice_depth(df, column_name, ahd_height, n_neighbours, mesh_grid)
+            volume[:,:,index]=surface
+
+    def interpolate_lithologydata_slice_depth(self, df, column_name, slice_depth, n_neighbours, mesh_grid):
+        """
+        Interpolate lithology data
+
+        :df: bore lithology data  
+        :type: pandas data frame 
+        
+        :slice_depth: AHD coordinate at which to slice the data frame for lithology observations 
+        :type: double  
+        
+        :n_neighbours: Number of neighbors to pass to KNeighborsClassifier
+        :type: integer
+        
+        :mesh_grid: coordinate matrices to interpolate over (numpy.meshgrid)
+        :type: tuple
+        
+        :return: predicted values over the grid
+        :rtype: numpy array
+
+        """
+        knn = self.get_knn_model(df, column_name, slice_depth, n_neighbours)
+        return interpolate_over_meshgrid(knn, mesh_grid)
+
+    def get_knn_model(self, df, column_name, slice_depth, n_neighbours):
+        """Train a K-nearest neighbours model for a given plane 
+
+        Args:
+            df (data frame): 
+            column_name (str): 
+            slice_depth (numeric): 
+            n_neighbours (int): 
+
+        Returns:
+            KNeighborsClassifier: trained classifier.
+        """
+        df_1 = self.get_lithology_observations_for_depth(df, slice_depth, column_name)
+        X, y = self.make_training_set(df_1, column_name)
+        if n_neighbours > len(df_1):
+            return None
+        else:
+            knn = neighbors.KNeighborsClassifier(n_neighbours, weights = KNN_WEIGHTING).fit(X, y)
+            return knn
+
+    def get_lithology_observations_for_depth(self, df, slice_depth, column_name ):
+        """
+        Subset data frame with entries at a specified AHD coordinate, and with valid lithology information.
+
+            Args:
+                df (pandas data frame): bore lithology data  
+                slice_depth (float): AHD coordinate at which to slice the data frame for lithology observations 
+                column_name (str): name of the column with string information to use to strip entries with missing lithology information
+        
+            Returns:
+                a (view of a) data frame; a subset of the input data frame, 
+                entries intersecting with the specified slice depth
+        """
+        df_slice=lithologydata_slice_depth(df, slice_depth)
+        df_1=df_slice[np.isnan(df_slice[column_name]) == False]
+        return df_1
+
+    def make_training_set(self, observations, column_name):
+        # X = observations.as_matrix(columns=[EASTING_COL, NORTHING_COL])
+        X = observations[[self.easting_col, self.northing_col]].values
+        y = np.array(observations[column_name])
+        #NOTE: should I also do e.g.:
+        #shuffle_index = np.random.permutation(len(y))
+        #X, y = X[shuffle_index], y[shuffle_index]   
+        return (X, y)
+
 
 
 def pad_training_set_functor(classes):
