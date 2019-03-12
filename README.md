@@ -21,6 +21,8 @@ MIT (see [License.txt](https://github.com/jmp75/pyela/blob/master/LICENSE.txt))
 
 Get a [quick tour of the visualisation part of 'ela'](https://github.com/jmp75/pyela/blob/master/docs/visual_tour.md)
 
+As of March 2019 tutorials are hosted [in a separate githug repo](https://github.com/jmp75/pyela-doc)
+
 ## Installation
 
 'ela' relies on several external packages, and some can be fiddly to install depending on the version of Python and these external packages. This section thus has fairly prescriptive instructions, given in the hope of limiting the risk of issues.
