@@ -12,6 +12,8 @@ def read_raster_value(dem,band_1,easting,northing):
         dem (rasterio dataset): dem
     
     """
+    if (np.isnan(easting) or np.isnan(northing)):
+        raise Exception("Easting and northing must not be NaN")
     row, col = dem.index(easting,northing)
     # dem.index seems to return floats and this causes a but to index its numpy array. 
     # something used to work (who knows which package version soup) and does not anymore. At runtime. Dynamic typing...
@@ -70,7 +72,7 @@ class HeightDatumConverter:
     def _raster_drill_df(self, df, easting_col, northing_col):
         x = df[easting_col].values
         y = df[northing_col].values
-        v = np.empty_like(x)
+        v = np.empty_like(x, dtype=self.data_grid.dtype) # Try to fix https://github.com/jmp75/pyela/issues/2
         for i in range(len(x)):
             v[i] = read_raster_value(self.dem_raster, self.data_grid, x[i], y[i])
         return v
@@ -81,7 +83,7 @@ class HeightDatumConverter:
         easting_col=EASTING_COL, northing_col=NORTHING_COL,
         drop_na=False):
         df = lithology_df.copy(deep=True)
-        nd = self.dem_raster.nodata
+        nd = np.float32(self.dem_raster.nodata) # Try to fix https://github.com/jmp75/pyela/issues/2
         ahd = self._raster_drill_df(df, easting_col, northing_col)
         ahd[ahd==nd] = np.nan
         df[depth_from_ahd_col]=ahd-df[depth_from_col]
@@ -366,6 +368,7 @@ def surface_array(raster, x_min, y_min, x_max, y_max, grid_res):
     num_points=points.shape[1]
     band_1 = raster.read(1)
     z = []
+    nd = np.float32(raster.nodata)
     for point in np.arange(0,num_points):
         x=points[0,point]
         y=points[1,point]
@@ -378,6 +381,8 @@ def surface_array(raster, x_min, y_min, x_max, y_max, grid_res):
         col = int(col)
         if (row < nrow and col < ncol and row >= 0 and col >= 0):
             result=band_1[row,col]
+            if (result == nd):
+                result = np.nan
         else:
             result = np.nan
         z=np.append(z,result)

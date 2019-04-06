@@ -1,5 +1,7 @@
 # Log
 
+[slice this to visualise vertical cross-sections along arbitrarily oriented (straight) section lines](https://swung.slack.com/archives/C094GV18T/p1551858731038300)
+
 ## 2019-01-07
 
 Dry run for submission to pypi. Bank on learnings from [releasing refcount](https://github.com/jmp75/didactique/blob/master/doc/know_how.md#python-packaging-for-pypi)

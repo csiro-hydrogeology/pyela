@@ -252,13 +252,13 @@ def test_flip():
     flip(flip(m, 1),2)[0,0,3] == 3.14
     # assert flip(m, (1,3))[0,2,0] == 3.14
 
-# test_flip()
-# test_surface_array()
-# test_average_slices()
-# test_slice_volume()
-# test_interpolate_slice()
-# test_burn_volume()
-# test_height_coordinate_functor()
+test_flip()
+test_surface_array()
+test_average_slices()
+test_slice_volume()
+test_interpolate_slice()
+test_burn_volume()
+test_height_coordinate_functor()
 # test_make_training_set()
-# test_raster_drill()
+test_raster_drill()
 
