@@ -1,9 +1,11 @@
 # ela
 
-Exploratory Lithology Analysis
+## Exploratory Lithology Analysis
 
 [![license](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/jmp75/pyela/blob/devel/LICENSE.txt) ![status](https://img.shields.io/badge/status-alpha-blue.svg) master: [![build](https://img.shields.io/travis/jmp75/pyela.svg?branch=master)](https://travis-ci.org/jmp75/pyela)
 [![coverage](https://coveralls.io/repos/github/jmp75/pyela/badge.svg?branch=master)](https://coveralls.io/github/jmp75/pyela?branch=master)
+
+[![Getting started tutorial - Bungendore 3D lithology](https://raw.githubusercontent.com/jmp75/pyela-doc/master/tutorials/img/3d_overlay_bungendore_clay_lithology_small.png "Getting started tutorial - Bungendore 3D lithology")](https://github.com/jmp75/pyela-doc/blob/master/tutorials/getting_started.ipynb)
 
 Analysing driller’s logs is a tedious and repetitive task in many groundwater modelling projects. Automating the process of extracting useful information from driller's logs allows spending less time on manual data wrangling, more time on its interpretation, and enhances the reproducibility of the analysis.
 
@@ -19,9 +21,9 @@ MIT (see [License.txt](https://github.com/jmp75/pyela/blob/master/LICENSE.txt))
 
 ## Documentation
 
-Get a [quick tour of the visualisation part of 'ela'](https://github.com/jmp75/pyela/blob/master/docs/visual_tour.md)
+Tutorials are hosted [in a separate github repo](https://github.com/jmp75/pyela-doc)
 
-As of March 2019 tutorials are hosted [in a separate githug repo](https://github.com/jmp75/pyela-doc)
+Get a [quick tour of the visualisation part of 'ela'](https://github.com/jmp75/pyela/blob/master/docs/visual_tour.md).
 
 ## Installation
 
@@ -107,7 +109,8 @@ python setup.py install
 
 ## Known issues
 
-As of 2018-08, using mayavi 4.6 on python 3.6 is [buggy, a VTK issue it seems](https://github.com/enthought/mayavi/issues/656). Python 2.7 with mayavi 4.5 via Anaconda2 is known to work.
+3D interactive visualisation: As of 2018-08, using mayavi 4.6 on python 3.6 may be [visually buggy](https://github.com/enthought/mayavi/issues/656), though users reported success on 2019-03. Python 2.7 with mayavi 4.5 via Anaconda2 is known to 
+work.
 
 ## Troubleshooting
 
