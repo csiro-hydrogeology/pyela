@@ -50,6 +50,13 @@ def get_coords_from_gpd_shape(shp, colname='geometry'):
     c = [(pt.x, pt.y) for pt in pts]
     return pd.DataFrame(c, columns=["x","y"])
 
+def get_unique_coordinates(easting, northing):
+    grid_coords = np.empty( (len(easting), 2) )
+    grid_coords[:,0] = easting
+    grid_coords[:,1] = northing
+    b = np.unique(grid_coords[:,0] + 1j * grid_coords[:,1])
+    points = np.column_stack((b.real, b.imag))
+    return points
 
 class HeightDatumConverter:
     """
