@@ -426,9 +426,13 @@ def interpolate_volume(volume, df, column_name, z_ahd_coords, n_neighbours, mesh
 
 class GridInterpolation:
 
-    def __init__(self, easting_col=EASTING_COL, northing_col=NORTHING_COL):
+    def __init__(self, easting_col=EASTING_COL, northing_col=NORTHING_COL, depth_from_ahd_col=DEPTH_FROM_AHD_COL, depth_to_ahd_col=DEPTH_TO_AHD_COL):
         self.easting_col = easting_col
         self.northing_col = northing_col
+        self.depth_from_ahd_col = depth_from_ahd_col
+        self.depth_to_ahd_col = depth_to_ahd_col
+        self.dfcn = GeospatialDataFrameColumnNames(easting_col, northing_col, depth_from_ahd_col, depth_to_ahd_col)
+
 
     def interpolate_volume(self, volume, df, column_name, z_ahd_coords, n_neighbours, mesh_grid):
         dim_x,dim_y = mesh_grid[0].shape
@@ -465,10 +469,10 @@ class GridInterpolation:
     def get_knn_model(self, df, column_name, slice_depth, n_neighbours):
         """Train a K-nearest neighbours model for a given plane 
 
-        Args:
-            df (data frame): 
-            column_name (str): 
-            slice_depth (numeric): 
+        Args:self.dfcn
+            dself.dfcn): 
+            cself.dfcntr): 
+            sself.dfcnumeric): 
             n_neighbours (int): 
 
         Returns:
@@ -495,7 +499,7 @@ class GridInterpolation:
                 a (view of a) data frame; a subset of the input data frame, 
                 entries intersecting with the specified slice depth
         """
-        df_slice=lithologydata_slice_depth(df, slice_depth)
+        df_slice=self.dfcn.lithologydata_slice_depth(df, slice_depth)
         df_1=df_slice[np.isnan(df_slice[column_name]) == False]
         return df_1
 

@@ -2,7 +2,7 @@ import numpy as np
 
 from mayavi import mlab
 
-from ela.classification import extract_single_lithology_class_3d, extract_bore_class_num
+from ela.classification import extract_single_lithology_class_3d, GeospatialDataFrameColumnNames
 from ela.utils import flip
 from ela.visual import to_rgba_255, to_rgb, LithologiesClassesVisual
 from ela.textproc import EASTING_COL, NORTHING_COL, DEPTH_FROM_AHD_COL, DEPTH_FROM_COL, DEPTH_TO_AHD_COL, DEPTH_TO_COL, PRIMARY_LITHO_NUM_COL, GEOMETRY_COL
@@ -137,6 +137,7 @@ class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
     def __init__(self, class_names, color_names, missing_value_color_name, dem_array_data, z_coords, z_scaling, litho_df, column_name):
         super(LithologiesClassesOverlayVisual3d, self).__init__(class_names, color_names, missing_value_color_name)
         # 1D georeferenced data (bore primary litho data)
+        self.dfcn = GeospatialDataFrameColumnNames(easting_col, northing_col, depth_from_ahd_col, depth_to_ahd_col)
         x, y, z_from, z_to, s = extract_bore_class_num(litho_df, column_name)
         self.bore_data = scale_z_bore_pos_points(x, y, z_to, s, z_scaling)
         # 2d data: DEM
