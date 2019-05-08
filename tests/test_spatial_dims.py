@@ -189,7 +189,8 @@ def test_raster_drill():
     df = get_test_bore_df()
     dem = rasterio.open(os.path.join(pkg_dir, 'tests', 'data', 'test_raster_drill.tif'))
     raster_grid = dem.read(1)
-    heights = raster_drill_df(df, dem, raster_grid)
+    cd = HeightDatumConverter(dem)
+    heights = cd.raster_drill_df(df)
     assert np.isnan(heights[0])
     assert heights[1] == 1.0
     assert heights[2] == 2.0
@@ -200,7 +201,8 @@ def test_add_ahd():
     y_max = 6422275
     df = get_test_bore_df()
     dem = rasterio.open(os.path.join(pkg_dir, 'tests', 'data', 'test_raster_drill.tif'))
-    df_ahd = add_ahd(df, dem)
+    cd = HeightDatumConverter(dem)
+    df_ahd = cd.add_height(df)
     from_ahd = df_ahd[DEPTH_FROM_AHD_COL]
     to_ahd = df_ahd[DEPTH_TO_AHD_COL]
     assert np.isnan(from_ahd[0])
@@ -220,8 +222,6 @@ def test_average_slices():
     assert avg[0,0] == incr_2 / 2
     assert avg[0,1] == (incr_2 / 2) + 1.0
     assert avg[1,0] == (incr_2 / 2) + 3.0
-
-
 
 # create_test_raster(x_min = 383200, y_max = 6422275, grid_res = 25 , ni = 10, nj = 10, start=0.0, incr_1 = 1.0, output_file=os.path.join(pkg_dir, 'tests', 'data', 'test_raster_25m.tif'))
 def test_surface_array():
@@ -252,13 +252,15 @@ def test_flip():
     flip(flip(m, 1),2)[0,0,3] == 3.14
     # assert flip(m, (1,3))[0,2,0] == 3.14
 
-test_flip()
-test_surface_array()
-test_average_slices()
-test_slice_volume()
-test_interpolate_slice()
-test_burn_volume()
-test_height_coordinate_functor()
-# test_make_training_set()
-test_raster_drill()
+
+test_add_ahd()
+# test_flip()
+# test_surface_array()
+# test_average_slices()
+# test_slice_volume()
+# test_interpolate_slice()
+# test_burn_volume()
+# test_height_coordinate_functor()
+# # test_make_training_set()
+# test_raster_drill()
 
