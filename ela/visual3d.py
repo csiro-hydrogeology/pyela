@@ -46,8 +46,10 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         color_names (str):
         color_names_with_missing (str):
     """
-    def __init__(self, class_names, color_names, missing_value_color_name):
+    def __init__(self, class_names, color_names, missing_value_color_name, easting_col=EASTING_COL, northing_col=NORTHING_COL, depth_from_ahd_col=DEPTH_FROM_AHD_COL, depth_to_ahd_col=DEPTH_TO_AHD_COL):
         super(LithologiesClassesVisual3d, self).__init__(class_names, color_names, missing_value_color_name)
+        # 1D georeferenced data (bore primary litho data)
+        self.dfcn = GeospatialDataFrameColumnNames(easting_col, northing_col, depth_from_ahd_col, depth_to_ahd_col)
 
     def set_litho_class_colormap(self, lut):
         set_custom_colormap(lut, self.color_names)
@@ -75,8 +77,8 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         y_cut=self.create_plane_cut(s, plane_orientation='y_axes')
         z_cut=self.create_plane_cut(s, plane_orientation='z_axes')
         mlab.outline()
-        mlab_label(mlab.xlabel, text=EASTING_COL)
-        mlab_label(mlab.ylabel, text=NORTHING_COL)
+        mlab_label(mlab.xlabel, text=self.dfcn.easting_col)
+        mlab_label(mlab.ylabel, text=self.dfcn.northing_col)
         mlab_label(mlab.zlabel, text='mAHD')
         mlab.scalarbar(nb_labels=self.nb_labels())
         mlab_title(title)
@@ -91,8 +93,8 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         s = single_litho
         mlab.contour3d(s, contours=[class_value-0.5], color=to_rgb(color_name))
         mlab.outline()
-        mlab_label(mlab.xlabel, text=EASTING_COL)
-        mlab_label(mlab.ylabel, text=NORTHING_COL)
+        mlab_label(mlab.xlabel, text=self.dfcn.easting_col)
+        mlab_label(mlab.ylabel, text=self.dfcn.northing_col)
         mlab_label(mlab.zlabel, text='mAHD')
         mlab_title(class_name)
 
@@ -106,8 +108,8 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         y_cut=self.create_plane_cut(s, plane_orientation='y_axes', colormap=colormap)
         z_cut=self.create_plane_cut(s, plane_orientation='z_axes', colormap=colormap)
         mlab.outline()
-        mlab_label(mlab.xlabel, text=EASTING_COL)
-        mlab_label(mlab.ylabel, text=NORTHING_COL)
+        mlab_label(mlab.xlabel, text=self.dfcn.easting_col)
+        mlab_label(mlab.ylabel, text=self.dfcn.northing_col)
         mlab_label(mlab.zlabel, text='mAHD')
         mlab_title(title)
         mlab.scalarbar(nb_labels=11)
@@ -134,11 +136,12 @@ def scale_z_bore_pos_points(x, y, z, s, z_scaling):
 #######################
 
 class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
-    def __init__(self, class_names, color_names, missing_value_color_name, dem_array_data, z_coords, z_scaling, litho_df, column_name):
+    def __init__(self, class_names, color_names, missing_value_color_name, dem_array_data, z_coords, z_scaling, litho_df, column_name, 
+        easting_col=EASTING_COL, northing_col=NORTHING_COL, depth_from_ahd_col=DEPTH_FROM_AHD_COL, depth_to_ahd_col=DEPTH_TO_AHD_COL):
         super(LithologiesClassesOverlayVisual3d, self).__init__(class_names, color_names, missing_value_color_name)
         # 1D georeferenced data (bore primary litho data)
         self.dfcn = GeospatialDataFrameColumnNames(easting_col, northing_col, depth_from_ahd_col, depth_to_ahd_col)
-        x, y, z_from, z_to, s = extract_bore_class_num(litho_df, column_name)
+        x, y, z_from, z_to, s = self.dfcn.extract_bore_class_num(litho_df, column_name)
         self.bore_data = scale_z_bore_pos_points(x, y, z_to, s, z_scaling)
         # 2d data: DEM
         xg, yg = dem_array_data['mesh_xy']
