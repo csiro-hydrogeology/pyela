@@ -253,7 +253,7 @@ def test_flip():
     # assert flip(m, (1,3))[0,2,0] == 3.14
 
 
-test_add_ahd()
+# test_add_ahd()
 # test_flip()
 # test_surface_array()
 # test_average_slices()
