@@ -25,7 +25,23 @@ Tutorials are hosted [in a separate github repo](https://github.com/jmp75/pyela-
 
 Get a [quick tour of the visualisation part of 'ela'](https://github.com/jmp75/pyela/blob/master/docs/visual_tour.md).
 
-## Installation
+## Installation 
+
+As of January 2019 [ela is on pypi](https://pypi.org/project/ela/). Before installing you may want to skim the "Installation details" section thereafter to think of context (e.g. conda env) but otherwhse `pip install ela` should install the required dependencies.
+
+```bash
+pip search ela
+pip install ela
+```
+
+Alternatively, from source:
+
+```bash
+pip install -r requirements.txt
+python setup.py install
+```
+
+## Installation details
 
 'ela' relies on several external packages, and some can be fiddly to install depending on the version of Python and these external packages. This section thus has fairly prescriptive instructions, given in the hope of limiting the risk of issues.
 
@@ -86,22 +102,6 @@ pip install mayavi
 ### Windows
 
 Placeholder section. As of Sept 2018 it may be possible to install upon Python 3.6+ with Anaconda 3, and then including mayavi from pip.
-
-### Installation of pyela
-
-As of January 2019 [ela is on pypi](https://pypi.org/project/ela/)
-
-```bash
-pip search ela
-pip install ela
-```
-
-Alternatively, from source:
-
-```bash
-pip install -r requirements.txt
-python setup.py install
-```
 
 ## Related Geoscience packages
 
