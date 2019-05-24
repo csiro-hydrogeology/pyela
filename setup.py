@@ -90,7 +90,7 @@ setup(
     author_email='per202@csiro.au',
     classifiers=CLASSIFIERS,
     keywords='lithology geophysics groundwater data-mining',
-    packages=['ela'],
+    packages=['ela', 'ela.experiment'],
     install_requires=REQUIREMENTS,
     extras_require={
         ':python_version >= "3.6"': [
