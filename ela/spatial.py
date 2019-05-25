@@ -428,6 +428,24 @@ def surface_array(raster, x_min, y_min, x_max, y_max, grid_res):
 # mlab.outline()
 # mlab.show()
 
+def pad_training_set_functor(classes):
+    ### NEED TO APPEND DUMMY DATA TO MAKE SURE ALL CLASSES ARE PRESENT IN EACH SLICE ###
+    # 0=sand
+    # 1=sandstone 
+    # 2=clay
+    # 3=limestone
+    # 4=shale
+    # 5=basalt
+    # 6=coffee rock
+    n = len(classes)
+    def pad_training_set(X, y):
+        dummy_EN=np.array([[0,0] for i in range(n)])
+        dummy_targets=np.array(range(n))
+        X=np.vstack((X,dummy_EN))
+        y=np.append(y,dummy_targets)
+        return (X, y)
+    return pad_training_set
+
 
 
 class GeospatialDataFrameColumnNames(object):
@@ -563,6 +581,7 @@ class GeospatialDataFrameColumnNames(object):
 
             Args:
                 df (pandas data frame): bore lithology data  
+                column_name (str): name of the column with string information to use to strip entries with missing lithology information
                 slice_depth (float): AHD coordinate at which to slice the data frame for lithology observations
                 n_neighbours (int): number of nearest neighbours 
                 mesh_grid (tuple): coordinate matrices to interpolate over (numpy.meshgrid)
@@ -588,6 +607,19 @@ class GeospatialDataFrameColumnNames(object):
     def class_probability_estimates_depth_bbox(self, df, column_name, slice_depth, n_neighbours, geo_pd, grid_res = 100, func_training_set=None):
         mesh_grid = create_meshgrid(geo_pd, grid_res)
         return self.class_probability_estimates_depth(df, column_name, slice_depth, n_neighbours, mesh_grid, func_training_set)
+
+    def get_lithology_classes_probabilities(self, lithologies, shape, df, column_name, z_ahd_coords, n_neighbours, mesh_grid):
+        dim_x,dim_y,dim_z = shape
+        vol_template=np.empty((dim_x,dim_y,dim_z))
+        classprob_3d_arrays=[vol_template.copy() for i in lithologies]
+        n_classes = len(lithologies)
+        pad_training_set = pad_training_set_functor(lithologies)
+        # iterate over all slices
+        for z_index,ahd_height in enumerate(z_ahd_coords):
+            result=self.class_probability_estimates_depth(df, column_name, ahd_height, n_neighbours, mesh_grid, func_training_set = pad_training_set)
+            for i in range(n_classes):
+                classprob_3d_arrays[i][:,:,z_index]=result[i]
+        return classprob_3d_arrays
 
     def interpolate_lithologydata_slice_depth(self, df, column_name, slice_depth, n_neighbours, mesh_grid):
         """Interpolate lithology data

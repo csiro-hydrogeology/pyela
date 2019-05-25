@@ -177,28 +177,62 @@ def legend_fig(k_legend_display_info):
 
 
 class LithologiesClassesVisual(object):
+    """Visual information to map to rendering lithology classes
+
+    A parent helper class with lithology classes and color scheme information to apply to data in a set of custom visual rendering using Mayavi
+
+    Attributes:
+        class_names (str):
+        color_names (str):
+        color_names_with_missing (str):
+    """
     def __init__(self, class_names, color_names, missing_value_color_name):
+        """Define class names of interest in visualised data set, and color coding.
+        
+        Args:
+            class_names (list of str): names of the classes
+            color_names (list of str): names of the colors for the classes. See matplotlib doc for suitable names: https://matplotlib.org/examples/color/named_colors.html
+            missing_value_color_name (str): name of the color for missing values (NaN)
+        """
         self.class_names = class_names
         self.color_names = color_names
         self.color_names_with_missing = [missing_value_color_name] + color_names
 
     def nb_labels(self):
+        """Gets the number of classes. Used for e.g. legend's portioning"""
         return len(self.class_names)
 
     def nb_labels_with_missing(self):
+        """Gets the number of classes plus one for the missing value code. Used for e.g. legend's portioning"""
         return self.nb_labels() + 1
 
 
 def to_rgb(color_name):  # because anaconda2 seems stuck with Matplotlib 1.5 and there is no to_rgb (there is, in ulterior versions!)
+    """
+    Returns an *RGB* tuple of three floats from 0-1. shortcut to matplotlib, needed bc anaconda2 seems stuck with Matplotlib 1.5 .
+
+    *color_name* can be an *RGB* or *RGBA* sequence or a string in any of
+    several forms:
+
+        1) a letter from the set 'rgbcmykw'
+        2) a hex color string, like '#00FFFF'
+        3) a standard name, like 'aqua'
+        4) a string representation of a float, like '0.4',
+            indicating gray on a 0-1 scale
+
+    if *arg* is *RGBA*, the *A* will simply be discarded.
+    """
     return colors.colorConverter.to_rgb(color_name)
 
 # a couple of functions to create color maps suitable for mayavi.
 
 def to_rgb_255(colorname):
+    """Returns an *RGB* tuple of three ints from 0-255"""
     rgb = to_rgb(colorname)
     return [int(x * 255) for x in rgb]
 
 def to_rgba_255(colorname, alpha = 255):
+    """Returns an *RGBA* tuple of 4 ints from 0-255"""
     rgb = to_rgb_255(colorname)
     return [rgb[0], rgb[1], rgb[2], alpha]
 

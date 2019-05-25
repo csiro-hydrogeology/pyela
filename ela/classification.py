@@ -337,40 +337,6 @@ class GridInterpolation:
         return (X, y)
 
 
-
-def pad_training_set_functor(classes):
-    ### NEED TO APPEND DUMMY DATA TO MAKE SURE ALL CLASSES ARE PRESENT IN EACH SLICE ###
-    # 0=sand
-    # 1=sandstone 
-    # 2=clay
-    # 3=limestone
-    # 4=shale
-    # 5=basalt
-    # 6=coffee rock
-    n = len(classes)
-    def pad_training_set(X, y):
-        dummy_EN=np.array([[0,0] for i in range(n)])
-        dummy_targets=np.array(range(n))
-        X=np.vstack((X,dummy_EN))
-        y=np.append(y,dummy_targets)
-        return (X, y)
-    return pad_training_set
-
-
-def get_lithology_classes_probabilities(lithologies, shape, df, column_name, z_ahd_coords, n_neighbours, mesh_grid):
-    dim_x,dim_y,dim_z = shape
-    vol_template=np.empty((dim_x,dim_y,dim_z))
-    classprob_3d_arrays=[vol_template.copy() for i in lithologies]
-    n_classes = len(lithologies)
-    pad_training_set = pad_training_set_functor(lithologies)
-    # iterate over all slices
-    for z_index,ahd_height in enumerate(z_ahd_coords):
-        result=class_probability_estimates_depth(df, column_name, ahd_height, n_neighbours, mesh_grid, func_training_set = pad_training_set)
-        for i in range(n_classes):
-            classprob_3d_arrays[i][:,:,z_index]=result[i]
-    return classprob_3d_arrays
-
-
 def extract_single_lithology_class_3d(lithology_3d_classes, class_value):
     """Transform a 3D volume of lithology class codes by binary bining cells as being either of a class value or other. Preprocessing primarily for 3D visualisation for Mayavi.
 
