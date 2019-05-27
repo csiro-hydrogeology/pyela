@@ -4,12 +4,9 @@ ela
 Exploratory Lithology Analysis
 ------------------------------
 
-`license <https://github.com/jmp75/pyela/blob/devel/LICENSE.txt>`__
-|status| master: `build <https://travis-ci.org/jmp75/pyela>`__
-`coverage <https://coveralls.io/github/jmp75/pyela?branch=master>`__
+|license| |status| master: |build| |coverage|
 
-`Getting started tutorial - Bungendore 3D
-lithology <https://github.com/jmp75/pyela-doc/blob/master/tutorials/getting_started.ipynb>`__
+|Getting started tutorial - Bungendore 3D lithology|
 
 Analysing driller’s logs is a tedious and repetitive task in many
 groundwater modelling projects. Automating the process of extracting
@@ -139,6 +136,18 @@ affected by this. Nevertheless this is not a commplete blocker for most
    pip install pyqt5
    pip install mayavi
 
+Optional dependencies
+^^^^^^^^^^^^^^^^^^^^^
+
+As of 2019-05 you can find new features using deep learning for
+classification in the ``ela.experiment`` submodule. You will need the
+additional dependencies:
+
+.. code:: bash
+
+   conda install --name ${my_env_name} gensim tensorflow keras
+   pip install wordcloud
+
 Windows
 ~~~~~~~
 
@@ -153,6 +162,9 @@ particular for handling bore data . It depends on the package
 `‘striplog’ <https://github.com/agile-geoscience/striplog>`__ and is
 likely to depend on `‘lasio’ <https://github.com/kinverarity1/lasio>`__
 in the future.
+
+You should also check the reposiroty
+`hydrogeol_utils <https://github.com/Neil-Symington/hydrogeol_utils>`__
 
 Known issues
 ------------
@@ -179,5 +191,12 @@ consider:
    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
    python3 get-pip.py --force-reinstall
 
+.. |license| image:: http://img.shields.io/badge/license-MIT-blue.svg
+   :target: https://github.com/jmp75/pyela/blob/devel/LICENSE.txt
 .. |status| image:: https://img.shields.io/badge/status-alpha-blue.svg
-
+.. |build| image:: https://img.shields.io/travis/jmp75/pyela.svg?branch=master
+   :target: https://travis-ci.org/jmp75/pyela
+.. |coverage| image:: https://coveralls.io/repos/github/jmp75/pyela/badge.svg?branch=master
+   :target: https://coveralls.io/github/jmp75/pyela?branch=master
+.. |Getting started tutorial - Bungendore 3D lithology| image:: https://raw.githubusercontent.com/jmp75/pyela-doc/master/tutorials/img/3d_overlay_bungendore_clay_lithology_small.png
+   :target: https://github.com/jmp75/pyela-doc/blob/master/tutorials/getting_started.ipynb

@@ -99,6 +99,15 @@ pip install pyqt5
 pip install mayavi
 ```
 
+#### Optional dependencies
+
+As of 2019-05 you can find new features using deep learning for classification in the `ela.experiment` submodule. You will need the additional dependencies:
+
+```bash
+conda install --name ${my_env_name} gensim tensorflow keras
+pip install wordcloud
+```
+
 ### Windows
 
 Placeholder section. As of Sept 2018 it may be possible to install upon Python 3.6+ with Anaconda 3, and then including mayavi from pip.
@@ -106,6 +115,8 @@ Placeholder section. As of Sept 2018 it may be possible to install upon Python 3
 ## Related Geoscience packages
 
 'ela' aims to complement other Python packages for geoscience, in particular for handling bore data . It depends on the package ['striplog'](https://github.com/agile-geoscience/striplog) and is likely to depend on ['lasio'](https://github.com/kinverarity1/lasio) in the future.
+
+You should also check the reposiroty [hydrogeol_utils](https://github.com/Neil-Symington/hydrogeol_utils)
 
 ## Known issues
 
