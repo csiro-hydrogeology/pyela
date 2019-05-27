@@ -1,3 +1,4 @@
+import numpy as np
 import string
 import pandas as pd
 import re
@@ -10,7 +11,7 @@ from keras.preprocessing.sequence import pad_sequences
 from keras import utils
 from keras import regularizers
 from keras import optimizers
-from wordcloud import WordCloud,STOPWORD
+from wordcloud import WordCloud,STOPWORDS
 
 
 import nltk
