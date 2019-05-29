@@ -24,6 +24,7 @@ conda install wheel twine six pytest
 conda activate ${my_env_name}
 cd ~/src/github_jm/pyela
 rm dist/*
+pandoc -f markdown -t rst README.md  > README.rst
 python3 setup.py sdist bdist_wheel
 ```
 

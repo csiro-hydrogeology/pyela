@@ -25,7 +25,23 @@ Tutorials are hosted [in a separate github repo](https://github.com/jmp75/pyela-
 
 Get a [quick tour of the visualisation part of 'ela'](https://github.com/jmp75/pyela/blob/master/docs/visual_tour.md).
 
-## Installation
+## Installation 
+
+As of January 2019 [ela is on pypi](https://pypi.org/project/ela/). Before installing you may want to skim the "Installation details" section thereafter to think of context (e.g. conda env) but otherwhse `pip install ela` should install the required dependencies.
+
+```bash
+pip search ela
+pip install ela
+```
+
+Alternatively, from source:
+
+```bash
+pip install -r requirements.txt
+python setup.py install
+```
+
+## Installation details
 
 'ela' relies on several external packages, and some can be fiddly to install depending on the version of Python and these external packages. This section thus has fairly prescriptive instructions, given in the hope of limiting the risk of issues.
 
@@ -83,29 +99,24 @@ pip install pyqt5
 pip install mayavi
 ```
 
+#### Optional dependencies
+
+As of 2019-05 you can find new features using deep learning for classification in the `ela.experiment` submodule. You will need the additional dependencies:
+
+```bash
+conda install --name ${my_env_name} gensim tensorflow keras
+pip install wordcloud
+```
+
 ### Windows
 
 Placeholder section. As of Sept 2018 it may be possible to install upon Python 3.6+ with Anaconda 3, and then including mayavi from pip.
 
-### Installation of pyela
-
-As of January 2019 [ela is on pypi](https://pypi.org/project/ela/)
-
-```bash
-pip search ela
-pip install ela
-```
-
-Alternatively, from source:
-
-```bash
-pip install -r requirements.txt
-python setup.py install
-```
-
 ## Related Geoscience packages
 
 'ela' aims to complement other Python packages for geoscience, in particular for handling bore data . It depends on the package ['striplog'](https://github.com/agile-geoscience/striplog) and is likely to depend on ['lasio'](https://github.com/kinverarity1/lasio) in the future.
+
+You should also check the reposiroty [hydrogeol_utils](https://github.com/Neil-Symington/hydrogeol_utils)
 
 ## Known issues
 

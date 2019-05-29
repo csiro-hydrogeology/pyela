@@ -2,7 +2,7 @@ import numpy as np
 
 from mayavi import mlab
 
-from ela.classification import extract_single_lithology_class_3d, extract_bore_class_num
+from ela.classification import extract_single_lithology_class_3d, GeospatialDataFrameColumnNames
 from ela.utils import flip
 from ela.visual import to_rgba_255, to_rgb, LithologiesClassesVisual
 from ela.textproc import EASTING_COL, NORTHING_COL, DEPTH_FROM_AHD_COL, DEPTH_FROM_COL, DEPTH_TO_AHD_COL, DEPTH_TO_COL, PRIMARY_LITHO_NUM_COL, GEOMETRY_COL
@@ -37,22 +37,43 @@ def set_custom_colormap(lut, color_names):
 
 
 class LithologiesClassesVisual3d(LithologiesClassesVisual):
-    """Visual information to map to rendering 3D lithologies
-
-    A helper class with lithology classes and color scheme information to apply to data in a set of custom visual rendering using Mayavi
+    """Visual information to facilitate the visualisation of 3D lithologies
 
     Attributes:
-        class_names (str):
-        color_names (str):
-        color_names_with_missing (str):
+        dfcn (GeospatialDataFrameColumnNames): data frame column names definition
     """
-    def __init__(self, class_names, color_names, missing_value_color_name):
+    def __init__(self, class_names, color_names, missing_value_color_name, easting_col=EASTING_COL, northing_col=NORTHING_COL, depth_from_ahd_col=DEPTH_FROM_AHD_COL, depth_to_ahd_col=DEPTH_TO_AHD_COL):
         super(LithologiesClassesVisual3d, self).__init__(class_names, color_names, missing_value_color_name)
+        """Define class names of interest in visualised data set, and color coding.
+        
+        Args:
+            class_names (list of str): names of the classes
+            color_names (list of str): names of the colors for the classes. See matplotlib doc for suitable names: https://matplotlib.org/examples/color/named_colors.html
+            missing_value_color_name (str): name of the color for missing values (NaN)
+            easting_col (str): name of the data frame column for easting
+            northing_col (str): name of the data frame column for northing
+            depth_from_ahd_col (str): name of the data frame column for the height of the top of the soil column (ahd stands for for australian height datum, but not restricted)
+            depth_to_ahd_col (str): name of the data frame column for the height of the bottom of the soil column (ahd stands for for australian height datum, but not restricted)        
+        """
+        # 1D georeferenced data (bore primary litho data)
+        self.dfcn = GeospatialDataFrameColumnNames(easting_col, northing_col, depth_from_ahd_col, depth_to_ahd_col)
 
     def set_litho_class_colormap(self, lut):
+        """Builds a Mayavi compatible LookUpTable given the colormap definition of the present object. 
+        See Reference: http://docs.enthought.com/mayavi/mayavi/auto/example_custom_colormap.html 
+        
+        Args:
+            lut (LUTManager): an instance of an LUTManager coming from Mayavi. 
+        """        
         set_custom_colormap(lut, self.color_names)
 
     def set_litho_class_colormap_with_unclassified(self, lut):
+        """Builds a Mayavi compatible LookUpTable given the colormap definition of the present object, including the missing value code. 
+        See Reference: http://docs.enthought.com/mayavi/mayavi/auto/example_custom_colormap.html 
+        
+        Args:
+            lut (LUTManager): an instance of an LUTManager coming from Mayavi. 
+        """        
         set_custom_colormap(lut, self.color_names_with_missing)
 
     def create_plane_cut(self, volume, plane_orientation='x_axes', slice_index = 20, colormap=None):
@@ -75,8 +96,8 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         y_cut=self.create_plane_cut(s, plane_orientation='y_axes')
         z_cut=self.create_plane_cut(s, plane_orientation='z_axes')
         mlab.outline()
-        mlab_label(mlab.xlabel, text=EASTING_COL)
-        mlab_label(mlab.ylabel, text=NORTHING_COL)
+        mlab_label(mlab.xlabel, text=self.dfcn.easting_col)
+        mlab_label(mlab.ylabel, text=self.dfcn.northing_col)
         mlab_label(mlab.zlabel, text='mAHD')
         mlab.scalarbar(nb_labels=self.nb_labels())
         mlab_title(title)
@@ -91,8 +112,8 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         s = single_litho
         mlab.contour3d(s, contours=[class_value-0.5], color=to_rgb(color_name))
         mlab.outline()
-        mlab_label(mlab.xlabel, text=EASTING_COL)
-        mlab_label(mlab.ylabel, text=NORTHING_COL)
+        mlab_label(mlab.xlabel, text=self.dfcn.easting_col)
+        mlab_label(mlab.ylabel, text=self.dfcn.northing_col)
         mlab_label(mlab.zlabel, text='mAHD')
         mlab_title(class_name)
 
@@ -106,8 +127,8 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         y_cut=self.create_plane_cut(s, plane_orientation='y_axes', colormap=colormap)
         z_cut=self.create_plane_cut(s, plane_orientation='z_axes', colormap=colormap)
         mlab.outline()
-        mlab_label(mlab.xlabel, text=EASTING_COL)
-        mlab_label(mlab.ylabel, text=NORTHING_COL)
+        mlab_label(mlab.xlabel, text=self.dfcn.easting_col)
+        mlab_label(mlab.ylabel, text=self.dfcn.northing_col)
         mlab_label(mlab.zlabel, text='mAHD')
         mlab_title(title)
         mlab.scalarbar(nb_labels=11)
@@ -134,14 +155,17 @@ def scale_z_bore_pos_points(x, y, z, s, z_scaling):
 #######################
 
 class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
-    def __init__(self, class_names, color_names, missing_value_color_name, dem_array_data, z_coords, z_scaling, litho_df, column_name):
+    def __init__(self, class_names, color_names, missing_value_color_name, dem_array_data, z_coords, z_scaling, litho_df, column_name, 
+        easting_col=EASTING_COL, northing_col=NORTHING_COL, depth_from_ahd_col=DEPTH_FROM_AHD_COL, depth_to_ahd_col=DEPTH_TO_AHD_COL):
         super(LithologiesClassesOverlayVisual3d, self).__init__(class_names, color_names, missing_value_color_name)
         # 1D georeferenced data (bore primary litho data)
-        x, y, z_from, z_to, s = extract_bore_class_num(litho_df, column_name)
+        self.dfcn = GeospatialDataFrameColumnNames(easting_col, northing_col, depth_from_ahd_col, depth_to_ahd_col)
+        x, y, z_from, z_to, s = self.dfcn.extract_bore_class_num(litho_df, column_name)
         self.bore_data = scale_z_bore_pos_points(x, y, z_to, s, z_scaling)
         # 2d data: DEM
         xg, yg = dem_array_data['mesh_xy']
         dem_a = dem_array_data['dem_array']
+        self.z_scaling = z_scaling
         dem_a_scaled = dem_a * z_scaling
         self.dem_mesh = (xg, yg, dem_a_scaled)
         self.dim_x,self.dim_y=xg.shape
@@ -193,7 +217,8 @@ class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
         class_name = self.class_names[litho_class_index]
         s = extract_single_lithology_class_3d(lithology_3d_array, litho_class_value)
         vol_mesh = (self.xxx, self.yyy, self.zzz, s)
-        return self.overlay_bore_classes(self.dem_mesh, vol_mesh, self.bore_data, vol_colorname, z_label='AHD x 50', points_scale_factor=self.POINTS_SCALE_FACTOR, title=self.title_prefix + class_name)
+        z_label='AHD x ' + str(self.z_scaling)
+        return self.overlay_bore_classes(self.dem_mesh, vol_mesh, self.bore_data, vol_colorname, z_label=z_label, points_scale_factor=self.POINTS_SCALE_FACTOR, title=self.title_prefix + class_name)
 
 def get_colorscale_lut(vis_widget):
     # not sure this is valid for all mayavi things...
