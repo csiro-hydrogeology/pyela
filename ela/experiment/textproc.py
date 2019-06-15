@@ -401,7 +401,7 @@ class Model:
         predict_X=pad_sequences(predict_X,padding='post',maxlen=self.maxlen)
         output=self.ml_model.predict_proba(predict_X)
         
-        print(output)
+        return output
             
         
         
