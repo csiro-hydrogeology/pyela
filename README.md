@@ -15,13 +15,15 @@ This package combines features to:
 * apply supervised machine learning to interpolate lithologies across a 3D grid
 * visualise interactively the 3D data
 
+An introductory [sample workflow](https://github.com/jmp75/pyela-doc/blob/master/tutorials/getting_started.ipynb) gives an overview of some of these capabilities.
+
 ## License
 
 MIT (see [License.txt](https://github.com/jmp75/pyela/blob/master/LICENSE.txt))
 
 ## Documentation
 
-Tutorials are hosted [in a separate github repo](https://github.com/jmp75/pyela-doc)
+Tutorials are hosted [in a separate github repository](https://github.com/jmp75/pyela-doc)
 
 Get a [quick tour of the visualisation part of 'ela'](https://github.com/jmp75/pyela/blob/master/docs/visual_tour.md).
 
