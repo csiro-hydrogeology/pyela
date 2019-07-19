@@ -5,6 +5,8 @@ import cartopy.crs as ccrs
 from cartopy.io.shapereader import Reader
 import cartopy.io.img_tiles as cimgt
 
+from wordcloud import WordCloud,STOPWORDS
+
 from sklearn import neighbors
 import numpy as np
 
@@ -373,3 +375,29 @@ def plot_lithologydata_slice_depth(df, slice_depth, n_neighbours, extent, data_p
     predicted = predicted.reshape(xx.shape)
     plt.pcolormesh(xx, yy, predicted, cmap=cmap_settings['cmap'], norm=cmap_settings['norm'], alpha=0.3)
     ax.set_extent(near_field_extents, crs=data_proj)
+
+
+def show_wordcloud(text, title = None, max_words=200, max_font_size=40, seed=1, scale=3, figsize=(12, 12)):
+    """Plot wordclouds from text
+
+        Args:
+            text (str or list of str): text to depict
+    """
+    if text is list:
+        text = ' '.join(text)
+    stopwords = set(STOPWORDS)
+    wordcloud = WordCloud(
+        background_color='white',
+        stopwords=stopwords,
+        max_words=max_words,
+        max_font_size=max_font_size, 
+        scale=scale,
+        random_state=seed
+    ).generate(text)
+    fig = plt.figure(1, figsize=figsize)
+    plt.axis('off')
+    if title: 
+        fig.suptitle(title, fontsize=20)
+        fig.subplots_adjust(top=2.3)
+    plt.imshow(wordcloud)
+    plt.show()

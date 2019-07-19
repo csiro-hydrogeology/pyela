@@ -103,3 +103,11 @@ def test_v_find_litho_markers():
     assert terms[0][2] == 'silt'
     assert terms[1][0] == 'ironstone'
 
+def test_flatten_strings():
+    descs = [
+        'clay, sand',
+        'clay with loam  ;',
+        'uranium'
+    ]
+    tk = flat_list_tokens(descs)
+    assert set(tk) == set(['clay', 'loam', 'uranium', 'sand'])

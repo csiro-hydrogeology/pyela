@@ -272,3 +272,37 @@ def find_secondary_lithology(tokens_and_primary, lithologies_adjective_dict, lit
                 return litho_class
     return ''
 
+
+def flat_list_tokens(descriptions):
+    """Convert a collection of strings to a flat list of tokens. English NLTK stopwords.
+
+    Args:
+        descriptions (iterable of str): lithology descriptions.
+
+    Returns:
+        list: List of tokens.
+
+    """
+    vt = v_word_tokenize(descriptions)
+    flat = np.concatenate(vt)
+    stoplist = stopwords.words('english')
+    exclude = stoplist + ['.',',',';',':','(',')','-']
+    flat = [word for word in flat if word not in exclude]
+    return flat
+
+
+def quick_check_lithoclass(df, litho_class_name, colname=PRIMARY_LITHO_COL, out_colname=None, size=50, seed=None):
+    """Sample a random subset of rows where the lithology column matches a particular class name.
+
+        Args:
+            df (pandas data frame): bore lithology data  with columns named PRIMARY_LITHO_COL
+    
+        Returns:
+            a list of strings, compound primary+optional_secondary lithology descriptions e.g. 'sand/clay', 'loam/'
+    """
+    df_test = df.loc[ df[colname] == litho_class_name ]
+    y = df_test.sample(n=size, frac=None, replace=False, weights=None, random_state=seed)
+    if not out_colname is None:
+        y = y[LITHO_DESC_COL]
+    return y
+
