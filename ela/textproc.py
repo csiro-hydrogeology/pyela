@@ -306,3 +306,19 @@ def match_and_sample_df(df, litho_class_name, colname=PRIMARY_LITHO_COL, out_col
         y = y[LITHO_DESC_COL]
     return y
 
+
+def find_regex_df(df, expression, colname, out_colname=None):
+    """Sample a random subset of rows where the lithology column matches a particular class name.
+
+        Args:
+            df (pandas data frame): bore lithology data  with columns named PRIMARY_LITHO_COL
+    
+        Returns:
+            a list of strings, compound primary+optional_secondary lithology descriptions e.g. 'sand/clay', 'loam/'
+    """
+    df_test = df.loc[ df[colname] == litho_class_name ]
+    y = df_test.sample(n=size, frac=None, replace=False, weights=None, random_state=seed)
+    if not out_colname is None:
+        y = y[LITHO_DESC_COL]
+    return y
+
