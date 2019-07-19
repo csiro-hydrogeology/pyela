@@ -291,7 +291,7 @@ def flat_list_tokens(descriptions):
     return flat
 
 
-def quick_check_lithoclass(df, litho_class_name, colname=PRIMARY_LITHO_COL, out_colname=None, size=50, seed=None):
+def match_and_sample_df(df, litho_class_name, colname=PRIMARY_LITHO_COL, out_colname=None, size=50, seed=None):
     """Sample a random subset of rows where the lithology column matches a particular class name.
 
         Args:
