@@ -11,11 +11,13 @@ import nltk
 from nltk.corpus import stopwords
 
 
-def remove_punctuations(text):
+def replace_punctuations(text, replacement=' '):
     for punctuation in string.punctuation:
-        text = text.replace(punctuation, '')
+        text = text.replace(punctuation, replacement)
     return text
 
+def remove_punctuations(text):
+    return replace_punctuations(text, '')
 
 LITHO_DESC_COL = u'Lithological Description'
 
@@ -157,6 +159,12 @@ def split_with_term(x):
 
 def v_split_with_term(xlist):
     return [split_with_term(x) for x in xlist]
+
+def v_remove_punctuations(textlist):
+    return [remove_punctuations(x) for x in textlist]
+
+def v_replace_punctuations(textlist, replacement=' '):
+    return [replace_punctuations(x, replacement) for x in textlist]
 
 def clean_lithology_descriptions(description_series, lex):
     """Preparatory cleanup of lithology descriptions for further analysis: 
@@ -307,18 +315,17 @@ def match_and_sample_df(df, litho_class_name, colname=PRIMARY_LITHO_COL, out_col
     return y
 
 
-def find_regex_df(df, expression, colname, out_colname=None):
+def find_regex_df(df, expression, colname):
     """Sample a random subset of rows where the lithology column matches a particular class name.
 
         Args:
             df (pandas data frame): bore lithology data  with columns named PRIMARY_LITHO_COL
     
         Returns:
-            a list of strings, compound primary+optional_secondary lithology descriptions e.g. 'sand/clay', 'loam/'
+            dataframe:
     """
-    df_test = df.loc[ df[colname] == litho_class_name ]
-    y = df_test.sample(n=size, frac=None, replace=False, weights=None, random_state=seed)
-    if not out_colname is None:
-        y = y[LITHO_DESC_COL]
-    return y
-
+    tested = df[colname].values
+    regex = re.compile(expression)
+    xx = [(regex.match(x) is not None) for x in tested]
+    df_test = df.loc[xx]
+    return df_test

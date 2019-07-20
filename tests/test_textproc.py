@@ -111,3 +111,15 @@ def test_flatten_strings():
     ]
     tk = flat_list_tokens(descs)
     assert set(tk) == set(['clay', 'loam', 'uranium', 'sand'])
+
+
+def test_replace_punctuations():
+    textlist = ['Lots of basalt.driller joe 24/10/1982','clay/loam vfine silt. black-brown']
+    rpl = v_replace_punctuations(textlist)
+    assert rpl[0] == 'Lots of basalt driller joe 24 10 1982'
+    assert rpl[1] == 'clay loam vfine silt  black brown'
+    rpl = v_replace_punctuations(textlist, replacement='R')
+    assert rpl[0] == 'Lots of basaltRdriller joe 24R10R1982'
+
+
+
