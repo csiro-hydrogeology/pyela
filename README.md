@@ -61,15 +61,16 @@ You may want to install [Anaconda](http://docs.continuum.io/anaconda/install) to
 
 Optionally you may want to do `conda update -n base conda` and `conda update -n base anaconda-navigator`
 
-```bash
-my_env_name=ELA
-```
+On Linux/bash:
 
 ```bash
-conda create --name ${my_env_name} python=3.6
+my_env_name=ELA
+conda create --name ${my_env_name} python=3.7
 conda activate  ${my_env_name}
 conda install --name ${my_env_name} rasterio cartopy geopandas pandas nltk scikit-learn scikit-image matplotlib vtk
 ```
+
+Using the DOS prompt on windows:
 
 ```cmd
 call %userprofile%\AppData\Local\Continuum\anaconda3\Scripts\activate.bat
@@ -87,7 +88,7 @@ As of writing (2018-08) conda does not have pyqt5, and a suitable version of may
 pip install --upgrade pip
 ```
 
-For Python 3.x one needs to install pyqt5 for mayavi, as per [these instructions](https://docs.enthought.com/mayavi/mayavi/installation.html). As of Jan 2019 be aware that there is a [known issue in mayavi visual rendering with pyqt5 as a backend](https://github.com/enthought/mayavi/issues/656) and 'ela' is affected by this. Nevertheless this is not a commplete blocker for most 'ela' features so installation instructions are kept here.
+For Python 3.x one needs to install pyqt5 for mayavi, as per [these instructions](https://docs.enthought.com/mayavi/mayavi/installation.html). As of Jan 2019 be aware that there is a [known issue in mayavi visual rendering with pyqt5 as a backend on Linux](https://github.com/enthought/mayavi/issues/656) and 'ela' is affected by this. Nevertheless this is not a commplete blocker for most 'ela' features so installation instructions are kept here.
 
 ```bash
 pip search pyqt5 | sort -g
