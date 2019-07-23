@@ -29,21 +29,9 @@ Get a [quick tour of the visualisation part of 'ela'](https://github.com/jmp75/p
 
 ## Installation 
 
-As of January 2019 [ela is on pypi](https://pypi.org/project/ela/). Before installing you may want to skim the "Installation details" section thereafter to think of context (e.g. conda env) but otherwhse `pip install ela` should install the required dependencies.
+As of January 2019 [ela is on pypi](https://pypi.org/project/ela/). 
 
-```bash
-pip search ela
-pip install ela
-```
-
-Alternatively, from source:
-
-```bash
-pip install -r requirements.txt
-python setup.py install
-```
-
-## Installation details
+While `pip install ela` might work on some computers, it is unlikely that all geospatial dependencies will install. We highly recommend you use a conda environment. 
 
 'ela' relies on several external packages, and some can be fiddly to install depending on the version of Python and these external packages. This section thus has fairly prescriptive instructions, given in the hope of limiting the risk of issues.
 
@@ -83,6 +71,16 @@ conda activate  ${my_env_name}
 conda install --name ${my_env_name} rasterio cartopy geopandas pandas nltk scikit-learn scikit-image matplotlib vtk
 ```
 
+```cmd
+call %userprofile%\AppData\Local\Continuum\anaconda3\Scripts\activate.bat
+set my_env_name=ELA
+conda create --name %my_env_name% python=3.7
+REM if using conda activate  %my_env_name%  I seem to loose conda from the command line, so:
+conda install --name %my_env_name% conda 
+conda install --name %my_env_name% rasterio cartopy geopandas pandas nltk scikit-learn scikit-image matplotlib vtk
+conda activate  %my_env_name%
+```
+
 As of writing (2018-08) conda does not have pyqt5, and a suitable version of mayavi for python3. We use `pip`
 
 ```bash
@@ -99,6 +97,20 @@ pip search mayavi
 ```bash
 pip install pyqt5
 pip install mayavi
+```
+
+### Installing ELA
+
+```bash
+pip search ela
+pip install ela
+```
+
+Alternatively, from source:
+
+```bash
+pip install -r requirements.txt
+python setup.py install
 ```
 
 #### Optional dependencies
