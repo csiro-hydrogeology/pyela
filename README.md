@@ -123,9 +123,18 @@ conda install --name ${my_env_name} gensim tensorflow keras
 pip install wordcloud
 ```
 
-### Windows
+### using Jupyter-lab
 
-Placeholder section. As of Sept 2018 it may be possible to install upon Python 3.6+ with Anaconda 3, and then including mayavi from pip.
+Optional but suggested:
+
+See the [Jupyter lab doc](https://jupyterlab.readthedocs.io/en/stable/) for official info; the following may be enoughotherwise:
+
+```bat
+set my_env_name=ELA
+conda install --name %my_env_name% jupyterlab ipywidgets jupyter
+jupyter-labextension install @jupyter-widgets/jupyterlab-manager
+python -m ipykernel install --user --name %my_env_name% --display-name "Py3 ELA"
+```
 
 ## Related Geoscience packages
 
