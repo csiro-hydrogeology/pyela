@@ -281,7 +281,7 @@ def plot_lithologydata_slice_points_redo(df,
 def create_background(extent, data_proj, 
     near_field_extents, geoms):
     fig,ax=plt.subplots(1,1,figsize=(15,15), subplot_kw={'projection': data_proj,'extent': extent})
-    stamen_terrain = cimgt.StamenTerrain()
+    stamen_terrain = cimgt.Stamen('terrain-background')
     ax.add_image(stamen_terrain, 11)
     ax.add_geometries(geoms[0], ccrs.PlateCarree(),facecolor='none',edgecolor='k',zorder=1)
     ax.add_geometries(geoms[1], ccrs.PlateCarree(),facecolor='none',edgecolor='r',zorder=1)
@@ -326,7 +326,7 @@ def plot_lithologydata_slice_points(df, slice_depth, scatter_layer, fig):
 def plot_lithologydata_slice_depth(df, slice_depth, n_neighbours, extent, data_proj, near_field_extents, geoms, gw_subareas, cmap_settings):
     df_slice=df.loc[(df[DEPTH_FROM_AHD_COL] >= slice_depth) & (df[DEPTH_TO_AHD_COL] <= slice_depth)]
     fig,ax=plt.subplots(1,1,figsize=(15,15),subplot_kw={'projection': data_proj,'extent': extent})
-    stamen_terrain = cimgt.StamenTerrain()
+    stamen_terrain = cimgt.Stamen('terrain-background')
     ax.add_image(stamen_terrain, 11)
     ax.add_geometries(geoms[0], ccrs.PlateCarree(),facecolor='none',edgecolor='k',zorder=1)
     ax.add_geometries(geoms[1], ccrs.PlateCarree(),facecolor='none',edgecolor='r',zorder=1)

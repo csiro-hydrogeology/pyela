@@ -66,8 +66,8 @@ On Linux/bash:
 ```bash
 my_env_name=ELA
 conda create --name ${my_env_name} python=3.7
-conda activate  ${my_env_name}
 conda install --name ${my_env_name} rasterio cartopy geopandas pandas nltk scikit-learn scikit-image matplotlib vtk
+conda activate  ${my_env_name}
 ```
 
 Using the DOS prompt on windows:
@@ -123,11 +123,21 @@ conda install --name ${my_env_name} gensim tensorflow keras
 pip install wordcloud
 ```
 
+If reading xls files using pandas, need pkg `xlrd` with e.g. `conda install xlrd`
+
 ### using Jupyter-lab
 
 Optional but suggested:
 
 See the [Jupyter lab doc](https://jupyterlab.readthedocs.io/en/stable/) for official info; the following may be enoughotherwise:
+
+```sh
+my_env_name=ELA
+conda install --name ${my_env_name} jupyterlab ipywidgets jupyter
+jupyter-labextension install @jupyter-widgets/jupyterlab-manager
+python -m ipykernel install --user --name ${my_env_name} --display-name "Py3 ELA"
+```
+
 
 ```bat
 set my_env_name=ELA
