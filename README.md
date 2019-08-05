@@ -29,13 +29,9 @@ Get a [quick tour of the visualisation part of 'ela'](https://github.com/jmp75/p
 
 ## Installation 
 
-As of January 2019 [ela is on pypi](https://pypi.org/project/ela/). 
-
-While `pip install ela` might work on some computers, it is unlikely that all geospatial dependencies will install. We highly recommend you use a conda environment. 
+As of January 2019 [ela is on pypi](https://pypi.org/project/ela/). While `pip install ela` might work on some computers, it is _unlikely that all python geospatial dependencies will install_. *We highly recommend you set up a conda environment with all dependent packages* prior to installing ela with pip or from source.
 
 'ela' relies on several external packages, and some can be fiddly to install depending on the version of Python and these external packages. This section thus has fairly prescriptive instructions, given in the hope of limiting the risk of issues.
-
-The first part of this section is focused on Linux.
 
 ### Debian packages for spatial projections
 
@@ -57,20 +53,21 @@ sudo dpkg -i libproj-dev_4.9.3-2_amd64.deb
 
 ### Installation of python packages dependencies
 
-You may want to install [Anaconda](http://docs.continuum.io/anaconda/install) to install dependencies. Note that I recommend to **not** let anaconda change your startup file and change the `PATH` environment. To activate Anaconda you first need: `source ~/anaconda3/bin/activate`. Then choose a conda environment name.
+We recommend install [Anaconda](http://docs.continuum.io/anaconda/install) to install dependencies. Note that I recommend to **not** let anaconda change your startup file and change the `PATH` environment. To activate Anaconda you first need: `source ~/anaconda3/bin/activate`. Then choose a conda environment name.
 
-Optionally you may want to do `conda update -n base conda` and `conda update -n base anaconda-navigator`
+Optionally, if your anaconda installation is a bit dated, you may want to do `conda update -n base conda` and `conda update -n base anaconda-navigator`
 
-On Linux/bash:
+To create the conda environment for ela on Linux:
 
 ```bash
+# source ~/anaconda3/bin/activate
 my_env_name=ELA
 conda create --name ${my_env_name} python=3.7
 conda install --name ${my_env_name} rasterio cartopy geopandas pandas nltk scikit-learn scikit-image matplotlib vtk
 conda activate  ${my_env_name}
 ```
 
-Using the DOS prompt on windows:
+On Windows, using the DOS CMD prompt, assuming you installed Anaconda in user mode.
 
 ```cmd
 call %userprofile%\AppData\Local\Continuum\anaconda3\Scripts\activate.bat
@@ -82,7 +79,9 @@ conda install --name %my_env_name% rasterio cartopy geopandas pandas nltk scikit
 conda activate  %my_env_name%
 ```
 
-As of writing (2018-08) conda does not have pyqt5, and a suitable version of mayavi for python3. We use `pip`
+At this point we have installed all the python dependencies ela needs that are available via `conda`.
+
+As of writing (2019-08) conda does not have pyqt5, and no suitable version of mayavi for python3. We resort to use `pip`. You may want to do first:
 
 ```bash
 pip install --upgrade pip
@@ -100,14 +99,22 @@ pip install pyqt5
 pip install mayavi
 ```
 
+At this point all mandatory dependencies for 'ela' are installed.
+
 ### Installing ELA
+
+There are three options to access ela:
+
+* use the latest available on pip, 
+* clone and install with `setup.py`
+* direct import of the package directory (this is done at runtime from e.g. a notebook)
 
 ```bash
 pip search ela
 pip install ela
 ```
 
-Alternatively, from source:
+Alternatively, from source with `setup.py`
 
 ```bash
 pip install -r requirements.txt
@@ -116,7 +123,7 @@ python setup.py install
 
 #### Optional dependencies
 
-As of 2019-05 you can find new features using deep learning for classification in the `ela.experiment` submodule. You will need the additional dependencies:
+As of 2019-05 you can find new features using deep learning for classification in the submodule `ela.experiment`. You will need the additional dependencies:
 
 ```bash
 conda install --name ${my_env_name} gensim tensorflow keras
@@ -127,9 +134,11 @@ If reading xls files using pandas, need pkg `xlrd` with e.g. `conda install xlrd
 
 ### using Jupyter-lab
 
-Optional but suggested:
+You may use ela as you prefer; we recomment using "Jupyter Lab" to write notebooks. See the [Jupyter lab doc](https://jupyterlab.readthedocs.io/en/stable/) for official information. 
 
-See the [Jupyter lab doc](https://jupyterlab.readthedocs.io/en/stable/) for official info; the following may be enoughotherwise:
+The following should be enough otherwise to use 'ela'
+
+Linux:
 
 ```sh
 my_env_name=ELA
@@ -138,6 +147,7 @@ jupyter-labextension install @jupyter-widgets/jupyterlab-manager
 python -m ipykernel install --user --name ${my_env_name} --display-name "Py3 ELA"
 ```
 
+Windows: 
 
 ```bat
 set my_env_name=ELA
@@ -148,14 +158,13 @@ python -m ipykernel install --user --name %my_env_name% --display-name "Py3 ELA"
 
 ## Related Geoscience packages
 
-'ela' aims to complement other Python packages for geoscience, in particular for handling bore data . It depends on the package ['striplog'](https://github.com/agile-geoscience/striplog) and is likely to depend on ['lasio'](https://github.com/kinverarity1/lasio) in the future.
+'ela' aims to complement other Python packages for geoscience, in particular for handling bore data . It already depends on the package ['striplog'](https://github.com/agile-geoscience/striplog) and is likely to depend on ['lasio'](https://github.com/kinverarity1/lasio) in the future.
 
-You should also check the reposiroty [hydrogeol_utils](https://github.com/Neil-Symington/hydrogeol_utils)
+You should also check the repository [hydrogeol_utils](https://github.com/Neil-Symington/hydrogeol_utils)
 
 ## Known issues
 
-3D interactive visualisation: As of 2018-08, using mayavi 4.6 on python 3.6 may be [visually buggy](https://github.com/enthought/mayavi/issues/656), though users reported success on 2019-03. Python 2.7 with mayavi 4.5 via Anaconda2 is known to 
-work.
+3D interactive visualisation - Using mayavi 4.6+ on python 3.6+ may be [visually buggy](https://github.com/enthought/mayavi/issues/656) on Linux. This appears to be a low level issue running on laptop with dual Intel/NVIDIA Graphic cards.
 
 ## Troubleshooting
 
