@@ -45,7 +45,8 @@ script:
   - coverage run run_tests.py
 
 after_success:
+  # May be worth trying to add nothing as of 2019 09, to see whether the github app picks up changes.
+  - codecov
   # - coveralls
-  # - codecov
   # trying by inference from https://hackernoon.com/integrating-travis-ci-and-codecov-into-a-python-based-project-6f658074ff63  
-  - bash <(curl -s https://codecov.io/bash)
+  # - bash <(curl -s https://codecov.io/bash)
