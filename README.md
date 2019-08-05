@@ -69,7 +69,7 @@ conda activate  ${my_env_name}
 
 On Windows, using the DOS CMD prompt, assuming you installed Anaconda in user mode.
 
-```cmd
+```bat
 call %userprofile%\AppData\Local\Continuum\anaconda3\Scripts\activate.bat
 set my_env_name=ELA
 conda create --name %my_env_name% python=3.7
