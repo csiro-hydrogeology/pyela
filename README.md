@@ -2,10 +2,10 @@
 
 ## Exploratory Lithology Analysis
 
-[![pypi](https://img.shields.io/pypi/v/ela.svg?logo=python&logoColor=white)](https://pypi.org/project/ela/)[![license](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/jmp75/pyela/blob/devel/LICENSE.txt) ![status](https://img.shields.io/badge/status-alpha-blue.svg) master: [![build](https://img.shields.io/travis/jmp75/pyela.svg?branch=master)](https://travis-ci.org/jmp75/pyela)
-[![coverage](https://coveralls.io/repos/github/jmp75/pyela/badge.svg?branch=master)](https://coveralls.io/github/jmp75/pyela?branch=master)
+[![pypi](https://img.shields.io/pypi/v/ela.svg?logo=python&logoColor=white)](https://pypi.org/project/ela/)[![license](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/csiro-hydrogeology/pyela/blob/master/LICENSE.txt) ![status](https://img.shields.io/badge/status-alpha-blue.svg) master: [![build](https://img.shields.io/travis/csiro-hydrogeology/pyela.svg?branch=master)](https://travis-ci.org/csiro-hydrogeology/pyela)
+[![coverage](https://coveralls.io/repos/github/csiro-hydrogeology/pyela/badge.svg?branch=master)](https://coveralls.io/github/csiro-hydrogeology/pyela?branch=master)
 
-[![Getting started tutorial - Bungendore 3D lithology](https://raw.githubusercontent.com/jmp75/pyela-doc/master/tutorials/img/3d_overlay_bungendore_clay_lithology_small.png "Getting started tutorial - Bungendore 3D lithology")](https://github.com/jmp75/pyela-doc/blob/master/tutorials/getting_started.ipynb)
+[![Getting started tutorial - Bungendore 3D lithology](https://raw.githubusercontent.com/csiro-hydrogeology/pyela-doc/master/tutorials/img/3d_overlay_bungendore_clay_lithology_small.png "Getting started tutorial - Bungendore 3D lithology")](https://github.com/csiro-hydrogeology/pyela-doc/blob/master/tutorials/getting_started.ipynb)
 
 Analysing driller’s logs is a tedious and repetitive task in many groundwater modelling projects. Automating the process of extracting useful information from driller's logs allows spending less time on manual data wrangling, more time on its interpretation, and enhances the reproducibility of the analysis.
 
@@ -15,17 +15,17 @@ This package combines features to:
 * apply supervised machine learning to interpolate lithologies across a 3D grid
 * visualise interactively the 3D data
 
-An introductory [sample workflow](https://github.com/jmp75/pyela-doc/blob/master/tutorials/getting_started.ipynb) gives an overview of some of these capabilities.
+An introductory [sample workflow](https://github.com/csiro-hydrogeology/pyela-doc/blob/master/tutorials/getting_started.ipynb) gives an overview of some of these capabilities.
 
 ## License
 
-MIT (see [License.txt](https://github.com/jmp75/pyela/blob/master/LICENSE.txt))
+MIT (see [License.txt](https://github.com/csiro-hydrogeology/pyela/blob/master/LICENSE.txt))
 
 ## Documentation
 
-Tutorials are hosted [in a separate github repository](https://github.com/jmp75/pyela-doc)
+Tutorials are hosted [in a separate github repository](https://github.com/csiro-hydrogeology/pyela-doc)
 
-Get a [quick tour of the visualisation part of 'ela'](https://github.com/jmp75/pyela/blob/master/docs/visual_tour.md).
+Get a [quick tour of the visualisation part of 'ela'](https://github.com/csiro-hydrogeology/pyela/blob/master/docs/visual_tour.md).
 
 ## Installation 
 

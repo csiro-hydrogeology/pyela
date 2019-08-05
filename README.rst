@@ -23,23 +23,23 @@ This package combines features to:
 -  visualise interactively the 3D data
 
 An introductory `sample
-workflow <https://github.com/jmp75/pyela-doc/blob/master/tutorials/getting_started.ipynb>`__
+workflow <https://github.com/csiro-hydrogeology/pyela-doc/blob/master/tutorials/getting_started.ipynb>`__
 gives an overview of some of these capabilities.
 
 License
 -------
 
 MIT (see
-`License.txt <https://github.com/jmp75/pyela/blob/master/LICENSE.txt>`__)
+`License.txt <https://github.com/csiro-hydrogeology/pyela/blob/master/LICENSE.txt>`__)
 
 Documentation
 -------------
 
 Tutorials are hosted `in a separate github
-repository <https://github.com/jmp75/pyela-doc>`__
+repository <https://github.com/csiro-hydrogeology/pyela-doc>`__
 
 Get a `quick tour of the visualisation part of
-‘ela’ <https://github.com/jmp75/pyela/blob/master/docs/visual_tour.md>`__.
+‘ela’ <https://github.com/csiro-hydrogeology/pyela/blob/master/docs/visual_tour.md>`__.
 
 Installation
 ------------
@@ -248,11 +248,11 @@ consider:
 .. |pypi| image:: https://img.shields.io/pypi/v/ela.svg?logo=python&logoColor=white
    :target: https://pypi.org/project/ela/
 .. |license| image:: http://img.shields.io/badge/license-MIT-blue.svg
-   :target: https://github.com/jmp75/pyela/blob/devel/LICENSE.txt
+   :target: https://github.com/csiro-hydrogeology/pyela/blob/master/LICENSE.txt
 .. |status| image:: https://img.shields.io/badge/status-alpha-blue.svg
-.. |build| image:: https://img.shields.io/travis/jmp75/pyela.svg?branch=master
-   :target: https://travis-ci.org/jmp75/pyela
-.. |coverage| image:: https://coveralls.io/repos/github/jmp75/pyela/badge.svg?branch=master
-   :target: https://coveralls.io/github/jmp75/pyela?branch=master
-.. |Getting started tutorial - Bungendore 3D lithology| image:: https://raw.githubusercontent.com/jmp75/pyela-doc/master/tutorials/img/3d_overlay_bungendore_clay_lithology_small.png
-   :target: https://github.com/jmp75/pyela-doc/blob/master/tutorials/getting_started.ipynb
+.. |build| image:: https://img.shields.io/travis/csiro-hydrogeology/pyela.svg?branch=master
+   :target: https://travis-ci.org/csiro-hydrogeology/pyela
+.. |coverage| image:: https://coveralls.io/repos/github/csiro-hydrogeology/pyela/badge.svg?branch=master
+   :target: https://coveralls.io/github/csiro-hydrogeology/pyela?branch=master
+.. |Getting started tutorial - Bungendore 3D lithology| image:: https://raw.githubusercontent.com/csiro-hydrogeology/pyela-doc/master/tutorials/img/3d_overlay_bungendore_clay_lithology_small.png
+   :target: https://github.com/csiro-hydrogeology/pyela-doc/blob/master/tutorials/getting_started.ipynb
