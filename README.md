@@ -57,7 +57,7 @@ sudo dpkg -i libproj-dev_4.9.3-2_amd64.deb
 
 ### Installation of python packages dependencies
 
-We recommend install [Anaconda](http://docs.continuum.io/anaconda/install) to install dependencies. Note that I recommend to **not** let anaconda change your startup file and change the `PATH` environment. To activate Anaconda you first need: `source ~/anaconda3/bin/activate`. Then choose a conda environment name.
+We recommend installing [Anaconda](http://docs.continuum.io/anaconda/install) to install dependencies. Note that I recommend to **not** let anaconda change your startup file and change the `PATH` environment. To activate Anaconda you first need: `source ~/anaconda3/bin/activate`. Then choose a conda environment name.
 
 Optionally, if your anaconda installation is a bit dated, you may want to do `conda update -n base conda` and `conda update -n base anaconda-navigator`
 

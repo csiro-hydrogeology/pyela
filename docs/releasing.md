@@ -24,7 +24,7 @@ rm dist/*
 Normally commits on the testing branch would trigger tests on travis, but no harm in local run. Remember you need to have done `pip install codecov coverage pytest-cov pytest-mpl cython`
 
 ```bash
-python3 run_tests.py
+coverage run -m pytest
 ```
 
 ```bash

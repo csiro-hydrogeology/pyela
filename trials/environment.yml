@@ -1,0 +1,22 @@
+name: ela_test
+dependencies: 
+ - conda 
+ - rasterio
+ - cartopy
+ - geopandas
+ - pandas
+ - nltk
+ - scikit-learn
+ - scikit-image
+ - matplotlib 
+ - vtk
+ - coverage
+ - pytest-cov
+ - cython
+ - pip
+ - pip:
+    - pyqt5
+    - mayavi
+    - codecov
+    - wordcloud
+    - git+https://github.com/jmp75/striplog@master#egg=striplog
