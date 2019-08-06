@@ -28,34 +28,29 @@ def read_raster_value(dem,band_1,easting,northing):
     else:
         return band_1[row,col]
 
-# DEPRECATED should not be superseded by HeightDatumConverter
-# def raster_drill(row,dem, raster_grid):
-#     easting=row[EASTING_COL]
-#     northing=row[NORTHING_COL]
-#     return read_raster_value(dem,raster_grid,easting,northing)
-
-# def raster_drill_df(df, dem, raster_grid):
-#     return df.apply (lambda row: raster_drill(row,dem, raster_grid),axis=1)
-
-# def add_ahd(lithology_df, data_raster, drop_na=False):
-#     df = lithology_df.copy(deep=True)
-#     data_grid = data_raster.read(1)
-#     nd = data_raster.nodata
-#     ahd = raster_drill_df(df, data_raster, data_grid)
-#     ahd[ahd==nd] = np.nan
-#     df[DEPTH_FROM_AHD_COL]=ahd-df[DEPTH_FROM_COL]
-#     df[DEPTH_TO_AHD_COL]=ahd-df[DEPTH_TO_COL]
-#     if drop_na:
-#         df = df[pd.notna(df[DEPTH_TO_AHD_COL])]
-#     return df
-
-def get_coords_from_gpd_shape(shp, colname='geometry'):
+def get_coords_from_gpd_shape(shp, colname='geometry', out_colnames = ["x","y"]):
+    """Gets a dataframe of x/y geolocations out of a geopandas object
+    
+        Args:
+            shp (GeoDataFrame): a geopandas GeoDataFrame
+            colname (str): name of columns that has the geometry in the geopandas shapefile
+        Returns:
+            (DataFrame): a two column data frames, coordinates of all the points in the geodataframe
+    """
     p = shp[[colname]]
     pts = p.values.flatten()
     c = [(pt.x, pt.y) for pt in pts]
-    return pd.DataFrame(c, columns=["x","y"])
+    return pd.DataFrame(c, columns=out_colnames)
 
 def get_unique_coordinates(easting, northing):
+    """Gets the unique set of geolocated points  
+    
+        Args:
+            easting (iterable of floats): easting values
+            northing (iterable of floats): northing values
+        Returns:
+            (numpy array): two dimensional nparray
+    """
     grid_coords = np.empty( (len(easting), 2) )
     grid_coords[:,0] = easting
     grid_coords[:,1] = northing
@@ -116,12 +111,32 @@ class HeightDatumConverter:
         return read_raster_value(self.dem_raster, self.data_grid, easting, northing)
 
 class DepthsRounding:
+    """Helper class to round lithology record classes to the nearest metre of depth
 
+    Attributes:
+        depth_from_col (str): Name of the column in the data frame of lithology records, storing "from depth" information
+        depth_to_col (str): Name of the column in the data frame of lithology records, storing "to depth" information
+    """
     def __init__(self, depth_from_col=DEPTH_FROM_COL, depth_to_col=DEPTH_TO_COL):
+        """Helper class to round lithology record classes to the nearest metre of depth
+
+        Args:
+            depth_from_col (str): Name of the column in the data frame of lithology records, storing "from depth" information
+            depth_to_col (str): Name of the column in the data frame of lithology records, storing "to depth" information
+        """
         self.depth_from_col = depth_from_col
         self.depth_to_col = depth_to_col
 
     def round_to_metre_depths(self, df, func=np.round, remove_collapsed=False):
+        """Round lithology record classes to the nearest metre of depth
+
+        Args:
+            df (pandas data frame): bore lithology data  
+            func (callable): rounding function callable with a signature similar to `np.round`
+            remove_collapsed (bool): should entries where depths from and to are equal be removed from the result
+        Returns:
+            (pandas dataframe): a data frame of similar structure as the input but without entries less than a metre resolution.
+        """
         depth_from_rounded =df[self.depth_from_col].apply(func)
         depth_to_rounded =df[self.depth_to_col].apply(func)
         df_1 = df.copy(deep=True)
@@ -133,6 +148,14 @@ class DepthsRounding:
         return df_1
 
     def assess_num_collapsed(self, df, func=np.round):
+        """How many records would be removed from the lithology records if rounding from/to depths
+
+        Args:
+            df (pandas data frame): bore lithology data  
+            func (callable): rounding function callable with a signature similar to `np.round`
+        Returns:
+            (int): the number of entries that would be collapsed from/to depths
+        """
         tmp = self.round_to_metre_depths(df, func)
         collapsed = (tmp[self.depth_from_col] == tmp[self.depth_to_col])
         return collapsed.sum()
@@ -234,15 +257,18 @@ def slice_volume(volume, slice_surface, height_to_z):
     return result
 
 class SliceOperation:
-    """
+    """Helper class to perform slicing operations on a 3D volume.
+
     Attributes:
-        crs (str, dict, or CRS): The coordinate reference system.
-        transform (Affine instance): Affine transformation mapping the pixel space to geographic space.
+        dem_array_zeroes_infill (2D array): An array, DEM for the grid at the same x/y resolution as the volume to be sliced.
+        z_index_for_ahd (callable): bujection from a z index in the volume to its AHD height
     """
     def __init__(self, dem_array_zeroes_infill, z_index_for_ahd):
-        """initialize this with a coordinate reference system object and an affine transform. See rasterio.
+        """initialize a slice operator for a given grid size
         
         Args:
+            dem_array_zeroes_infill (2D array): An array, DEM for the grid at the same x/y resolution as the volume to be sliced.
+            z_index_for_ahd (callable): bujection from a z index in the volume to its AHD height
         """
         self.dem_array_zeroes_infill = dem_array_zeroes_infill
         self.z_index_for_ahd = z_index_for_ahd
@@ -261,10 +287,30 @@ class SliceOperation:
         return np.round(SliceOperation.arithmetic_average(slices))
 
     def reduce_slices_at_depths(self, volume, from_depth, to_depth, reduce_func):
+        """Slice a volume at every meter between two depths below ground level, and reduce the resulting 'vertical' values to a single statistic.
+        
+        Args:
+            volume (3D array): volume of interest
+            from_depth (numeric): top level depth below ground 
+            to_depth (numeric): bottom level depth below ground. `from_depth` is less than `to_depth`
+            reduce_func (callable): A function that takes in a list of 2D grids and returns one 2D grid
+
+        Returns:
+            (2D Array): reduced values (e.g. averaged) for each grid geolocation between the two depths below ground.
+        """
         slices = [slice_volume(volume, self.dem_array_zeroes_infill - depth, self.z_index_for_ahd) for depth in range(from_depth, to_depth+1)]
         return reduce_func(slices)
 
     def from_ahd_to_depth_below_ground_level(self, volume, from_depth, to_depth):
+        """Slice a volume at every meter between two depths below ground level
+        
+        Args:
+            volume (3D array): volume of interest
+            from_depth (numeric): top level depth below ground 
+            to_depth (numeric): bottom level depth below ground. `from_depth` is less than `to_depth`
+        Returns:
+            (3D Array): volume values between the two depths below ground.
+        """
         # Note: may not be the most computationally efficient, but deal later.
         depths = range(from_depth, to_depth+1)
         slices = [slice_volume(volume, self.dem_array_zeroes_infill - depth, self.z_index_for_ahd) for depth in depths]
@@ -272,7 +318,7 @@ class SliceOperation:
         nz = len(depths)
         result = np.empty([nx, ny, nz])
         for i in range(nz):
-            ii = (nz-1) - i 
+            ii = (nz-1) - i
             result[:,:,i] = slices[ii]
         return result
 
