@@ -44,8 +44,8 @@ install:
   # Useful for debugging any issues with conda
   - conda info -a
   # Replace dep1 dep2 ... with your dependencies
-  - conda env create -q -f=trials/environment.yml python=$TRAVIS_PYTHON_VERSION
-  - conda activate ena_test
+  - conda create -q -f=trials/environment.yml python=$TRAVIS_PYTHON_VERSION
+  - source $HOME/miniconda/bin/activate ela_test
 
 script:
   # Needed the following to get codecov to collect coverage data and produce a correct .coverage file
