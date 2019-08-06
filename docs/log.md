@@ -2,6 +2,14 @@
 
 [slice this to visualise vertical cross-sections along arbitrarily oriented (straight) section lines](https://swung.slack.com/archives/C094GV18T/p1551858731038300)
 
+## 2019-08-05
+
+Trying to set up codecov for pyela. coveralls was somehow troublesome in the past but am confuxsed by where the migration is up to. Looking at travis.yaml
+
+[quick start](https://docs.codecov.io/docs/quick-start) is OK.
+
+After giving additional permossions to github orgs I am looking at [Team Bot](https://docs.codecov.io/docs/team-bot) There is now a github app for codecov. Now how to I get it to collect coverage data. Do I still need a travis thinggy set  up and using the codecov packges? presmably. COmmand line? curiously not readily avail from the codecov online doc: https://github.com/codecov/example-python 
+
 ## 2019-01-07
 
 See [releasing.md](./releasing.md)

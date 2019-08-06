@@ -42,7 +42,9 @@ install:
 
 script:
   # - python run_tests.py
-  - coverage run run_tests.py
+  # - coverage run run_tests.py
+  # Needed the following to get codecov to collect coverage data and produce a correct .coverage file
+  - coverage run -m pytest 
 
 after_success:
   # May be worth trying to add nothing as of 2019 09, to see whether the github app picks up changes.
