@@ -111,10 +111,6 @@ def test_to_color_image():
     f(image[1,2], [255,255,255,255]) # nan is white 
 
 
-# def test_visual_info():
-#     class_names = ['high_k','low_k']
-#     color_names = ['blue','red']
-#     blah = LithologiesClassesVisual(class_names, color_names, missing_value_color_name)
 
 def test_rgba_conversions():
     rgbx = to_rgb('green')
@@ -142,4 +138,14 @@ def test_legend_fig():
         (None, 'class_three', 'red')
     ]
     fig = legend_fig(k_legend_display_info)
+
+def test_visual_info():
+    class_names = ['high_k','low_k']
+    color_names = ['blue','red']
+    missing_value_color_name = 'black'
+    lcv = LithologiesClassesVisual(class_names, color_names, missing_value_color_name)
+    assert lcv.nb_labels() == 2    
+    assert lcv.nb_labels_with_missing() == 3
+
+test_visual_info()
 

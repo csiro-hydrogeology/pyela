@@ -12,21 +12,22 @@
 # apptools\persistence\state_pickler.py:661: DeprecationWarning: np.loads is deprecated, use pickle.loads instead
 #   result = numpy.loads(junk, encoding='bytes')
 
-# import os
-# import pandas as pd
-# import numpy as np
-# import datetime as dt
-# import sys
-# from datetime import datetime
+import os
+import pandas as pd
+import numpy as np
+import datetime as dt
+import sys
+from datetime import datetime
 
-# pkg_dir = os.path.join(os.path.dirname(__file__),'..')
+pkg_dir = os.path.join(os.path.dirname(__file__),'..')
 
-# sys.path.append(pkg_dir)
+sys.path.append(pkg_dir)
 
-# from ela.visual3d import *
+from ela.visual3d import *
 
-# def test_mlab_ui():
+
 # def do_not_test_yet_ui():
+# def test_mlab_ui():
 #     class_names = [
 #         'class_1',
 #         'class_2',

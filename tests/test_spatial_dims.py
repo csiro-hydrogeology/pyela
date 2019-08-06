@@ -347,7 +347,7 @@ def test_rounding_depths():
 # test_flip()
 # test_surface_array()
 # test_average_slices()
-test_slice_volume()
+# test_slice_volume()
 # test_interpolate_slice()
 # test_burn_volume()
 # test_height_coordinate_functor()
