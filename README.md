@@ -2,11 +2,11 @@
 
 ## Exploratory Lithology Analysis
 
-[![pypi](https://img.shields.io/pypi/v/ela.svg?logo=python&logoColor=white)](https://pypi.org/project/ela/)[![license](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/csiro-hydrogeology/pyela/blob/master/LICENSE.txt) ![status](https://img.shields.io/badge/status-alpha-blue.svg) master: [![build](https://img.shields.io/travis/csiro-hydrogeology/pyela.svg?branch=master)](https://travis-ci.org/csiro-hydrogeology/pyela)
-[![coverage](https://coveralls.io/repos/github/csiro-hydrogeology/pyela/badge.svg?branch=master)](https://coveralls.io/github/csiro-hydrogeology/pyela?branch=master)
+[![pypi](https://img.shields.io/pypi/v/ela.svg?logo=python&logoColor=white)](https://pypi.org/project/ela/)[![license](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/csiro-hydrogeology/pyela/blob/master/LICENSE.txt) ![status](https://img.shields.io/badge/status-alpha-blue.svg) 
 
+master: [![build](https://img.shields.io/travis/csiro-hydrogeology/pyela.svg?branch=master)](https://travis-ci.org/csiro-hydrogeology/pyela)[![codecov](https://codecov.io/gh/csiro-hydrogeology/pyela/branch/master/graph/badge.svg)](https://codecov.io/gh/csiro-hydrogeology/pyela)
 
-[![codecov](https://codecov.io/gh/csiro-hydrogeology/pyela/branch/master/graph/badge.svg)](https://codecov.io/gh/csiro-hydrogeology/pyela)
+testing: [![build](https://img.shields.io/travis/csiro-hydrogeology/pyela.svg?branch=testing)](https://travis-ci.org/csiro-hydrogeology/pyela)[![codecov](https://codecov.io/gh/csiro-hydrogeology/pyela/branch/testing/graph/badge.svg)](https://codecov.io/gh/csiro-hydrogeology/pyela)
 
 
 [![Getting started tutorial - Bungendore 3D lithology](https://raw.githubusercontent.com/csiro-hydrogeology/pyela-doc/master/tutorials/img/3d_overlay_bungendore_clay_lithology_small.png "Getting started tutorial - Bungendore 3D lithology")](https://github.com/csiro-hydrogeology/pyela-doc/blob/master/tutorials/getting_started.ipynb)
