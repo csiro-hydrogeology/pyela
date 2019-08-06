@@ -56,12 +56,12 @@ class ClassMapper:
             lithology_names (iterable of str): Name of the lithologies
             mapping (dict): dictionary where keys are primary+secondary lithologies ('sand/clay') and values are numeric codes for e.g. hydraulic conductivities
         """
+        self.lithology_names = lithology_names
         self.mapping = mapping
         self.litho_numeric_mapper = np.empty((len(lithology_names), len(lithology_names)))
         for i in np.arange(0, len(lithology_names), 1):
             for j in np.arange(0, len(lithology_names), 1):
                 self.litho_numeric_mapper[i,j] = self.class_code(lithology_names[i], lithology_names[j])
-        self.lithology_names = lithology_names
     @staticmethod
     def create_full_litho_desc(df):
         """Create strings identifying primary+secondary lithologies, used as keys in classification operations
@@ -104,17 +104,28 @@ class ClassMapper:
                 string, lithologies key such as 'sand/clay'
         """
         if isinstance(primary_litho_class, float):
-            if np.isnan(primary_litho_class): return np.nan
+            if np.isnan(primary_litho_class): 
+                return ''
             primary_litho_class = self._to_int(primary_litho_class)
         if isinstance(secondary_litho_class, float):
             if np.isnan(secondary_litho_class): 
                 secondary_litho_class = ''
             else:
                 secondary_litho_class = self._to_int(secondary_litho_class)
+
         if isinstance(primary_litho_class, int): primary_litho_class = self.lithology_names[primary_litho_class]
         if isinstance(secondary_litho_class, int): secondary_litho_class = self.lithology_names[secondary_litho_class]
+
+        if isinstance(primary_litho_class, str):
+            if not primary_litho_class in self.lithology_names:
+                return ''
+        if isinstance(secondary_litho_class, str): 
+            if not secondary_litho_class in self.lithology_names:
+                secondary_litho_class = ''
+
         litho_class = '/'.join([primary_litho_class, secondary_litho_class])
         return litho_class
+
     def class_code(self, primary_litho_class, secondary_litho_class):
         """Get the mapping class code (e.g. hydraulic condouctivity) for a set of primary+secondary lithologies
 
@@ -210,8 +221,7 @@ def interpolate_over_meshgrid(predicting_algorithm, mesh_grid):
     xx, yy = mesh_grid
     if predicting_algorithm is None:
         # the training set was too small and prediction cannot be made (odd that scikit would have let us train still)
-        predicted = np.empty(xx.shape)
-        predicted[:] = np.nan # np.empty should have done that already, but, no...
+        predicted = np.full(xx.shape, np.nan)
     else:
         predicted = predicting_algorithm.predict(np.c_[xx.ravel(), yy.ravel()])
         predicted = predicted.reshape(xx.shape)

@@ -49,7 +49,8 @@ def test_interpolate_slice():
     p = MockSlicePredictor(a, b, c)
     def z_func(xi, yi):
         return p.f(xx[xi, yi], yy[xi, yi])
-    
+
+
     predicted = interpolate_over_meshgrid(p, m)
     assert predicted.shape[0] == 3
     assert predicted.shape[1] == 2
@@ -59,6 +60,11 @@ def test_interpolate_slice():
     assert predicted[0,1] == z_func(0, 1)
     assert predicted[1,1] == z_func(1, 1)
     assert predicted[2,1] == z_func(2, 1)
+    # work around scikit behavior:
+    predicted = interpolate_over_meshgrid(None, m)
+    assert predicted.shape[0] == 3
+    assert predicted.shape[1] == 2
+    assert np.isnan(predicted[1,1])
 
 def test_height_coordinate_functor():
     z_index_for_ahd = z_index_for_ahd_functor(b=+100)
