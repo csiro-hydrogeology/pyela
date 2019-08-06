@@ -4,7 +4,11 @@ ela
 Exploratory Lithology Analysis
 ------------------------------
 
-|pypi|\ |license| |status| master: |build| |coverage|
+|pypi|\ |license| |status|
+
+master |build-master|\ |codecov-master|
+
+testing |build-testing|\ |codecov-testing|
 
 |Getting started tutorial - Bungendore 3D lithology|
 
@@ -79,7 +83,7 @@ suffice (older versions) you may try:
 Installation of python packages dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We recommend install
+We recommend installing
 `Anaconda <http://docs.continuum.io/anaconda/install>`__ to install
 dependencies. Note that I recommend to **not** let anaconda change your
 startup file and change the ``PATH`` environment. To activate Anaconda
@@ -250,9 +254,13 @@ consider:
 .. |license| image:: http://img.shields.io/badge/license-MIT-blue.svg
    :target: https://github.com/csiro-hydrogeology/pyela/blob/master/LICENSE.txt
 .. |status| image:: https://img.shields.io/badge/status-alpha-blue.svg
-.. |build| image:: https://img.shields.io/travis/csiro-hydrogeology/pyela.svg?branch=master
-   :target: https://travis-ci.org/csiro-hydrogeology/pyela
-.. |coverage| image:: https://coveralls.io/repos/github/csiro-hydrogeology/pyela/badge.svg?branch=master
-   :target: https://coveralls.io/github/csiro-hydrogeology/pyela?branch=master
+.. |build-master| image:: https://img.shields.io/travis/csiro-hydrogeology/pyela.svg?branch=master
+   :target: https://travis-ci.org/csiro-hydrogeology/pyela/branches
+.. |codecov-master| image:: https://codecov.io/gh/csiro-hydrogeology/pyela/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/csiro-hydrogeology/pyela/branch/master
+.. |build-testing| image:: https://img.shields.io/travis/csiro-hydrogeology/pyela.svg?branch=testing
+   :target: https://travis-ci.org/csiro-hydrogeology/pyela/branches
+.. |codecov-testing| image:: https://codecov.io/gh/csiro-hydrogeology/pyela/branch/testing/graph/badge.svg
+   :target: https://codecov.io/gh/csiro-hydrogeology/pyela/branch/testing
 .. |Getting started tutorial - Bungendore 3D lithology| image:: https://raw.githubusercontent.com/csiro-hydrogeology/pyela-doc/master/tutorials/img/3d_overlay_bungendore_clay_lithology_small.png
    :target: https://github.com/csiro-hydrogeology/pyela-doc/blob/master/tutorials/getting_started.ipynb
