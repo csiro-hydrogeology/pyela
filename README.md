@@ -2,7 +2,7 @@
 
 ## Exploratory Lithology Analysis
 
-[![pypi](https://img.shields.io/pypi/v/ela.svg?logo=python&logoColor=white)](https://pypi.org/project/ela/)[![license](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/csiro-hydrogeology/pyela/blob/master/LICENSE.txt) ![status](https://img.shields.io/badge/status-alpha-blue.svg) 
+[![pypi](https://img.shields.io/pypi/v/ela.svg?logo=python&logoColor=white)](https://pypi.org/project/ela/)[![license](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/csiro-hydrogeology/pyela/blob/master/LICENSE.txt)
 
 master [![build-master](https://img.shields.io/travis/csiro-hydrogeology/pyela.svg?branch=master)](https://travis-ci.org/csiro-hydrogeology/pyela/branches)[![codecov-master](https://codecov.io/gh/csiro-hydrogeology/pyela/branch/master/graph/badge.svg)](https://codecov.io/gh/csiro-hydrogeology/pyela/branch/master)
 
@@ -27,11 +27,32 @@ MIT (see [License.txt](https://github.com/csiro-hydrogeology/pyela/blob/master/L
 
 ## Documentation
 
-Tutorials are hosted [in a separate github repository](https://github.com/csiro-hydrogeology/pyela-doc)
+Tutorials are hosted [in a separate github repository pyela-doc](https://github.com/csiro-hydrogeology/pyela-doc). pyela-doc does include quick setup instructions with conda.
 
 Get a [quick tour of the visualisation part of 'ela'](https://github.com/csiro-hydrogeology/pyela/blob/master/docs/visual_tour.md).
 
 ## Installation 
+
+The quickest way with conda:
+
+```bash
+wget https://raw.githubusercontent.com/csiro-hydrogeology/pyela/testing/configs/ela_environment.yml
+my_env_name=ELA
+# my_env_name=elauser
+conda env create -n $my_env_name -f ./ela_environment.yml python=3.7
+conda activate $my_env_name 
+```
+
+This should be all to get a working environment. If you want to use 'ela' from jupyter lab:
+
+```bash
+conda install --name ${my_env_name} jupyterlab ipywidgets jupyter
+jupyter-labextension install @jupyter-widgets/jupyterlab-manager
+python -m ipykernel install --user --name ${my_env_name} --display-name "Py3 ELA"
+```
+
+
+### Manual installation
 
 As of January 2019 [ela is on pypi](https://pypi.org/project/ela/). While `pip install ela` might work on some computers, it is _unlikely that all python geospatial dependencies will install_. *We highly recommend you set up a conda environment with all dependent packages* prior to installing ela with pip or from source.
 
@@ -144,7 +165,7 @@ The following should be enough otherwise to use 'ela'
 
 Linux:
 
-```sh
+```bash
 my_env_name=ELA
 conda install --name ${my_env_name} jupyterlab ipywidgets jupyter
 jupyter-labextension install @jupyter-widgets/jupyterlab-manager
