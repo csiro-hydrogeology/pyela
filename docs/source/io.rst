@@ -3,8 +3,6 @@
 Input/Output
 ------------
 
-.. automodule:: ela.io
-
 ela.io module
 ~~~~~~~~~~~~~~~
 

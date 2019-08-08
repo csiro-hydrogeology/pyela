@@ -3,8 +3,6 @@
 Spatial processing
 ------------------
 
-.. automodule:: ela.spatial
-
 ela.spatial module
 ~~~~~~~~~~~~~~~
 

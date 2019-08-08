@@ -3,8 +3,6 @@
 Visualisation
 --------------
 
-.. automodule:: ela.visual
-
 ela.visual module
 ~~~~~~~~~~~~~~~
 

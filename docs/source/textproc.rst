@@ -3,8 +3,6 @@
 Text Processing
 ---------------
 
-.. automodule:: ela.textproc
-
 ela.textproc module
 ~~~~~~~~~~~~~~~
 
