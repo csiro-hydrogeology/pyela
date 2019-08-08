@@ -6,6 +6,7 @@ ELA
    :hidden:
 
    textproc.rst
+   classification.rst
    spatial.rst
    io.rst
    utils.rst

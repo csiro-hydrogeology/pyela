@@ -4,7 +4,7 @@ Text Processing
 ---------------
 
 ela.textproc module
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 
 .. automodule:: ela.textproc

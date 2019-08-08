@@ -4,7 +4,7 @@ Input/Output
 ------------
 
 ela.io module
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 .. automodule:: ela.io
    :members:

@@ -4,7 +4,7 @@ Visualisation
 --------------
 
 ela.visual module
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 
 .. automodule:: ela.visual
