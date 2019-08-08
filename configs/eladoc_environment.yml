@@ -1,0 +1,22 @@
+name: eladoc
+dependencies: 
+ - rasterio=1.0.21
+ - cartopy=0.17.0
+ - geopandas=0.4.1
+ - pandas=0.24.2
+ - nltk=3.4.4
+ - scikit-learn=0.21.2
+ - matplotlib=3.1.0
+ - vtk=8.2.0
+ - pytest-cov=2.7.1
+ - sphinx=2.1.2
+ - pip
+ - pip:
+    - cython==0.29.13
+    - pyqt5==5.13.0
+    - mayavi==4.7.1
+    - codecov==2.0.15
+    - wordcloud
+    - coverage==4.5.4
+    - git+https://github.com/jmp75/striplog@master#egg=striplog
+    - ela==0.7.1
