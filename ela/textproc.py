@@ -1,3 +1,10 @@
+"""Text processing features for lithology analysis.
+
+Todo:
+    * For module TODOs
+    * You have to also use ``sphinx.ext.todo`` extension
+"""
+
 import string
 import sys
 import numpy as np
@@ -12,35 +19,50 @@ from nltk.corpus import stopwords
 
 
 def replace_punctuations(text, replacement=' '):
+    """Replace the punctuations (``string.punctuation``) in a string."""
     for punctuation in string.punctuation:
         text = text.replace(punctuation, replacement)
     return text
 
 def remove_punctuations(text):
+    """Remove the punctuations (``string.punctuation``) in a string."""
     return replace_punctuations(text, '')
 
 LITHO_DESC_COL = u'Lithological Description'
+"""Default column name expected in lithodescription data frames"""
 
 PRIMARY_LITHO_COL = u'Lithology_1'
+"""Default column name expected in lithodescription data frames"""
 SECONDARY_LITHO_COL = u'Lithology_2'
+"""Default column name expected in lithodescription data frames"""
 PRIMARY_LITHO_NUM_COL = u'Lithology_1_num'
+"""Default column name expected in lithodescription data frames"""
 SECONDARY_LITHO_NUM_COL = u'Lithology_2_num'
+"""Default column name expected in lithodescription data frames"""
 
 DEPTH_FROM_COL = u'Depth From (m)'
+"""Default column name expected in lithodescription data frames"""
 DEPTH_TO_COL = u'Depth To (m)'
+"""Default column name expected in lithodescription data frames"""
 DEPTH_FROM_AHD_COL = u'Depth From (AHD)'
+"""Default column name expected in lithodescription data frames"""
 DEPTH_TO_AHD_COL = u'Depth To (AHD)'
+"""Default column name expected in lithodescription data frames"""
 
 EASTING_COL = u'Easting'
+"""Default column name expected in lithodescription data frames"""
 NORTHING_COL = u'Northing'
+"""Default column name expected in lithodescription data frames"""
 
 DISTANCE_COL = u'distance'
+"""Default column name expected in lithodescription data frames"""
 GEOMETRY_COL = u'geometry'
+"""Default column name expected in lithodescription data frames"""
 
 DEM_ELEVATION_COL = u'DEM_elevation'
+"""Default column name expected in lithodescription data frames"""
 
-WIN_SITE_ID_COL = u'WIN Site ID'
-
+# WIN_SITE_ID_COL = u'WIN Site ID'
 
 
 def v_find_primary_lithology(v_tokens, lithologies_dict):
@@ -116,16 +138,29 @@ def token_freq(tokens, n_most_common = 50):
     return pd.DataFrame(list_most_common, columns=["token","frequency"])
 
 def plot_freq(dataframe, y_log = False, x='token', figsize=(15,10), fontsize=14):
+    """Plot a sorted histogram of work frequencies
+
+    Args:
+        dataframe (pandas dataframe): frequency of tokens, typically with colnames ["token","frequency"]
+        y_log (bool): should there be a log scale on the y axis
+        x (str): name of the columns with the tokens (i.e. words)
+        figsize (tuple):
+        fontsize (int):
+
+    Returns:
+        barplot: plot
+
+    """
     p = dataframe.plot.bar(x=x, figsize=figsize, fontsize=fontsize)
     if y_log:
         p.set_yscale("log", nonposy='clip')
-    return p
+    return preplace
 
-def find_word_from_root(tokens, root):
-    """Filter token (words) to retain only those containing a root term 
+def find_worreplace
+    """Filtereplaceterm 
 
     Args:
-        tokens (iterable of str): the list of tokens.
+        tokereplace
         root (str): regular expression for the root term, to look for (e.g 'clay' or 'cl(a|e)y'), which will be padded with '[a-z]*' for searching
 
     Returns:
@@ -137,8 +172,19 @@ def find_word_from_root(tokens, root):
     return xx
 
 def plot_freq_for_root(tokens, root, y_log=True):
-    sand_terms = find_word_from_root(tokens, root)
-    xf = token_freq(sand_terms, len(sand_terms))
+    """Plot a sorted histogram of work frequencies
+
+    Args:
+        tokens (iterable of str): the list of tokens.
+        root (str): regular expression for the root term, to look for (e.g 'clay' or 'cl(a|e)y'), which will be padded with '[a-z]*' for searching
+        y_log (bool): should there be a log scale on the y axis
+
+    Returns:
+        barplot: plot
+
+    """
+    matching_terns = find_word_from_root(tokens, root)
+    xf = token_freq(matching_terns, len(matching_terns))
     return plot_freq(xf, y_log=y_log)
 
 def split_composite_term(x, joint_re = 'with'):
@@ -155,20 +201,49 @@ def split_composite_term(x, joint_re = 'with'):
     return re.sub("([a-z]+)(" + joint_re + ")([a-z]+)", r"\1 \2 \3", x, flags=re.DOTALL)
 
 def split_with_term(x):
+    """split words that are joined by a with, i.e. 'sandwithclay' 
+    Args:
+        x (str): the term to split if matching, e.g. 'claywithsand' to 'clay with sand'
+
+    Returns:
+        split wording (str): tokens split from the joining term.
+    """
     return split_composite_term(x, 'with')
 
 def v_split_with_term(xlist):
+    """split words that are joined by a with, i.e. 'sandwithclay' 
+    Args:
+        xlist (iterable of str): the terms to split if matching, e.g. 'claywithsand' to 'clay with sand'
+
+    Returns:
+        split tokens (list of str): tokens split from the joining term.
+    """
     return [split_with_term(x) for x in xlist]
 
 def v_remove_punctuations(textlist):
+    """vectorised function to remove punctuations
+    Args:
+        textlist (iterable of str): list of terms
+    
+    Returns:
+        (list):
+    """
     return [remove_punctuations(x) for x in textlist]
 
 def v_replace_punctuations(textlist, replacement=' '):
+    """vectorised function to replace punctuations
+    Args:
+        textlist (iterable of str): list of terms
+    
+    Returns:
+        (list):
+    """
     return [replace_punctuations(x, replacement) for x in textlist]
 
 def clean_lithology_descriptions(description_series, lex):
-    """Preparatory cleanup of lithology descriptions for further analysis: 
-    replace abbreviations and misspelling according to a lexicon, 
+    """Preparatory cleanup of lithology descriptions for further analysis
+
+    Replace abbreviations and misspelling according to a lexicon, 
     and transform to lower case
 
     Args:
@@ -188,6 +263,15 @@ def clean_lithology_descriptions(description_series, lex):
     return y
 
 def find_litho_markers(tokens, regex):
+    """Find lithology lithology terms that match a regular expression
+
+    Args:
+        tokens (iterable of str): the list of tokenised sentences.
+        regex (regex): compiles regular expression  e.g. re.compile('sand|clay')
+
+    Returns:
+        (list of str): tokens found to be matching the expression
+    """
     return list(filter(regex.search, tokens))
 
 def v_find_litho_markers(v_tokens, regex):

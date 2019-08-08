@@ -1,5 +1,14 @@
 # Log
 
+## 2019-08-08
+
+Setting up [docs on readthedocs](https://pyela.readthedocs.io/en/latest/)
+
+* https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html
+* http://www.ericholscher.com/blog/2016/jul/1/sphinx-and-rtd-for-writers/
+* https://google.github.io/styleguide/pyguide.html
+
+??? 
 [slice this to visualise vertical cross-sections along arbitrarily oriented (straight) section lines](https://swung.slack.com/archives/C094GV18T/p1551858731038300)
 
 ## 2019-08-05
