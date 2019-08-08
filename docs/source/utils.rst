@@ -3,9 +3,9 @@
 Utilities
 ---------
 
-
 ela.utils module
 ~~~~~~~~~~~~~~~~
+
 
 .. automodule:: ela.utils
    :members:
