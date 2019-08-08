@@ -4,7 +4,7 @@ ela
 Exploratory Lithology Analysis
 ------------------------------
 
-|pypi|\ |license| |status|
+|pypi|\ |license|
 
 master |build-master|\ |codecov-master|
 
@@ -39,14 +39,37 @@ MIT (see
 Documentation
 -------------
 
-Tutorials are hosted `in a separate github
-repository <https://github.com/csiro-hydrogeology/pyela-doc>`__
+Tutorials are hosted `in a separate github repository
+pyela-doc <https://github.com/csiro-hydrogeology/pyela-doc>`__.
+pyela-doc does include quick setup instructions with conda.
 
 Get a `quick tour of the visualisation part of
 ‘ela’ <https://github.com/csiro-hydrogeology/pyela/blob/master/docs/visual_tour.md>`__.
 
 Installation
 ------------
+
+The quickest way with conda:
+
+.. code:: bash
+
+   wget https://raw.githubusercontent.com/csiro-hydrogeology/pyela/testing/configs/ela_environment.yml
+   my_env_name=ELA
+   # my_env_name=elauser
+   conda env create -n $my_env_name -f ./ela_environment.yml python=3.7
+   conda activate $my_env_name 
+
+This should be all to get a working environment. If you want to use
+‘ela’ from jupyter lab:
+
+.. code:: bash
+
+   conda install --name ${my_env_name} jupyterlab ipywidgets jupyter
+   jupyter-labextension install @jupyter-widgets/jupyterlab-manager
+   python -m ipykernel install --user --name ${my_env_name} --display-name "Py3 ELA"
+
+Manual installation
+~~~~~~~~~~~~~~~~~~~
 
 As of January 2019 `ela is on pypi <https://pypi.org/project/ela/>`__.
 While ``pip install ela`` might work on some computers, it is *unlikely
@@ -197,7 +220,7 @@ The following should be enough otherwise to use ‘ela’
 
 Linux:
 
-.. code:: sh
+.. code:: bash
 
    my_env_name=ELA
    conda install --name ${my_env_name} jupyterlab ipywidgets jupyter
@@ -253,7 +276,6 @@ consider:
    :target: https://pypi.org/project/ela/
 .. |license| image:: http://img.shields.io/badge/license-MIT-blue.svg
    :target: https://github.com/csiro-hydrogeology/pyela/blob/master/LICENSE.txt
-.. |status| image:: https://img.shields.io/badge/status-alpha-blue.svg
 .. |build-master| image:: https://img.shields.io/travis/csiro-hydrogeology/pyela.svg?branch=master
    :target: https://travis-ci.org/csiro-hydrogeology/pyela/branches
 .. |codecov-master| image:: https://codecov.io/gh/csiro-hydrogeology/pyela/branch/master/graph/badge.svg
