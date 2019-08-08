@@ -48,6 +48,25 @@ Then and only then:
 twine upload dist/*
 ```
 
+## doc generation
+
+Found out that I needed to use the napoleon extention to read google style docstrings
+
+```bash
+conda install sphinx
+
+sphinx-quickstart
+
+
+cd ~/src/ela/pyela
+sphinx-apidoc -f -o ./docs/source ela
+
+cd docs 
+make html
+```
+
+
+
 ## Troubleshooting
 
 ```bash
