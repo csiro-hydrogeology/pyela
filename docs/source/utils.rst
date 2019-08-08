@@ -3,11 +3,8 @@
 Utilities
 --------------
 
-.. automodule:: ela.utils
-
 ela.utils module
 ~~~~~~~~~~~~~~~
-
 
 .. automodule:: ela.utils
    :members:

@@ -27,9 +27,11 @@ MIT (see [License.txt](https://github.com/csiro-hydrogeology/pyela/blob/master/L
 
 ## Documentation
 
-Tutorials are hosted [in a separate github repository pyela-doc](https://github.com/csiro-hydrogeology/pyela-doc). pyela-doc does include quick setup instructions with conda.
+The [documentation](https://pyela.readthedocs.io) includes the API documentation.
 
-Get a [quick tour of the visualisation part of 'ela'](https://github.com/csiro-hydrogeology/pyela/blob/master/docs/visual_tour.md).
+Some notebook tutorials are hosted [in a separate github repository pyela-doc](https://github.com/csiro-hydrogeology/pyela-doc). pyela-doc includes quick setup instructions with conda.
+
+Get a quick tour of [some legacy visualisations](https://github.com/csiro-hydrogeology/pyela/blob/master/docs/visual_tour.md). Visualisation features are currently being reengineered.
 
 ## Installation 
 
