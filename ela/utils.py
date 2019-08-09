@@ -1,9 +1,10 @@
 
-##if using numpy < 1.12, np.flip is not available: Anaconda for windows. 
-# see https://stackoverflow.com/a/45707308/2752565
 def flip(m, axis):
-    """Reverse the order of elements in an array along the given axis.
-The shape of the array is preserved, but the elements are reordered.
+    """Reverse the order of elements in an array along the given axis. Only use if numpy < 1.12, otherwise use np.flip
+    
+    The shape of the array is preserved, but the elements are reordered.
+    If using numpy < 1.12, np.flip is not available (stemmed from Anaconda for windows).
+    # see https://stackoverflow.com/a/45707308/2752565
 
     Args:
         m (array_like): Input array.

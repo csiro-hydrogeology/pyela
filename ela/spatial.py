@@ -14,7 +14,12 @@ def read_raster_value(dem,band_1,easting,northing):
     
     Args:
         dem (rasterio dataset): dem
-    
+        band_1 (numpy array): the band 1 from the DEM
+        easting (float): easting value
+        northing (float): northing value
+
+    Returns:
+        (float): the value of the band at the specified point
     """
     if (np.isnan(easting) or np.isnan(northing)):
         raise Exception("Easting and northing must not be NaN")
@@ -34,8 +39,20 @@ def get_coords_from_gpd_shape(shp, colname='geometry', out_colnames = ["x","y"])
         Args:
             shp (GeoDataFrame): a geopandas GeoDataFrame
             colname (str): name of columns that has the geometry in the geopandas shapefile
+            out_colnames (list of str): names of the added geolocation columns in the output data frame 
         Returns:
             (DataFrame): a two column data frames, coordinates of all the points in the geodataframe
+
+        Example:
+            >>> from ela.doc.sampledata import *
+            >>> from ela.spatial import get_coords_from_gpd_shape
+            >>> dem ,bore_loc, litho_logs = sample_data()
+            >>> df = litho_logs[[DEPTH_FROM_COL, DEPTH_TO_COL,TOP_ELEV_COL,BOTTOM_ELEV_COL,LITHO_DESC_COL,HYDRO_CODE_COL]]
+            >>> geoloc = get_coords_from_gpd_shape(bore_loc, colname='geometry', out_colnames=[EASTING_COL, NORTHING_COL])
+            >>> geoloc[HYDRO_CODE_COL] = bore_loc[HYDRO_CODE_COL]
+            >>> geoloc.head()
+            >>> # With this data frame we can perform two operations in one go: subsetting the lithology records to only the 640 bores of interest, and adding to the result the x/y geolocations to the data frame.
+            >>> df = pd.merge(df, geoloc, how='inner', on=HYDRO_CODE_COL, sort=False, copy=True, indicator=False, validate=None)
     """
     p = shp[[colname]]
     pts = p.values.flatten()
@@ -61,8 +78,9 @@ def get_unique_coordinates(easting, northing):
 class HeightDatumConverter:
     """
     Attributes:
-        crs (str, dict, or CRS): The coordinate reference system.
-        transform (Affine instance): Affine transformation mapping the pixel space to geographic space.
+        dfcn (GeospatialDataFrameColumnNames): Adapter to a dataframe column names for depth/height information.
+        dem_raster (rasterio dataset): DEM raster
+        data_grid (??): band 1 data in the raster
     """
     def __init__(self, dem_raster, easting_col=EASTING_COL, northing_col=NORTHING_COL, depth_from_ahd_col=DEPTH_FROM_AHD_COL, depth_to_ahd_col=DEPTH_TO_AHD_COL):
         """Initialize this with a coordinate reference system object and an affine transform. See rasterio.
@@ -90,6 +108,14 @@ class HeightDatumConverter:
         return v
 
     def raster_drill_df(self, df):
+        """Gets the DEM values for the easting/northing in a data frame
+    
+        Args:
+            df (pandas.DataFrame): data frame of records with easting/northing information in columns compatible with this object
+    
+        Returns:
+            (1D numpy array): the datum height values at the specified points
+        """
         return self._raster_drill_df(df, self.dfcn.easting_col, self.dfcn.northing_col)
 
     def add_height(self, lithology_df, 
@@ -97,6 +123,21 @@ class HeightDatumConverter:
         depth_from_ahd_col=DEPTH_FROM_AHD_COL, depth_to_ahd_col=DEPTH_TO_AHD_COL, 
         easting_col=EASTING_COL, northing_col=NORTHING_COL,
         drop_na=False):
+        """Helper class to round lithology record classes to the nearest metre of depth
+
+        Args:
+            lithology_df:
+            depth_from_col (str): Column name storing "from depth" information
+            depth_to_col (str): Column name storing "to depth" information
+            depth_from_ahd_col (str): Column name datum height information
+            depth_to_ahd_col (str): Column name datum height information
+            easting_col (str): Column name storing easting information
+            northing_col (str): Column name storing northing information
+            drop_na (bool): If true, entries with nissing datum heights are dropped
+
+        Returns:
+            (pandas.DataFrame):
+        """
         df = lithology_df.copy(deep=True)
         nd = np.float32(self.dem_raster.nodata) # Try to fix https://github.com/jmp75/pyela/issues/2
         ahd = self._raster_drill_df(df, easting_col, northing_col)
@@ -108,21 +149,30 @@ class HeightDatumConverter:
         return df
 
     def raster_value_at(self, easting, northing):
+        """Raster value for a given easting/northing
+    
+        Args:
+            easting (float): easting value
+            northing (float): northing value
+    
+        Returns:
+            (float): the value of the band at the specified point
+        """
         return read_raster_value(self.dem_raster, self.data_grid, easting, northing)
 
 class DepthsRounding:
     """Helper class to round lithology record classes to the nearest metre of depth
 
     Attributes:
-        depth_from_col (str): Name of the column in the data frame of lithology records, storing "from depth" information
-        depth_to_col (str): Name of the column in the data frame of lithology records, storing "to depth" information
+        depth_from_col (str): Column name  storing "from depth" information
+        depth_to_col (str): Column name  storing "to depth" information
     """
     def __init__(self, depth_from_col=DEPTH_FROM_COL, depth_to_col=DEPTH_TO_COL):
         """Helper class to round lithology record classes to the nearest metre of depth
 
         Args:
-            depth_from_col (str): Name of the column in the data frame of lithology records, storing "from depth" information
-            depth_to_col (str): Name of the column in the data frame of lithology records, storing "to depth" information
+            depth_from_col (str): Column name  storing "from depth" information
+            depth_to_col (str): Column name  storing "to depth" information
         """
         self.depth_from_col = depth_from_col
         self.depth_to_col = depth_to_col
@@ -172,6 +222,15 @@ class DepthsRounding:
 #     return df_slice
 
 def z_index_for_ahd_functor(a=1, b=50):
+    """Creates a linear univariate function for height to index conversions
+    
+    Args:
+        a (float): slope - defaults to one
+        b (float): height offset
+
+    Returns:
+        (callable): univariate linear function
+    """
     def z_index_for_ahd(ahd):
         return a * ahd + b
     return z_index_for_ahd
@@ -229,7 +288,19 @@ def burn_volume_func(func_below, func_above, volume, surface_raster, height_to_z
                         zh_nan = min(z_index_max, max(0.0, zh_nan))
                     func_above(volume, x, y, zh_nan)
 
-def drill_volume(volume, slice_surface, height_to_z, x, y):
+def volume_value_at(volume, slice_surface, height_to_z, x, y):
+    """read a volume value at an x/y/z location.
+    
+    Args:
+        volume (3D ndarray): volume to drill
+        slice_surface (2D numpy array): array of elevations
+        height_to_z (callable): converter from datum height to z index
+        x (float): easting index
+        y (float): northing index
+
+    Returns:
+        (float): the value in the volume at the specified point
+    """
     dim_z=volume.shape[2]
     z_index_max = dim_z-1
     slice_height = slice_surface[x,y]
@@ -248,12 +319,22 @@ def drill_volume(volume, slice_surface, height_to_z, x, y):
             return volume[x,y,z]
 
 def slice_volume(volume, slice_surface, height_to_z):
+    """read values in a volume along a slicing surface
+    
+    Args:
+        volume (3D ndarray): volume to drill
+        slice_surface (2D numpy array): array of elevations
+        height_to_z (callable): converter from datum height to z index
+
+    Returns:
+        (float): the value in the volume at the specified point
+    """
     dim_x,dim_y,dim_z=volume.shape
     # TODO if surface_raster.shape[0] != dim_x or surface_raster.shape[1] != dim_y 
     result = np.empty((dim_x,dim_y))
     for x in np.arange(0,dim_x,1):
         for y in np.arange(0,dim_y,1):
-            result[x,y] = drill_volume(volume, slice_surface, height_to_z, x, y)
+            result[x,y] = volume_value_at(volume, slice_surface, height_to_z, x, y)
     return result
 
 class SliceOperation:
@@ -261,14 +342,14 @@ class SliceOperation:
 
     Attributes:
         dem_array_zeroes_infill (2D array): An array, DEM for the grid at the same x/y resolution as the volume to be sliced.
-        z_index_for_ahd (callable): bujection from a z index in the volume to its AHD height
+        z_index_for_ahd (callable): bijection from a z index in the volume to its AHD height
     """
     def __init__(self, dem_array_zeroes_infill, z_index_for_ahd):
         """initialize a slice operator for a given grid size
         
         Args:
             dem_array_zeroes_infill (2D array): An array, DEM for the grid at the same x/y resolution as the volume to be sliced.
-            z_index_for_ahd (callable): bujection from a z index in the volume to its AHD height
+            z_index_for_ahd (callable): bijection from a z index in the volume to its AHD height
         """
         self.dem_array_zeroes_infill = dem_array_zeroes_infill
         self.z_index_for_ahd = z_index_for_ahd
@@ -325,7 +406,7 @@ class SliceOperation:
 
 def burn_volume(volume, surface_raster, height_to_z, below=False, ignore_nan=False, inclusive=False):
     """
-    "burn out" parts of a xyz volume given a surface, below or above the intersection of the volume with the surface
+    Burn out parts of a xyz volume given a surface, below or above the intersection of the volume with the surface
 
     :volume: volume to modify
     :type: 3D numpy
@@ -356,7 +437,7 @@ def burn_volume(volume, surface_raster, height_to_z, below=False, ignore_nan=Fal
 
 def set_at_surface_boundary(volume, surface_raster, height_to_z, value=0.0, ignore_nan=False):
     """
-    "burn out" parts of a xyz volume given a surface, below or above the intersection of the volume with the surface
+    Burn out parts of a xyz volume given a surface, below or above the intersection of the volume with the surface
 
     :volume: volume to modify
     :type: 3D numpy
@@ -383,6 +464,14 @@ def set_at_surface_boundary(volume, surface_raster, height_to_z, value=0.0, igno
 
 
 def get_bbox(geo_pd):
+    """Gets the bounding box of a geopandas dataframe
+    
+    Args:
+        geo_pd (geopandas): shape from which we can get the bounding box as a basis for the extend of the meshgrid
+
+    Return:
+        (tuple of floats): bbox (x_min, y_min, x_max, y_max)
+    """
     return (geo_pd.total_bounds[0], geo_pd.total_bounds[1], geo_pd.total_bounds[2], geo_pd.total_bounds[3])
 
 def create_meshgrid_cartesian(x_min, x_max, y_min, y_max, grid_res):
@@ -429,6 +518,21 @@ def vstacked_points(xx, yy):
     return points
 
 def surface_array(raster, x_min, y_min, x_max, y_max, grid_res):
+    """Creates an isometric 2D grid from a raster, effectively resampling. 
+
+    This resampling is done to facilitate downstream operations on gridded interpolated volumes.
+    
+    Args:
+    raster (rasterio dataset): raster to sample from, typically DEM elevations
+        x_min (numeric): lower x coordinate
+        x_max (numeric): upper x coordinate
+        y_min (numeric): lower y coordinate
+        y_max (numeric): upper y coordinate
+        grid_res (numeric): x and y resolution of the grid we create
+
+    Return:
+        (2dim numpy.ndarray): grid of raster values, typically DEM elevations 
+    """
     xx, yy = create_meshgrid_cartesian(x_min, x_max, y_min, y_max, grid_res)
     points = vstacked_points(xx, yy)
     num_points=points.shape[1]
@@ -475,6 +579,7 @@ def surface_array(raster, x_min, y_min, x_max, y_max, grid_res):
 # mlab.show()
 
 def pad_training_set_functor(classes):
+    """Create a function that pads a training set so that all possible classes are present"""
     ### NEED TO APPEND DUMMY DATA TO MAKE SURE ALL CLASSES ARE PRESENT IN EACH SLICE ###
     # 0=sand
     # 1=sandstone 
@@ -651,10 +756,35 @@ class GeospatialDataFrameColumnNames(object):
         return probs
 
     def class_probability_estimates_depth_bbox(self, df, column_name, slice_depth, n_neighbours, geo_pd, grid_res = 100, func_training_set=None):
+        """Interpolate over a volume the probability of each lithology class 
+
+            Args:
+                df (pandas data frame): bore lithology data, spatially georeferenced
+                column_name (str): name of the column with numeric codes for lithology classes
+                z_ahd_coords (iterable of int): datum heights at which to interpolate. Must be equal to the length of the last dimension of the volume
+                n_neighbours (int): number of nearest neighbours 
+                mesh_grid (tuple): coordinate matrices to interpolate over (numpy.meshgrid)
+
+            Returns:
+                numpy array, predicted values over the grid.
+        """
         mesh_grid = create_meshgrid(geo_pd, grid_res)
         return self.class_probability_estimates_depth(df, column_name, slice_depth, n_neighbours, mesh_grid, func_training_set)
 
     def get_lithology_classes_probabilities(self, lithologies, shape, df, column_name, z_ahd_coords, n_neighbours, mesh_grid):
+        """Interpolate over a volume the probability of each lithology class 
+
+            Args:
+                shape (tuple of ints): shape of the output volumes to interpolate over
+                df (pandas data frame): bore lithology data, spatially georeferenced
+                column_name (str): name of the column with numeric codes for lithology classes
+                z_ahd_coords (iterable of int): datum heights at which to interpolate. Must be equal to the length of the last dimension of the volume
+                n_neighbours (int): number of nearest neighbours 
+                mesh_grid (tuple): coordinate matrices to interpolate over (numpy.meshgrid)
+
+            Returns:
+                numpy array, predicted values over the grid.
+        """
         dim_x,dim_y,dim_z = shape
         vol_template=np.empty((dim_x,dim_y,dim_z))
         classprob_3d_arrays=[vol_template.copy() for i in lithologies]
@@ -698,4 +828,141 @@ class GeospatialDataFrameColumnNames(object):
         mesh_grid = create_meshgrid(geo_pd, grid_res)
         return self.interpolate_lithologydata_slice_depth(df, column_name, slice_depth, n_neighbours, mesh_grid)
 
+
+def interpolate_over_meshgrid(predicting_algorithm, mesh_grid):
+    """Interpolate lithology data
+
+        Args:
+            predicting_algorithm (algorithm with a predict method.): trained algorithm such as the K Nearest Neighbours in scikit (KNN)
+            mesh_grid (tuple): coordinate matrices to interpolate over (numpy.meshgrid)
+
+        Returns:
+            numpy array, predicted values over the grid.
+    """
+    xx, yy = mesh_grid
+    if predicting_algorithm is None:
+        # the training set was too small and prediction cannot be made (odd that scikit would have let us train still)
+        predicted = np.full(xx.shape, np.nan)
+    else:
+        predicted = predicting_algorithm.predict(np.c_[xx.ravel(), yy.ravel()])
+        predicted = predicted.reshape(xx.shape)
+    return predicted
+
+    
+
+class GridInterpolation:
+    """Operations interpolating over a grid using a trained model 
+    The purpose of this class is to adapt 'pyela' operations 
+    to different data without requiring renaming columns.
+
+    Attributes:
+        dfcn (GeospatialDataFrameColumnNames):
+        northing_col (str): name of the data frame column for northing
+        depth_from_ahd_col (str): name of the data frame column for the height of the top of the soil column (ahd stands for for australian height datum, but not restricted)
+        depth_to_ahd_col (str): name of the data frame column for the height of the bottom of the soil column (ahd stands for for australian height datum, but not restricted)
+    """
+
+    def __init__(self, easting_col=EASTING_COL, northing_col=NORTHING_COL, depth_from_ahd_col=DEPTH_FROM_AHD_COL, depth_to_ahd_col=DEPTH_TO_AHD_COL):
+        """Constructor, operations interpolating over a grid using a trained model 
+
+            Args:
+                easting_col (str): name of the data frame column for easting
+                northing_col (str): name of the data frame column for northing
+                depth_from_ahd_col (str): name of the data frame column for the height of the top of the soil column (ahd stands for for australian height datum, but not restricted)
+                depth_to_ahd_col (str): name of the data frame column for the height of the bottom of the soil column (ahd stands for for australian height datum, but not restricted)        
+        """
+        self.dfcn = GeospatialDataFrameColumnNames(easting_col, northing_col, depth_from_ahd_col, depth_to_ahd_col)
+
+
+    def interpolate_volume(self, volume, df, column_name, z_ahd_coords, n_neighbours, mesh_grid):
+        """Interpolate lithology data over a volume
+
+            Args:
+                volume (ndarray): 3d volume to fill with interpolated lithologies   
+                df (pandas data frame): bore lithology data
+                column_name (str): name of the column with numeric codes for lithology classes
+                z_ahd_coords (iterable of int): datum heights at which to interpolate. Must be equal to the length of the last dimension of the volume
+                n_neighbours (int): number of nearest neighbours 
+                mesh_grid (tuple): coordinate matrices to interpolate over (numpy.meshgrid)
+
+            Returns:
+                numpy array, predicted values over the grid.
+        """
+        dim_x,dim_y = mesh_grid[0].shape
+        dim_z = len(z_ahd_coords)
+        if volume.shape[0] != dim_x or volume.shape[1] != dim_y or volume.shape[2] != dim_z:
+            raise Error("Incompatible dimensions in arguments")
+        for index,ahd_height in enumerate(z_ahd_coords):
+            surface = self.interpolate_lithologydata_slice_depth(df, column_name, ahd_height, n_neighbours, mesh_grid)
+            volume[:,:,index]=surface
+
+    def interpolate_lithologydata_slice_depth(self, df, column_name, slice_depth, n_neighbours, mesh_grid):
+        """Interpolate lithology data
+
+            Args:
+                df (pandas data frame): bore lithology data  
+                column_name (str): name of the column with string information to use to strip entries with missing lithology information
+                slice_depth (float): AHD coordinate at which to slice the data frame for lithology observations
+                n_neighbours (int): number of nearest neighbours 
+                mesh_grid (tuple): coordinate matrices to interpolate over (numpy.meshgrid)
+
+            Returns:
+                numpy array, predicted values over the grid.
+        """
+        knn = self.get_knn_model(df, column_name, slice_depth, n_neighbours)
+        return interpolate_over_meshgrid(knn, mesh_grid)
+
+    def get_knn_model(self, df, column_name, slice_depth, n_neighbours):
+        """Train a K-nearest neighbours model for a given plane 
+
+            Args:
+                df (pandas data frame): bore lithology data  
+                column_name (str): name of the column with string information to use to strip entries with missing lithology information
+                slice_depth (float): AHD coordinate at which to slice the data frame for lithology observations
+                n_neighbours (int): number of nearest neighbours 
+
+        Returns:
+            KNeighborsClassifier: trained classifier.
+        """
+        df_1 = self.get_lithology_observations_for_depth(df, slice_depth, column_name)
+        X, y = self.make_training_set(df_1, column_name)
+        if n_neighbours > len(df_1):
+            return None
+        else:
+            knn = neighbors.KNeighborsClassifier(n_neighbours, weights = KNN_WEIGHTING).fit(X, y)
+            return knn
+
+    def get_lithology_observations_for_depth(self, df, slice_depth, column_name ):
+        """
+        Subset data frame with entries at a specified AHD coordinate, and with valid lithology information.
+
+            Args:
+                df (pandas data frame): bore lithology data  
+                slice_depth (float): AHD coordinate at which to slice the data frame for lithology observations 
+                column_name (str): name of the column with string information to use to strip entries with missing lithology information
+        
+            Returns:
+                a (view of a) data frame; a subset of the input data frame, 
+                entries intersecting with the specified slice depth
+        """
+        df_slice=self.dfcn.lithologydata_slice_depth(df, slice_depth)
+        df_1=df_slice[np.isnan(df_slice[column_name]) == False]
+        return df_1
+
+    def make_training_set(self, observations, column_name):
+        """Create a training set from a set of geolocated observations
+
+            Args:
+                observations (pandas data frame): bore lithology data with geocoordinates
+                column_name (str): name of the column with string information to use to strip entries with missing lithology information
+        
+            Returns:
+                (tuple): observations and predictors (geolocation).
+        """
+        X = observations[[self.dfcn.easting_col, self.dfcn.northing_col]].values
+        y = np.array(observations[column_name])
+        #NOTE: should I also do e.g.:
+        #shuffle_index = np.random.permutation(len(y))
+        #X, y = X[shuffle_index], y[shuffle_index]   
+        return (X, y)
 
