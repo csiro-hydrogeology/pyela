@@ -4,6 +4,7 @@
 
 Setting up [docs on readthedocs](https://pyela.readthedocs.io/en/latest/)
 
+* https://www.sphinx-doc.org/en/master/usage/extensions/example_google.html#example-google
 * https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html
 * http://www.ericholscher.com/blog/2016/jul/1/sphinx-and-rtd-for-writers/
 * https://google.github.io/styleguide/pyguide.html

@@ -128,9 +128,9 @@ def test_slice_volume():
     dem[2,2] = np.nan
     dem[2,3] = -1.0
 
-    # TODO: I do not really like using drill_volume. Make sure this is unit tested itself.
+    # TODO: I do not really like using volume_value_at. Make sure this is unit tested itself.
     def f(x, y):
-        return drill_volume(test_vol, dem, z_index_for_ahd, x, y)
+        return volume_value_at(test_vol, dem, z_index_for_ahd, x, y)
 
     assert np.isnan(f(0,0))
     assert np.isnan(f(0,1))

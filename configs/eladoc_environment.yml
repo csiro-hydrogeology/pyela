@@ -10,13 +10,14 @@ dependencies:
  - vtk=8.2.0
  - pytest-cov=2.7.1
  - sphinx=2.1.2
+ - sphinx_rtd_theme=0.4.3
  - pip
  - pip:
     - cython==0.29.13
     - pyqt5==5.13.0
     - mayavi==4.7.1
     - codecov==2.0.15
-    - wordcloud
+    - wordcloud==1.5.0
     - coverage==4.5.4
     - git+https://github.com/jmp75/striplog@master#egg=striplog
-    - ela==0.7.1
+    - ela

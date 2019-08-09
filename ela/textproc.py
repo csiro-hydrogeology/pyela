@@ -154,13 +154,13 @@ def plot_freq(dataframe, y_log = False, x='token', figsize=(15,10), fontsize=14)
     p = dataframe.plot.bar(x=x, figsize=figsize, fontsize=fontsize)
     if y_log:
         p.set_yscale("log", nonposy='clip')
-    return preplace
+    return p
 
-def find_worreplace
-    """Filtereplaceterm 
+def find_word_from_root(tokens, root):
+    """Filter token (words) to retain only those containing a root term 
 
     Args:
-        tokereplace
+        tokens (iterable of str): the list of tokens.
         root (str): regular expression for the root term, to look for (e.g 'clay' or 'cl(a|e)y'), which will be padded with '[a-z]*' for searching
 
     Returns:
@@ -413,3 +413,26 @@ def find_regex_df(df, expression, colname):
     xx = [(regex.match(x) is not None) for x in tested]
     df_test = df.loc[xx]
     return df_test
+
+def as_numeric(x):
+    if isinstance(x, float):
+        return x
+    if x == 'None':
+        return np.nan
+    elif x is None:
+        return np.nan
+    elif isinstance(x, str):
+        return float(x)
+    else:
+        return float(x)
+
+def columns_as_numeric(df, colnames=[DEPTH_FROM_COL, DEPTH_TO_COL]):
+    """Process some columns to make sure they are numeric. In-place changes.
+
+        Args:
+            df (pandas data frame): bore lithology data
+            colnames (iterable of str): column names
+    """
+    for colname in colnames:
+        df[colname] = df[colname].apply(as_numeric)
+

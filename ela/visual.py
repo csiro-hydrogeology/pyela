@@ -106,10 +106,8 @@ def to_color_image(x, cmap):
     """Convert a 2D array to a color representation (RGBA)
 
     Args:
-        cmap (dict): color map with keys as zero based numeric integers and values RGBA tuples.
-        lower_index (int): lower_index, key to the color to interpolate from (to the next color at lower_index + 1)
-        fraction (float): 0 to 1, weight to interpolate between the two colors
-        type (str): ignored; future arg for other interpolation schemes.
+        x (2d array): array of data to reprecent as colors
+        cmap (dict): discrete color map with keys as zero based numeric integers and values RGBA tuples.
 
     Returns:
         tuple: RGBA values.
