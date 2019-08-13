@@ -1,16 +1,4 @@
-# If I import visual3d currently I get warnings that may be considered as failures when using travis.
-# ============================== warnings summary ===============================
-# apptools\preferences\preferences_helper.py:166: DeprecationWarning: use "HasTraits.trait_set" instead
-#   self.set(trait_change_notify=notify, **traits_to_set)
-# apptools\preferences\preferences_helper.py:166: DeprecationWarning: use "HasTraits.trait_set" instead
-#   self.set(trait_change_notify=notify, **traits_to_set)
-
-# apptools\persistence\state_pickler.py:661: DeprecationWarning: np.loads is deprecated, use pickle.loads instead
-#   result = numpy.loads(junk, encoding='bytes')
-# apptools\persistence\state_pickler.py:661: DeprecationWarning: np.loads is deprecated, use pickle.loads instead
-#   result = numpy.loads(junk, encoding='bytes')
-# apptools\persistence\state_pickler.py:661: DeprecationWarning: np.loads is deprecated, use pickle.loads instead
-#   result = numpy.loads(junk, encoding='bytes')
+# See issue https://github.com/csiro-hydrogeology/pyela/issues/12
 
 # import os
 # import pandas as pd
@@ -26,7 +14,6 @@
 # from ela.visual3d import *
 
 # def test_mlab_ui():
-# def do_not_test_yet_ui():
 #     class_names = [
 #         'class_1',
 #         'class_2',

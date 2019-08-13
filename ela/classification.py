@@ -56,12 +56,12 @@ class ClassMapper:
             lithology_names (iterable of str): Name of the lithologies
             mapping (dict): dictionary where keys are primary+secondary lithologies ('sand/clay') and values are numeric codes for e.g. hydraulic conductivities
         """
+        self.lithology_names = lithology_names
         self.mapping = mapping
         self.litho_numeric_mapper = np.empty((len(lithology_names), len(lithology_names)))
         for i in np.arange(0, len(lithology_names), 1):
             for j in np.arange(0, len(lithology_names), 1):
                 self.litho_numeric_mapper[i,j] = self.class_code(lithology_names[i], lithology_names[j])
-        self.lithology_names = lithology_names
     @staticmethod
     def create_full_litho_desc(df):
         """Create strings identifying primary+secondary lithologies, used as keys in classification operations
@@ -104,17 +104,28 @@ class ClassMapper:
                 string, lithologies key such as 'sand/clay'
         """
         if isinstance(primary_litho_class, float):
-            if np.isnan(primary_litho_class): return np.nan
+            if np.isnan(primary_litho_class): 
+                return ''
             primary_litho_class = self._to_int(primary_litho_class)
         if isinstance(secondary_litho_class, float):
             if np.isnan(secondary_litho_class): 
                 secondary_litho_class = ''
             else:
                 secondary_litho_class = self._to_int(secondary_litho_class)
+
         if isinstance(primary_litho_class, int): primary_litho_class = self.lithology_names[primary_litho_class]
         if isinstance(secondary_litho_class, int): secondary_litho_class = self.lithology_names[secondary_litho_class]
+
+        if isinstance(primary_litho_class, str):
+            if not primary_litho_class in self.lithology_names:
+                return ''
+        if isinstance(secondary_litho_class, str): 
+            if not secondary_litho_class in self.lithology_names:
+                secondary_litho_class = ''
+
         litho_class = '/'.join([primary_litho_class, secondary_litho_class])
         return litho_class
+
     def class_code(self, primary_litho_class, secondary_litho_class):
         """Get the mapping class code (e.g. hydraulic condouctivity) for a set of primary+secondary lithologies
 
@@ -195,146 +206,6 @@ class ClassMapper:
         ## TODO should check on dimensions...
         x = [(self.litho_class_label(i, j), freq_table[i,j]) for i in range(len(self.lithology_names)) for j in range(len(self.lithology_names))]
         return pd.DataFrame(x, columns=["token","frequency"])
-
-
-def interpolate_over_meshgrid(predicting_algorithm, mesh_grid):
-    """Interpolate lithology data
-
-        Args:
-            predicting_algorithm (algorithm with a predict method.): trained algorithm such as the K Nearest Neighbours in scikit (KNN)
-            mesh_grid (tuple): coordinate matrices to interpolate over (numpy.meshgrid)
-
-        Returns:
-            numpy array, predicted values over the grid.
-    """
-    xx, yy = mesh_grid
-    if predicting_algorithm is None:
-        # the training set was too small and prediction cannot be made (odd that scikit would have let us train still)
-        predicted = np.empty(xx.shape)
-        predicted[:] = np.nan # np.empty should have done that already, but, no...
-    else:
-        predicted = predicting_algorithm.predict(np.c_[xx.ravel(), yy.ravel()])
-        predicted = predicted.reshape(xx.shape)
-    return predicted
-
-
-# def interpolate_volume(volume, df, column_name, z_ahd_coords, n_neighbours, mesh_grid):
-#     dim_x,dim_y = mesh_grid[0].shape
-#     dim_z = len(z_ahd_coords)
-#     if volume.shape[0] != dim_x or volume.shape[1] != dim_y or volume.shape[2] != dim_z:
-#         raise Error("Incompatible dimensions in arguments")
-#     for index,ahd_height in enumerate(z_ahd_coords):
-#         surface = interpolate_lithologydata_slice_depth(df, column_name, ahd_height, n_neighbours, mesh_grid)
-#         volume[:,:,index]=surface
-
-
-
-
-class GridInterpolation:
-    """Operations interpolating over a grid using a trained model 
-    The purpose of this class is to adapt 'pyela' operations 
-    to different data without requiring renaming columns.
-
-    Attributes:
-        dfcn (GeospatialDataFrameColumnNames):
-        northing_col (str): name of the data frame column for northing
-        depth_from_ahd_col (str): name of the data frame column for the height of the top of the soil column (ahd stands for for australian height datum, but not restricted)
-        depth_to_ahd_col (str): name of the data frame column for the height of the bottom of the soil column (ahd stands for for australian height datum, but not restricted)
-    """
-
-    def __init__(self, easting_col=EASTING_COL, northing_col=NORTHING_COL, depth_from_ahd_col=DEPTH_FROM_AHD_COL, depth_to_ahd_col=DEPTH_TO_AHD_COL):
-        """Constructor, operations interpolating over a grid using a trained model 
-
-            Args:
-                easting_col (str): name of the data frame column for easting
-                northing_col (str): name of the data frame column for northing
-                depth_from_ahd_col (str): name of the data frame column for the height of the top of the soil column (ahd stands for for australian height datum, but not restricted)
-                depth_to_ahd_col (str): name of the data frame column for the height of the bottom of the soil column (ahd stands for for australian height datum, but not restricted)        
-        """
-        self.dfcn = GeospatialDataFrameColumnNames(easting_col, northing_col, depth_from_ahd_col, depth_to_ahd_col)
-
-
-    def interpolate_volume(self, volume, df, column_name, z_ahd_coords, n_neighbours, mesh_grid):
-        """Interpolate lithology data over a volume
-
-            Args:
-                df (pandas data frame): bore lithology data  
-                slice_depth (float): AHD coordinate at which to slice the data frame for lithology observations
-                n_neighbours (int): number of nearest neighbours 
-                mesh_grid (tuple): coordinate matrices to interpolate over (numpy.meshgrid)
-
-            Returns:
-                numpy array, predicted values over the grid.
-        """
-        dim_x,dim_y = mesh_grid[0].shape
-        dim_z = len(z_ahd_coords)
-        if volume.shape[0] != dim_x or volume.shape[1] != dim_y or volume.shape[2] != dim_z:
-            raise Error("Incompatible dimensions in arguments")
-        for index,ahd_height in enumerate(z_ahd_coords):
-            surface = self.interpolate_lithologydata_slice_depth(df, column_name, ahd_height, n_neighbours, mesh_grid)
-            volume[:,:,index]=surface
-
-    def interpolate_lithologydata_slice_depth(self, df, column_name, slice_depth, n_neighbours, mesh_grid):
-        """Interpolate lithology data
-
-            Args:
-                df (pandas data frame): bore lithology data  
-                column_name (str): name of the column with string information to use to strip entries with missing lithology information
-                slice_depth (float): AHD coordinate at which to slice the data frame for lithology observations
-                n_neighbours (int): number of nearest neighbours 
-                mesh_grid (tuple): coordinate matrices to interpolate over (numpy.meshgrid)
-
-            Returns:
-                numpy array, predicted values over the grid.
-        """
-        knn = self.get_knn_model(df, column_name, slice_depth, n_neighbours)
-        return interpolate_over_meshgrid(knn, mesh_grid)
-
-    def get_knn_model(self, df, column_name, slice_depth, n_neighbours):
-        """Train a K-nearest neighbours model for a given plane 
-
-            Args:
-                df (pandas data frame): bore lithology data  
-                column_name (str): name of the column with string information to use to strip entries with missing lithology information
-                slice_depth (float): AHD coordinate at which to slice the data frame for lithology observations
-                n_neighbours (int): number of nearest neighbours 
-
-        Returns:
-            KNeighborsClassifier: trained classifier.
-        """
-        df_1 = self.get_lithology_observations_for_depth(df, slice_depth, column_name)
-        X, y = self.make_training_set(df_1, column_name)
-        if n_neighbours > len(df_1):
-            return None
-        else:
-            knn = neighbors.KNeighborsClassifier(n_neighbours, weights = KNN_WEIGHTING).fit(X, y)
-            return knn
-
-    def get_lithology_observations_for_depth(self, df, slice_depth, column_name ):
-        """
-        Subset data frame with entries at a specified AHD coordinate, and with valid lithology information.
-
-            Args:
-                df (pandas data frame): bore lithology data  
-                slice_depth (float): AHD coordinate at which to slice the data frame for lithology observations 
-                column_name (str): name of the column with string information to use to strip entries with missing lithology information
-        
-            Returns:
-                a (view of a) data frame; a subset of the input data frame, 
-                entries intersecting with the specified slice depth
-        """
-        df_slice=self.dfcn.lithologydata_slice_depth(df, slice_depth)
-        df_1=df_slice[np.isnan(df_slice[column_name]) == False]
-        return df_1
-
-    def make_training_set(self, observations, column_name):
-        # X = observations.as_matrix(columns=[EASTING_COL, NORTHING_COL])
-        X = observations[[self.dfcn.easting_col, self.dfcn.northing_col]].values
-        y = np.array(observations[column_name])
-        #NOTE: should I also do e.g.:
-        #shuffle_index = np.random.permutation(len(y))
-        #X, y = X[shuffle_index], y[shuffle_index]   
-        return (X, y)
 
 
 def extract_single_lithology_class_3d(lithology_3d_classes, class_value):

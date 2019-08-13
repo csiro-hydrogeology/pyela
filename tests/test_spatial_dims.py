@@ -15,6 +15,8 @@ from ela.classification import *
 from ela.io import GeotiffExporter
 from ela.utils import flip
 
+from shapely.geometry import Point
+
 def test_create_meshgrid():
     xx, yy = create_meshgrid_cartesian(x_min=0.0, x_max=1.1, y_min=1.0, y_max=1.51, grid_res = 0.5)
     assert xx.shape[0] == 3
@@ -49,7 +51,8 @@ def test_interpolate_slice():
     p = MockSlicePredictor(a, b, c)
     def z_func(xi, yi):
         return p.f(xx[xi, yi], yy[xi, yi])
-    
+
+
     predicted = interpolate_over_meshgrid(p, m)
     assert predicted.shape[0] == 3
     assert predicted.shape[1] == 2
@@ -59,6 +62,11 @@ def test_interpolate_slice():
     assert predicted[0,1] == z_func(0, 1)
     assert predicted[1,1] == z_func(1, 1)
     assert predicted[2,1] == z_func(2, 1)
+    # work around scikit behavior:
+    predicted = interpolate_over_meshgrid(None, m)
+    assert predicted.shape[0] == 3
+    assert predicted.shape[1] == 2
+    assert np.isnan(predicted[1,1])
 
 def test_height_coordinate_functor():
     z_index_for_ahd = z_index_for_ahd_functor(b=+100)
@@ -120,9 +128,9 @@ def test_slice_volume():
     dem[2,2] = np.nan
     dem[2,3] = -1.0
 
-    # TODO: I do not really like using drill_volume. Make sure this is unit tested itself.
+    # TODO: I do not really like using volume_value_at. Make sure this is unit tested itself.
     def f(x, y):
-        return drill_volume(test_vol, dem, z_index_for_ahd, x, y)
+        return volume_value_at(test_vol, dem, z_index_for_ahd, x, y)
 
     assert np.isnan(f(0,0))
     assert np.isnan(f(0,1))
@@ -150,6 +158,41 @@ def test_slice_volume():
     assert f(2,1) == s[2,1]
     assert np.isnan(s[2,2])
     assert f(2,3) == s[2,3]
+
+    sops = SliceOperation(dem, z_index_for_ahd)
+    test_slices = sops.from_ahd_to_depth_below_ground_level(test_vol, from_depth=-1, to_depth=+1)
+    s = test_slices
+    assert s.shape[0] == dim_x
+    assert s.shape[1] == dim_y
+    assert s.shape[2] == 3
+    index_ground_lvl = 1 # the top level is for depth=0 (dem), but it is at index 1 in the resulting volume s. one metre below ground level is what is at index 0 for the third dimension.
+    assert np.isnan( s[0,0,index_ground_lvl])
+    assert np.isnan( s[0,1,index_ground_lvl])
+    assert f(0,2) == s[0,2,index_ground_lvl]
+    assert f(0,3) == s[0,3,index_ground_lvl]
+    assert f(1,0) == s[1,0,index_ground_lvl]
+    assert f(1,1) == s[1,1,index_ground_lvl]
+    assert f(1,2) == s[1,2,index_ground_lvl]
+    assert f(1,3) == s[1,3,index_ground_lvl]
+    assert f(2,0) == s[2,0,index_ground_lvl]
+    assert f(2,1) == s[2,1,index_ground_lvl]
+    assert np.isnan( s[2,2,index_ground_lvl])
+    assert f(2,3) == s[2,3,index_ground_lvl]
+    averaged_slices = sops.reduce_slices_at_depths(test_vol, from_depth=-1, to_depth=0, reduce_func=SliceOperation.arithmetic_average)
+    s = averaged_slices
+    assert np.isnan( s[0,0])
+    assert np.isnan( s[0,1])
+    # test_vol was constructed such that Z values increase by one at a given X/Y location, so the slicing/averaging result is like offsetting by 1/2:
+    assert f(0,2) + 0.5 == s[0,2]
+    assert f(0,3) + 0.5 == s[0,3]
+    assert f(1,0) + 0.5 == s[1,0]
+    assert f(1,1) + 0.5 == s[1,1]
+    assert f(1,2) + 0.5 == s[1,2]
+    assert f(1,3) + 0.5 == s[1,3]
+    assert f(2,0) + 0.5 == s[2,0]
+    assert f(2,1) + 0.5 == s[2,1]
+    assert np.isnan( s[2,2])
+    assert f(2,3) + 0.5 == s[2,3]
 
 def get_test_bore_df():
     x_min = 383200
@@ -253,6 +296,53 @@ def test_flip():
     # assert flip(m, (1,3))[0,2,0] == 3.14
 
 
+def test_get_coords_from_gpd_shape():
+    easting_values = np.array([.1, .2, .3, .3 ])
+    northing_values = np.array([.12, .22, .32, .32 ])
+    coords = get_unique_coordinates(easting_values, northing_values)
+    assert coords.shape[0] == 3
+    assert coords.shape[1] == 2
+    ptsdf = pd.DataFrame({ 'Coordinates' : list(zip(coords[:,0], coords[:,1])) })
+    ptsdf['Coordinates'] = ptsdf['Coordinates'].apply(Point)
+    gdf = gpd.GeoDataFrame(ptsdf, geometry='Coordinates')
+    gdf.crs = "+proj=utm +zone=56 +ellps=GRS80 +south +units=m +no_defs"
+    geoloc = get_coords_from_gpd_shape(gdf, colname='Coordinates', out_colnames=['xx','yy'])
+    x = geoloc.xx
+    y = geoloc.yy
+    assert len(x) == 3
+    assert x[0] == .1
+    assert x[1] == .2
+    assert x[2] == .3
+    assert y[0] == .12
+    assert y[1] == .22
+    assert y[2] == .32
+
+def test_rounding_depths():
+    n = 6
+    df = pd.DataFrame({
+        EASTING_COL:np.full(n, 1.1), 
+        NORTHING_COL:np.full(n, 2.2), 
+        'fake_obs': np.array([.1, .2, .3, .4, .5, .6]),
+        DEPTH_FROM_COL: np.array([1.11, 1.16, 2.22, 3.33, 3.38, 4.44]),
+        DEPTH_TO_COL: np.array(  [1.16, 2.22, 3.33, 3.38, 4.44, 5.55])
+    })
+    dr = DepthsRounding(DEPTH_FROM_COL, DEPTH_TO_COL)
+    assert dr.assess_num_collapsed(df) == 2
+    df_rd = dr.round_to_metre_depths(df, np.round, True)
+
+    f = df_rd[DEPTH_FROM_COL].values
+    t = df_rd[DEPTH_TO_COL].values
+    
+    assert f[0] == 1.0
+    assert f[1] == 2.0
+    assert f[2] == 3.0
+    assert f[3] == 4.0
+    assert t[0] == 2.0
+    assert t[1] == 3.0
+    assert t[2] == 4.0
+    assert t[3] == 6.0
+
+
 # test_add_ahd()
 # test_flip()
 # test_surface_array()
@@ -263,4 +353,5 @@ def test_flip():
 # test_height_coordinate_functor()
 # # test_make_training_set()
 # test_raster_drill()
-
+# test_get_coords_from_gpd_shape()
+# test_rounding_depths()

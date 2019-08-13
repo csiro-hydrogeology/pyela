@@ -9,6 +9,11 @@ from ela.textproc import EASTING_COL, NORTHING_COL, DEPTH_FROM_AHD_COL, DEPTH_FR
 
 
 def create_colormap_lut(color_names):
+    """Create a color map usable by a mayavi lookup table, based on a set of matplotlib color names 
+
+    Args:
+        color_names(iterable of str): color names recognisable by matplotlib
+    """
     return np.array([np.array(to_rgba_255(c), dtype=np.uint8) for c in color_names])
 
 # Below a couple of attempts to programmatically custom plot attributes. Frustrating.
@@ -28,8 +33,14 @@ def mlab_label(label_func, text, label_format=''):
 
 #@mlab.draw?
 def set_custom_colormap(lut, color_names):
-    """
+    """Sets the color map of a mayavi lookup table 
+
     Reference: http://docs.enthought.com/mayavi/mayavi/auto/example_custom_colormap.html 
+
+    Args:
+        lut(mayavi LUT): Mayavi lookup table thing
+        color_names(iterable of str): color names recognisable by matplotlib
+    
     """
     my_lut = create_colormap_lut(color_names)
     lut.number_of_colors = len(my_lut)
@@ -77,6 +88,8 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         set_custom_colormap(lut, self.color_names_with_missing)
 
     def create_plane_cut(self, volume, plane_orientation='x_axes', slice_index = 20, colormap=None):
+        """Create a plane cut on a 3d volume
+        """
         f = mlab.pipeline.scalar_field(volume)
         if colormap is None:
             cut = mlab.pipeline.image_plane_widget(f, 
@@ -90,6 +103,8 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
 
     # @mlab.show
     def render_classes_planar(self, volume, title):
+        """Create 3 movable plane cuts on a 3d volume
+        """
         mlab.figure(size=(800, 800))
         s = volume
         x_cut=self.create_plane_cut(s, plane_orientation='x_axes')
@@ -104,6 +119,12 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
 
     @mlab.show
     def render_class(self, volume_lithologies, class_value):
+        """Render a give lithology class as a volume within the interpolated volume
+
+        Args:
+            volume_lithologies (3D array): gridded lithology classes
+            class_value (int, or numeric cast to int): the numeric value (code) of the lithology class to render. 
+        """
         class_index = int(class_value)
         class_name = self.class_names[class_index]
         color_name = self.color_names[class_index]
@@ -119,6 +140,12 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
 
     @mlab.show
     def render_proba_class(self, prob_volume, title):
+        """Create 3 movable plane cuts on a 3d volume of probabilities (probability of classification)
+
+        Args:
+            prob_volume (3D array): gridded probability of a lithology
+            title (str): title
+        """
         mlab.figure(size=(800, 800))
         # s = np.flip(np.flip(test,axis=2), axis=0)
         s = prob_volume
@@ -134,6 +161,11 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         mlab.scalarbar(nb_labels=11)
 
 def scale_z_bore_pos_points(x, y, z, s, z_scaling):
+    """Scale the vertical values, to avoid a squashed view of borehole logs. 
+    
+    Note that I'd prefer a different scaling but may not be feasible in the composite view of 3D data.
+    You probably do not need to call this function from user code.
+    """
     zz = z * z_scaling
     return x, y, zz, s
 
@@ -155,10 +187,34 @@ def scale_z_bore_pos_points(x, y, z, s, z_scaling):
 #######################
 
 class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
+    """Facilities for combined visualisation of dem, bore and interpolated lithologies
+
+    Attributes:
+        dfcn (GeospatialDataFrameColumnNames): data frame column names definition
+    """
     def __init__(self, class_names, color_names, missing_value_color_name, dem_array_data, z_coords, z_scaling, litho_df, column_name, 
         easting_col=EASTING_COL, northing_col=NORTHING_COL, depth_from_ahd_col=DEPTH_FROM_AHD_COL, depth_to_ahd_col=DEPTH_TO_AHD_COL):
         super(LithologiesClassesOverlayVisual3d, self).__init__(class_names, color_names, missing_value_color_name)
-        # 1D georeferenced data (bore primary litho data)
+        """Facilities for combined visualisation of dem, bore and interpolated lithologies
+
+        Attributes:
+            dfcn (GeospatialDataFrameColumnNames): data frame column names definition
+
+        Args:
+            class_names (list of str): names of the classes
+            color_names (list of str): names of the colors for the classes. See matplotlib doc for suitable names: https://matplotlib.org/examples/color/named_colors.html
+            missing_value_color_name (str): name of the color for missing values (NaN)
+            dem_array_data (2D numpy array): grid of DEM values at the volume resolution/shape
+            z_coords(array of heights): list of heights on the z axis 
+            z_scaling(int) : scaling factor for the z axis
+            litho_df(pandas dataframe): data frame with heights and geolocation columns compatible with this other function parameters.
+            column_name(str): column name in the data frame of the numeric class to visualise in the volume rendering
+            easting_col (str): name of the data frame column for easting
+            northing_col (str): name of the data frame column for northing
+            depth_from_ahd_col (str): name of the data frame column for the height of the top of the soil column (ahd stands for for australian height datum, but not restricted)
+            depth_to_ahd_col (str): name of the data frame column for the height of the bottom of the soil column (ahd stands for for australian height datum, but not restricted)        
+        """
+            # 1D georeferenced data (bore primary litho data)
         self.dfcn = GeospatialDataFrameColumnNames(easting_col, northing_col, depth_from_ahd_col, depth_to_ahd_col)
         x, y, z_from, z_to, s = self.dfcn.extract_bore_class_num(litho_df, column_name)
         self.bore_data = scale_z_bore_pos_points(x, y, z_to, s, z_scaling)
@@ -221,7 +277,11 @@ class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
         return self.overlay_bore_classes(self.dem_mesh, vol_mesh, self.bore_data, vol_colorname, z_label=z_label, points_scale_factor=self.POINTS_SCALE_FACTOR, title=self.title_prefix + class_name)
 
 def get_colorscale_lut(vis_widget):
-    # not sure this is valid for all mayavi things...
+    """Retrieve the LUT (lookup table) of a mayavi widget
+    
+    not sure this is valid for all mayavi things...
+    
+    """
     return vis_widget.module_manager.scalar_lut_manager.lut
 
 

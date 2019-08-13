@@ -11,4 +11,6 @@ exclude_lines =
     if __name__ == .__main__.:
 ignore_errors = True
 omit =
-    tests/*
+    tests/*    
+    ela/experiment/*
+    ela/visual3d.py

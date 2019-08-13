@@ -18,12 +18,13 @@ def test_numeric_code_mapping():
     assert codes['sand'] == 0.0
     assert codes['clay'] == 1.0
     assert codes['silt'] == 2.0
-    test_lithologies = ['silt','sand','silt','sand','clay','silt']
+    test_lithologies = ['silt','sand','silt','sand','clay','silt','magma']
     vcodes = v_to_litho_class_num(test_lithologies, codes)
-    assert len(vcodes) == 6
+    assert len(vcodes) == 7
     assert vcodes[0] == 2.0
     assert vcodes[1] == 0.0
     assert vcodes[4] == 1.0
+    assert np.isnan(vcodes[6])
 
 def test_get_lithology_observations_for_depth():
     obs_colname = 'fake_obs'
@@ -141,6 +142,15 @@ def test_class_mapping():
         'limestone/clay':medium,
     }
     mapper = ClassMapper(mapping, lithology_names)
+
+    assert mapper.litho_class_label( sand_code, clay_code ) == 'sand/clay'
+    assert mapper.litho_class_label( sand_code, 'clay' ) == 'sand/clay'
+    assert mapper.litho_class_label( sand_code, np.nan ) == 'sand/'
+    assert mapper.litho_class_label( 'sand', np.nan ) == 'sand/'
+    assert mapper.litho_class_label( 'unknown_thing', 'clay' ) == ''
+    assert mapper.litho_class_label( 'unknown_thing', np.nan ) == ''
+    assert mapper.litho_class_label( np.nan, np.nan ) == ''
+
     assert mapper.class_code('sand','')  == fast
     assert mapper.class_code('sand','sand')  == fast
     assert mapper.class_code('sand',np.nan)  == fast
@@ -152,6 +162,13 @@ def test_class_mapping():
     assert mapper.bivariate_mapper(sand_code,sand_code)  == fast
     assert mapper.bivariate_mapper(sand_code,np.nan)  == fast
     assert mapper.bivariate_mapper(clay_code,np.nan)  == slow
+    assert np.isnan(mapper.bivariate_mapper(np.nan,np.nan))
+    assert np.isnan(mapper.bivariate_mapper(np.nan,clay_code))
+
+    num_remap = mapper.numeric_for_litho_classes(['sand/clay', 'clay/sand'])
+    assert num_remap[0] == fast
+    assert num_remap[1] == medium
+
 
     primary_lithology_3d_array = np.empty([3,4,5])
     secondary_lithology_3d_array = np.empty([3,4,5])
@@ -175,8 +192,30 @@ def test_class_mapping():
     litho_keys = mapper.create_full_litho_desc(df)
     assert litho_keys[0] == 'sand/clay'
     assert litho_keys[1] == 'loam/'
-    assert np.isnan(mapper.class_code('sand','martian rock'))
+    # Secondary lithology outside of the known class is ignored, but we need a valid one for the primary lithology
+    assert mapper.class_code('sand','martian rock') == mapper.class_code('sand','')
+    assert np.isnan(mapper.class_code('martian rock','sand'))
 
+    dims = (2,3,4)
+    dim_x,dim_y,dim_z = dims
+    prim_litho = np.full(dims, np.nan)
+    secd_litho = np.full(dims, np.nan)
+    sand_code = 0
+    clay_code = 1
+    limestone_code = 2
+    prim_litho[0,0,0] = sand_code
+    secd_litho[0,0,0] = sand_code
+    prim_litho[0,0,1] = sand_code
+    secd_litho[0,0,1] = clay_code
+    prim_litho[0,0,2] = clay_code
+    secd_litho[0,0,2] = sand_code
+    prim_litho[0,0,3] = clay_code
+    mapped = mapper.map_classes(prim_litho, secd_litho)
+    assert mapped[0,0,0] == fast
+    assert mapped[0,0,1] == fast
+    assert mapped[0,0,2] == medium
+    assert mapped[0,0,3] == slow
+    assert np.isnan(mapped[1,0,3])
 
 def test_extract_single_lithology_class_3d():
     x = np.empty([3,4,5])
@@ -198,6 +237,47 @@ def test_extract_single_lithology_class_3d():
     assert (y[:,:,-1] == other_val).all()
 
 
+def test_grid_interpolation():
+    slice_depth = 5.0
+    nlat = nlon = 4
+    n_depths = 10
+    litho_logs = []
+    easting_col = 'lat'
+    northing_col = 'lon'
+    depth_to_col = 'DePthTo'
+    depth_from_col = 'DePthFrOm'
+    litho_class_num_code_col = 'LithoNum'
+    lat_max = lon_max = 4
+
+    for i in range(lat_max):
+        for j in range(lon_max):
+            mock_obs = pd.DataFrame(
+            {
+                easting_col:np.full(n_depths, float(i)), 
+                northing_col:np.full(n_depths, float(j)),
+                depth_from_col: - np.arange(0, n_depths, 1), 
+                depth_to_col: - np.arange(1, n_depths+1, 1), 
+                litho_class_num_code_col: np.full(n_depths, np.floor(i / 3)),
+            })
+            litho_logs.append(mock_obs)
+    litho_logs = pd.concat(litho_logs)
+    gi = GridInterpolation(easting_col=easting_col, northing_col=northing_col, depth_from_ahd_col=depth_from_col, depth_to_ahd_col=depth_to_col)
+
+    n_neighbours=10
+    ahd_min=-9
+    ahd_max=-1
+
+    x_min, x_max, y_min, y_max = (0, lat_max, 0, lon_max)
+    grid_res = 0.25
+    m = create_meshgrid_cartesian(x_min, x_max, y_min, y_max, grid_res)
+    z_ahd_coords = np.arange(ahd_min,ahd_max,1)
+    dim_x,dim_y = m[0].shape
+    dim_z = len(z_ahd_coords)
+    dims = (dim_x,dim_y,dim_z)
+
+    lithology_3d_array=np.empty(dims)
+    gi.interpolate_volume(lithology_3d_array, litho_logs, litho_class_num_code_col, z_ahd_coords, n_neighbours, m)
+    assert lithology_3d_array[0,0,0] == 0.0
 
 # test_numeric_code_mapping()
 # test_get_lithology_observations_for_depth()
@@ -206,3 +286,4 @@ def test_extract_single_lithology_class_3d():
 # test_class_probability_estimates_depth()
 # test_class_mapping()
 # test_extract_single_lithology_class_3d()
+# test_grid_interpolation()

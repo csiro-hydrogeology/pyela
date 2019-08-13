@@ -29,23 +29,31 @@ before_install:
   - sudo dpkg -i libproj9_4.9.2-2_amd64.deb
   - wget http://en.archive.ubuntu.com/ubuntu/pool/universe/p/proj/libproj-dev_4.9.3-2_amd64.deb
   - sudo dpkg -i libproj-dev_4.9.3-2_amd64.deb
-  # - pip install coveralls
-  - pip install codecov
-  - pip install coverage
-  - pip install pytest-cov
-  - pip install pytest-mpl
-  - pip install cython
-  # - pip install vtk # otherwise mayavi pkg ModuleNotFoundError: No module named 'vtk'
 
 install:
-  - pip install -r requirements.txt
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+      wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+    else
+      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+    fi
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  # Useful for debugging any issues with conda
+  - conda info -a
+  # Replace dep1 dep2 ... with your dependencies
+  - conda env create -q -f=trials/environment.yml python=$TRAVIS_PYTHON_VERSION
+  - source $HOME/miniconda/bin/activate ela_test
 
 script:
-  # - python run_tests.py
-  - coverage run run_tests.py
+  # Needed the following to get codecov to collect coverage data and produce a correct .coverage file
+  - coverage run -m pytest 
 
 after_success:
+  # Not sure whether calling codecov is necessary as I installed the github app extension. Seems to work though.
+  - codecov
   # - coveralls
-  # - codecov
   # trying by inference from https://hackernoon.com/integrating-travis-ci-and-codecov-into-a-python-based-project-6f658074ff63  
-  - bash <(curl -s https://codecov.io/bash)
+  # - bash <(curl -s https://codecov.io/bash)

@@ -11,7 +11,7 @@ sys.path.append(pkg_dir)
 
 from ela.textproc import *
 
-# To avoit failing test on Travis:
+# To avoid failing test on Travis:
 
 try:
     nltk.data.find('tokenizers/punkt')
@@ -23,10 +23,10 @@ except LookupError:
 # except LookupError:
 #     nltk.download('averaged_perceptron_tagger')
 
-# try:
-#     nltk.data.find('tokenizers/stopwords')
-# except LookupError:
-#     nltk.download('stopwords')
+try:
+    nltk.data.find('tokenizers/stopwords')
+except LookupError:
+    nltk.download('stopwords')
 
 def test_litho_marker_detection():
     prim_classes = {
@@ -102,4 +102,24 @@ def test_v_find_litho_markers():
     assert terms[0][1] == 'sand'
     assert terms[0][2] == 'silt'
     assert terms[1][0] == 'ironstone'
+
+def test_flatten_strings():
+    descs = [
+        'clay, sand',
+        'clay with loam  ;',
+        'uranium'
+    ]
+    tk = flat_list_tokens(descs)
+    assert set(tk) == set(['clay', 'loam', 'uranium', 'sand'])
+
+
+def test_replace_punctuations():
+    textlist = ['Lots of basalt.driller joe 24/10/1982','clay/loam vfine silt. black-brown']
+    rpl = v_replace_punctuations(textlist)
+    assert rpl[0] == 'Lots of basalt driller joe 24 10 1982'
+    assert rpl[1] == 'clay loam vfine silt  black brown'
+    rpl = v_replace_punctuations(textlist, replacement='R')
+    assert rpl[0] == 'Lots of basaltRdriller joe 24R10R1982'
+
+
 
