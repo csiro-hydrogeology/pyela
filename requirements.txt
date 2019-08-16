@@ -1,3 +1,5 @@
+PVGeo
+pyvista
 # 2018-10 bumping requirements up to what I can see from `conda list`; otherwise old numpy on travis causes issues
 # It may be possible to lower version requireents but I do not have time to chase that rabbit up down the python version holes.
 cython>=0.28.5

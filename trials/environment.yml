@@ -2,7 +2,7 @@ name: ela_test
 channels:
   - conda
   - conda-forge
-dependencies: 
+dependencies:
   - cartopy=0.17.0
   - rasterio=1.0.24
   - pandas=0.25.0
@@ -13,6 +13,7 @@ dependencies:
   - matplotlib=3.1.1
   - matplotlib-base=3.1.1
   - mayavi=4.7.1
+  - pvgeo=2.0.2
   - vtk=8.2.0
   - cython=0.29.13
   - wordcloud=1.5.0
@@ -21,6 +22,7 @@ dependencies:
   - geopandas=0.5.1
   - pytest=5.0.1
   - pytest-cov=2.7.1
+  - pyvista=0.21.2
   # below are other pinned versions that may be useful if the build breaks down the track.
   # pinned as UT passing on 20190811
   # - python=3.7.3
@@ -169,5 +171,5 @@ dependencies:
   # - zstd=1.4.0
   - pip
   - pip:
-    #  - mayavi==4.7.1 # no need now that suitable conda pkg
-    - git+https://github.com/jmp75/striplog@master#egg=striplog
+      #  - mayavi==4.7.1 # no need now that suitable conda pkg
+      - git+https://github.com/jmp75/striplog@master#egg=striplog
