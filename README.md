@@ -147,6 +147,12 @@ pip search mayavi
 pip install pyqt5
 pip install mayavi
 ```
+For users without admin rights，
+
+```bash
+conda install pyqt5
+pip install mayavi --user
+```
 
 At this point all mandatory dependencies for 'ela' are installed.
 
