@@ -35,7 +35,7 @@ Get a quick tour of [some legacy visualisations](https://github.com/csiro-hydrog
 
 ## Installation 
 
-The quickest way with conda:
+The quickest way with conda, on Linux:
 
 ```bash
 wget https://raw.githubusercontent.com/csiro-hydrogeology/pyela/testing/configs/ela_environment.yml
@@ -53,6 +53,28 @@ jupyter-labextension install @jupyter-widgets/jupyterlab-manager
 python -m ipykernel install --user --name ${my_env_name} --display-name "Py3 ELA"
 ```
 
+Windows:
+
+```bat
+call C:\Users\xxxyyy\AppData\Local\Continuum\anaconda3\Scripts\activate.bat
+REM curl should come with anaconda3. Perhaps not with miniconda though.
+where curl
+cd c:\tmp
+curl -o ela_environment.yml https://raw.githubusercontent.com/csiro-hydrogeology/pyela/testing/configs/ela_environment.yml
+set my_env_name=ELA
+conda env create -n %my_env_name% -f ela_environment.yml python=3.7
+conda activate %my_env_name% 
+```
+
+```bat
+This should be all to get a working environment. If you want to use 'ela' from jupyter lab:
+```
+
+```bat
+conda install -c conda-forge --name %my_env_name% jupyterlab ipywidgets jupyter
+jupyter-labextension install @jupyter-widgets/jupyterlab-manager
+python -m ipykernel install --user --name %my_env_name% --display-name "Py3 ELA"
+```
 
 ### Manual installation
 
