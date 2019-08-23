@@ -5,7 +5,7 @@ from mayavi import mlab
 from ela.classification import extract_single_lithology_class_3d, GeospatialDataFrameColumnNames
 from ela.utils import flip
 from ela.visual import to_rgba_255, to_rgb, LithologiesClassesVisual
-from ela.textproc import EASTING_COL, NORTHING_COL, DEPTH_FROM_AHD_COL, DEPTH_FROM_COL, DEPTH_TO_AHD_COL, DEPTH_TO_COL, PRIMARY_LITHO_NUM_COL, GEOMETRY_COL
+from ela.textproc import EASTING_COL, NORTHING_COL, DEPTH_FROM_AHD_COL, DEPTH_TO_AHD_COL
 
 
 def create_colormap_lut(color_names):

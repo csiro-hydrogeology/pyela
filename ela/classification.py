@@ -3,7 +3,7 @@ from __future__ import print_function # anything else?
 import pandas as pd
 import numpy as np
 
-from ela.textproc import EASTING_COL, NORTHING_COL, DEPTH_FROM_AHD_COL, DEPTH_FROM_COL, DEPTH_TO_AHD_COL, DEPTH_TO_COL, PRIMARY_LITHO_COL, PRIMARY_LITHO_NUM_COL, SECONDARY_LITHO_COL
+from ela.textproc import PRIMARY_LITHO_COL, SECONDARY_LITHO_COL
 from ela.spatial import *
 
 def to_litho_class_num(lithology, kv):
