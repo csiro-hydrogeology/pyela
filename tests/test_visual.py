@@ -1,7 +1,5 @@
 import os
-import pandas as pd
 import numpy as np
-import datetime as dt
 import sys
 from datetime import datetime
 
@@ -104,12 +102,17 @@ def test_to_color_image():
     x = np.array([[0, 2, 1], [2, 0, np.nan]], dtype='float64')
     image = to_color_image(x, d)
     assert len(image.shape) == 3
-
     def f(actual, expected):
         assert actual[0] == expected[0]
         assert actual[1] == expected[1]
         assert actual[2] == expected[2]
         assert actual[3] == expected[3]
+    f(image[0,0], [0,0,255,255]) # 0 is blue
+    f(image[0,1], [0,128,0,255]) # 2 is green
+    f(image[0,2], [255,0,0,255]) # 1 is red
+    f(image[1,0], [0,128,0,255])
+    f(image[1,1], [0,0,255,255])
+    f(image[1,2], [255,255,255,255]) # nan is white
 
     f(image[0, 0], [0, 0, 255, 255])  # 0 is blue
     f(image[0, 1], [0, 128, 0, 255])  # 2 is green
@@ -145,6 +148,7 @@ def test_legend_fig():
         (None, 'class_three', 'red')
     ]
     fig = legend_fig(k_legend_display_info)
+    assert fig is not None
 
 
 def test_visual_info():

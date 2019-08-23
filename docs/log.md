@@ -1,5 +1,13 @@
 # Log
 
+## 2019-08-23
+
+
+```bat
+conda install -c conda-forge pyvista
+pip install --no-deps pvgeo
+```
+
 ## 2019-08-08
 
 Setting up [docs on readthedocs](https://pyela.readthedocs.io/en/latest/)

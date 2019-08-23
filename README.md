@@ -2,12 +2,11 @@
 
 ## Exploratory Lithology Analysis
 
-[![pypi](https://img.shields.io/pypi/v/ela.svg?logo=python&logoColor=white)](https://pypi.org/project/ela/)[![license](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/csiro-hydrogeology/pyela/blob/master/LICENSE.txt)
+[![pypi](https://img.shields.io/pypi/v/ela.svg?logo=python&logoColor=white)](https://pypi.org/project/ela/)[![license](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/csiro-hydrogeology/pyela/blob/master/LICENSE.txt) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/40f01ca659f04fe5832bbfe7f939bf8b)](https://www.codacy.com/app/jmp75/pyela?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=csiro-hydrogeology/pyela&amp;utm_campaign=Badge_Grade)
 
 master [![build-master](https://img.shields.io/travis/csiro-hydrogeology/pyela.svg?branch=master)](https://travis-ci.org/csiro-hydrogeology/pyela/branches)[![codecov-master](https://codecov.io/gh/csiro-hydrogeology/pyela/branch/master/graph/badge.svg)](https://codecov.io/gh/csiro-hydrogeology/pyela/branch/master)
 
 testing [![build-testing](https://img.shields.io/travis/csiro-hydrogeology/pyela.svg?branch=testing)](https://travis-ci.org/csiro-hydrogeology/pyela/branches)[![codecov-testing](https://codecov.io/gh/csiro-hydrogeology/pyela/branch/testing/graph/badge.svg)](https://codecov.io/gh/csiro-hydrogeology/pyela/branch/testing)
-
 
 [![Getting started tutorial - Bungendore 3D lithology](https://raw.githubusercontent.com/csiro-hydrogeology/pyela-doc/master/tutorials/img/3d_overlay_bungendore_clay_lithology_small.png "Getting started tutorial - Bungendore 3D lithology")](https://github.com/csiro-hydrogeology/pyela-doc/blob/master/tutorials/getting_started.ipynb)
 
@@ -15,9 +14,9 @@ Analysing driller’s logs is a tedious and repetitive task in many groundwater 
 
 This package combines features to:
 
-* perform natural language processing on lithology descriptions in the logs, to detect primary and secondary lithologies
-* apply supervised machine learning to interpolate lithologies across a 3D grid
-* visualise interactively the 3D data
+*  perform natural language processing on lithology descriptions in the logs, to detect primary and secondary lithologies
+*  apply supervised machine learning to interpolate lithologies across a 3D grid
+*  visualise interactively the 3D data
 
 An introductory [sample workflow](https://github.com/csiro-hydrogeology/pyela-doc/blob/master/tutorials/getting_started.ipynb) gives an overview of some of these capabilities.
 
@@ -160,9 +159,9 @@ At this point all mandatory dependencies for 'ela' are installed.
 
 There are three options to access ela:
 
-* use the latest available on pip, 
-* clone and install with `setup.py`
-* direct import of the package directory (this is done at runtime from e.g. a notebook)
+*  use the latest available on pip, 
+*  clone and install with `setup.py`
+*  direct import of the package directory (this is done at runtime from e.g. a notebook)
 
 ```bash
 pip search ela

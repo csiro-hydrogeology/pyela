@@ -1,23 +1,47 @@
 import numpy as np
-import string
 import pandas as pd
-import re
 import gensim
-import tensorflow as tf
 from keras import Sequential
 from keras import layers
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from keras import utils
-from keras import regularizers
 from keras import optimizers
 from wordcloud import WordCloud,STOPWORDS
 
-
 import nltk
-from nltk.corpus import stopwords
 
+def preprocessor(data):
+    """
+    Tokenizing the sentences using regular expressions and NLTK library
 
+    Input
+    text: list of descriptions
+
+    Output:
+    alphabet_tokens: list of tokens
+    """
+    __tokenization_pattern = r'''(?x)          # set flag to allow verbose regexps
+        \$?\d+(?:\.\d+)?%?  # currency and percentages, e.g. $12.40, 82%
+        | (?:[A-Z]\.)+        # abbreviations, e.g. U.S.A.
+        | \w+(?:-\w+)*        # words with optional internal hyphens
+        | \.\.\.              # ellipsis
+        | [][.,;"'?():_`-]    # these are separate tokens; includes ], [
+    '''
+
+    ## call it using tokenizer.tokenize
+    tokenizer = nltk.tokenize.regexp.RegexpTokenizer(__tokenization_pattern)
+    tokens = tokenizer.tokenize(data)
+    tokens=[token.lower() for token in tokens if token.isalpha()]
+    alphabet_tokens = [token for token in tokens if token.isalpha()]
+    #en_stopwords = set(nltk.corpus.stopwords.words('english'))
+    #non_stopwords = [word for word in alphabet_tokens if not word in en_stopwords]
+    #stemmer = nltk.stem.snowball.SnowballStemmer("english")
+    #stems = [str(stemmer.stem(word)) for word in non_stopwords]
+    if len(alphabet_tokens)==1:
+        return alphabet_tokens[0]
+    else:
+        return alphabet_tokens
 
 class Model:
     def __init__(self,train_data,maxlen):
@@ -65,39 +89,7 @@ class Model:
         plt.imshow(wordcloud)
         plt.show()
 
-        
-    def preprocessor(self,data):
-        """
-        Tokenizing the sentences using regular expressions and NLTK library
-
-        Input
-        text: list of descriptions
-
-        Output:
-        alphabet_tokens: list of tokens
-        """
-        __tokenization_pattern = r'''(?x)          # set flag to allow verbose regexps
-            \$?\d+(?:\.\d+)?%?  # currency and percentages, e.g. $12.40, 82%
-          | (?:[A-Z]\.)+        # abbreviations, e.g. U.S.A.
-          | \w+(?:-\w+)*        # words with optional internal hyphens
-          | \.\.\.              # ellipsis
-          | [][.,;"'?():_`-]    # these are separate tokens; includes ], [
-        '''
-
-        ## call it using tokenizer.tokenize
-        tokenizer = nltk.tokenize.regexp.RegexpTokenizer(__tokenization_pattern)
-        tokens = tokenizer.tokenize(data)
-        tokens=[token.lower() for token in tokens if token.isalpha()]
-        alphabet_tokens = [token for token in tokens if token.isalpha()]
-        #en_stopwords = set(nltk.corpus.stopwords.words('english'))
-        #non_stopwords = [word for word in alphabet_tokens if not word in en_stopwords]
-        #stemmer = nltk.stem.snowball.SnowballStemmer("english")
-        #stems = [str(stemmer.stem(word)) for word in non_stopwords]
-        if len(alphabet_tokens)==1:
-            return alphabet_tokens[0]
-        else:
-            return alphabet_tokens
-    
+            
     
     def transform_data(self):
         """
@@ -110,9 +102,9 @@ class Model:
         tuple containing the transformed data
         """
         self.train_data['Lithology_original']=self.train_data['Lithology_original'].replace(np.nan,'',regex=True)
-        self.train_data['Lithology_original'] =self.train_data['Lithology_original'].apply(self.preprocessor)
+        self.train_data['Lithology_original'] =self.train_data['Lithology_original'].apply(preprocessor)
         self.train_data['Simplified_lithology']=self.train_data['Simplified_lithology'].replace(np.nan,'Unknown',regex=True)
-        self.train_data['Simplified_lithology']=self.train_data['Simplified_lithology'].apply(self.preprocessor).astype(str)
+        self.train_data['Simplified_lithology']=self.train_data['Simplified_lithology'].apply(preprocessor).astype(str)
         self.train_data['Simplified_lithology'],self.label=pd.factorize(self.train_data['Simplified_lithology'])
         self.list_of_descriptions=self.train_data['Lithology_original'].tolist()
         self.list_of_simple_lithology=self.train_data['Simplified_lithology'].tolist()
@@ -229,7 +221,7 @@ class Model:
         embedding_matrix: matrix depicting the embeddings
         """
         self.embedding_matrix=np.zeros((len(self.embedding_model.wv.vocab),100))
-        for x,y in self.embedding_model.wv.vocab.items():
+        for x,_ in self.embedding_model.wv.vocab.items():
             if x in self.tokenizer.word_counts.keys():
                 self.embedding_matrix[self.tokenizer.word_index[x]]=np.array(self.embedding_model.wv[x], dtype=np.float32)[:100]
 
@@ -288,9 +280,9 @@ class Model:
                             epochs=10,
                             verbose=2,
                            validation_data=(validation_data_X,validation_data_Y))
-        loss, accuracy = self.ml_model.evaluate(self.train_X, self.train_y, verbose=False)
+        _, accuracy = self.ml_model.evaluate(self.train_X, self.train_y, verbose=False)
         print("Training Accuracy: {:.4f}".format(accuracy))
-        loss, accuracy = self.ml_model.evaluate(self.test_X, self.test_y, verbose=False)
+        _, accuracy = self.ml_model.evaluate(self.test_X, self.test_y, verbose=False)
         print("Testing Accuracy:  {:.4f}".format(accuracy))
 
 
