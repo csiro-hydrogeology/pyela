@@ -2,7 +2,7 @@
 
 ## Exploratory Lithology Analysis
 
-[![pypi](https://img.shields.io/pypi/v/ela.svg?logo=python&logoColor=white)](https://pypi.org/project/ela/)[![license](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/csiro-hydrogeology/pyela/blob/master/LICENSE.txt)
+[![pypi](https://img.shields.io/pypi/v/ela.svg?logo=python&logoColor=white)](https://pypi.org/project/ela/)[![license](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/csiro-hydrogeology/pyela/blob/master/LICENSE.txt) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/40f01ca659f04fe5832bbfe7f939bf8b)](https://www.codacy.com/app/jmp75/pyela?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=csiro-hydrogeology/pyela&amp;utm_campaign=Badge_Grade)
 
 master [![build-master](https://img.shields.io/travis/csiro-hydrogeology/pyela.svg?branch=master)](https://travis-ci.org/csiro-hydrogeology/pyela/branches)[![codecov-master](https://codecov.io/gh/csiro-hydrogeology/pyela/branch/master/graph/badge.svg)](https://codecov.io/gh/csiro-hydrogeology/pyela/branch/master)
 
