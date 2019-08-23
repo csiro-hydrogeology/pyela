@@ -4,6 +4,8 @@ import numpy as np
 import datetime as dt
 import sys
 from datetime import datetime
+import rasterio
+import geopandas as gpd
 
 pkg_dir = os.path.join(os.path.dirname(__file__),'..')
 
