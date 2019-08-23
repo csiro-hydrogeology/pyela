@@ -88,7 +88,7 @@ def test_color_interpolation():
     }
     c = interpolate_rgba(cmap, 1, .4)
     assert c[0] == 102 # 255 * 0.4
-    assert c[1] == 0 
+    assert c[1] == 0
     assert c[2] == 153 # 255 * 0.6
     assert c[3] == 255
 
@@ -98,7 +98,7 @@ def test_to_color_image():
     x = np.array([[0,2,1],[2,0,np.nan]],dtype='float64')
     image = to_color_image(x, d)
     assert len(image.shape) == 3
-    def f(actual, expected): 
+    def f(actual, expected):
         assert actual[0] == expected[0]
         assert actual[1] == expected[1]
         assert actual[2] == expected[2]
@@ -108,7 +108,7 @@ def test_to_color_image():
     f(image[0,2], [255,0,0,255]) # 1 is red
     f(image[1,0], [0,128,0,255])
     f(image[1,1], [0,0,255,255])
-    f(image[1,2], [255,255,255,255]) # nan is white 
+    f(image[1,2], [255,255,255,255]) # nan is white
 
 
 
@@ -144,7 +144,7 @@ def test_visual_info():
     color_names = ['blue','red']
     missing_value_color_name = 'black'
     lcv = LithologiesClassesVisual(class_names, color_names, missing_value_color_name)
-    assert lcv.nb_labels() == 2    
+    assert lcv.nb_labels() == 2
     assert lcv.nb_labels_with_missing() == 3
 
 test_visual_info()

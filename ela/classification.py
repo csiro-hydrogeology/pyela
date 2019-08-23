@@ -12,7 +12,7 @@ from ela.spatial import *
 
 def to_litho_class_num(lithology, kv):
     """Get a numeric code for a lithology, or NaN if not in the dictionary mapping lithologies to numeric code
-            
+
         Args:
             lithology (str): Name of the lithology
             kv (dict[str,float]): lithologies keywords to numeric code
@@ -24,7 +24,7 @@ def to_litho_class_num(lithology, kv):
 
 def v_to_litho_class_num(lithologies, kv):
     """Get numeric codes for lithologies, or NaN if not in the dictionary mapping lithologies to numeric code
-            
+
         Args:
             lithologies (iterable of str): Name of the lithologies
             kv (dict[str,float]): lithologies keywords to numeric code
@@ -33,13 +33,17 @@ def v_to_litho_class_num(lithologies, kv):
 
 def create_numeric_classes(lithologies):
     """Creates a dictionary mapping lithologies to numeric code
-            
+
         Args:
             lithologies (iterable of str): Name of the lithologies
     """
     my_lithologies_numclasses = dict([(lithologies[i], i) for i in range(len(lithologies))])
     return my_lithologies_numclasses
 
+
+def _to_int(f):
+    if np.isnan(f): return f
+    return int(round(f))
 
 class ClassMapper:
     """Hold information about and perform lithology and hydraulic conductivity classification
@@ -51,7 +55,7 @@ class ClassMapper:
     """
     def __init__(self, mapping, lithology_names):
         """initialize this with a coordinate reference system object and an affine transform. See rasterio.
-        
+
         Args:
             lithology_names (iterable of str): Name of the lithologies
             mapping (dict): dictionary where keys are primary+secondary lithologies ('sand/clay') and values are numeric codes for e.g. hydraulic conductivities
@@ -68,7 +72,7 @@ class ClassMapper:
 
             Args:
                 df (pandas data frame): bore lithology data  with columns named PRIMARY_LITHO_COL and SECONDARY_LITHO_COL
-        
+
             Returns:
                 a list of strings, compound primary+optional_secondary lithology descriptions e.g. 'sand/clay', 'loam/'
         """
@@ -81,14 +85,11 @@ class ClassMapper:
             return self.mapping[litho_class]
         else:
             return np.nan
-    def _to_int(self, f):
-        if np.isnan(f): return f
-        return int(round(f))
     def numeric_for_litho_classes(self, litho_classes):
         """Get the numeric class for primary+secondary lithologies
 
             Args:
-                litho_classes (iterable of str): one or more strings e.g. 'sand/clay'       
+                litho_classes (iterable of str): one or more strings e.g. 'sand/clay'
             Returns:
                 list of numeric codes
         """
@@ -99,19 +100,19 @@ class ClassMapper:
             Args:
                 primary_litho_class (str, float or int): primary lithology name or numeric (lithology class) identifier
                 secondary_litho_class (str, float or int): primary lithology name or numeric (lithology class) identifier
-        
+
             Returns:
                 string, lithologies key such as 'sand/clay'
         """
         if isinstance(primary_litho_class, float):
-            if np.isnan(primary_litho_class): 
+            if np.isnan(primary_litho_class):
                 return ''
-            primary_litho_class = self._to_int(primary_litho_class)
+            primary_litho_class = _to_int(primary_litho_class)
         if isinstance(secondary_litho_class, float):
-            if np.isnan(secondary_litho_class): 
+            if np.isnan(secondary_litho_class):
                 secondary_litho_class = ''
             else:
-                secondary_litho_class = self._to_int(secondary_litho_class)
+                secondary_litho_class = _to_int(secondary_litho_class)
 
         if isinstance(primary_litho_class, int): primary_litho_class = self.lithology_names[primary_litho_class]
         if isinstance(secondary_litho_class, int): secondary_litho_class = self.lithology_names[secondary_litho_class]
@@ -119,7 +120,7 @@ class ClassMapper:
         if isinstance(primary_litho_class, str):
             if not primary_litho_class in self.lithology_names:
                 return ''
-        if isinstance(secondary_litho_class, str): 
+        if isinstance(secondary_litho_class, str):
             if not secondary_litho_class in self.lithology_names:
                 secondary_litho_class = ''
 
@@ -132,7 +133,7 @@ class ClassMapper:
             Args:
                 primary_litho_class (str, float or int): primary lithology name or numeric (lithology class) identifier
                 secondary_litho_class (str, float or int): primary lithology name or numeric (lithology class) identifier
-        
+
             Returns:
                 numeric, numeric code of the mapped class for this  primary+secondary lithologies
         """
@@ -143,22 +144,22 @@ class ClassMapper:
             Args:
                 primary_litho_class (float): primary lithology numeric (lithology class) identifier
                 secondary_litho_class (float): primary lithology numeric (lithology class) identifier
-        
+
             Returns:
                 numeric, numeric code of the mapped class for this  primary+secondary lithologies
         """
         if np.isnan(primary_litho_code):
             return np.nan
-        if np.isnan(secondary_litho_code): 
-            return self.litho_numeric_mapper[self._to_int(primary_litho_code), self._to_int(primary_litho_code)]
-        return self.litho_numeric_mapper[self._to_int(primary_litho_code), self._to_int(secondary_litho_code)]
+        if np.isnan(secondary_litho_code):
+            return self.litho_numeric_mapper[_to_int(primary_litho_code), _to_int(primary_litho_code)]
+        return self.litho_numeric_mapper[_to_int(primary_litho_code), _to_int(secondary_litho_code)]
     def map_classes(self, primary_lithology_3d_array, secondary_lithology_3d_array):
         """(compute intensive) Get the mapping class codes (e.g. hydraulic conductivity) for grids of primary+secondary lithologies
 
             Args:
                 primary_lithology_3d_array (np.array of dim 3): primary lithology numeric (lithology class) identifiers
                 secondary_lithology_3d_array (np.array of dim 3): primary lithology numeric (lithology class) identifiers
-        
+
             Returns:
                 (np.array of dim 3): mapped numeric identifiers, e.g. as of hydraulic conductivities
         """
@@ -167,7 +168,7 @@ class ClassMapper:
         for i in np.arange(0, dim_x, 1):
             for j in np.arange(0, dim_y, 1):
                 for k in np.arange(0, dim_z, 1):
-                    three_k_classes[i,j,k] = self.bivariate_mapper(primary_lithology_3d_array[i,j,k], secondary_lithology_3d_array[i,j,k])    
+                    three_k_classes[i,j,k] = self.bivariate_mapper(primary_lithology_3d_array[i,j,k], secondary_lithology_3d_array[i,j,k])
         return three_k_classes
     def get_frequencies(self, mask_2d, primary_lithology_3d_array, secondary_lithology_3d_array):
         """Get the frequencies of primary+secondary for a set of x/y coordinates and all Z values in 3d lithologies
@@ -176,7 +177,7 @@ class ClassMapper:
                 mask_2d (np.array of dim 2): mask to apply to the x-y dimensions of the other arguments
                 primary_lithology_3d_array (np.array of dim 3): primary lithology numeric (lithology class) identifiers
                 secondary_lithology_3d_array (np.array of dim 3): primary lithology numeric (lithology class) identifiers
-        
+
             Returns:
                 (np.array of dim 2): counts of primary/secondary lithology occurrences.
         """
@@ -187,10 +188,10 @@ class ClassMapper:
             for j in np.arange(0, dim_y, 1):
                 if mask_2d[i,j]:
                     for k in np.arange(0, dim_z, 1):
-                        prim_litho_ind = self._to_int(primary_lithology_3d_array[i,j,k])
+                        prim_litho_ind = _to_int(primary_lithology_3d_array[i,j,k])
                         if np.isnan(prim_litho_ind) == False:
-                            sec_litho_ind = self._to_int(secondary_lithology_3d_array[i,j,k])
-                            if np.isnan(sec_litho_ind): 
+                            sec_litho_ind = _to_int(secondary_lithology_3d_array[i,j,k])
+                            if np.isnan(sec_litho_ind):
                                 sec_litho_ind = prim_litho_ind
                             result[prim_litho_ind,sec_litho_ind] = result[prim_litho_ind,sec_litho_ind] + 1
         return result
@@ -199,7 +200,7 @@ class ClassMapper:
 
             Args:
                 freq_table (np.array of dim 2): counts of primary/secondary lithology occurrences.
-        
+
             Returns:
                 (pandas data frame): counts of primary/secondary lithology occurrences.
         """

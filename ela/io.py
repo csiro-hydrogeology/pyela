@@ -22,7 +22,7 @@ class GeotiffExporter:
     """
     def __init__(self, crs, transform):
         """initialize this with a coordinate reference system object and an affine transform. See rasterio.
-        
+
         Args:
             crs (str, dict, or CRS): The coordinate reference system.
             transform (Affine instance): Affine transformation mapping the pixel space to geographic space.
@@ -67,7 +67,7 @@ class GeotiffExporter:
                                 count=1, dtype= 'float64',
                                 crs=self.crs, transform=self.transform)
         x_dataset.write(matrix, 1)
-        # Tried to write a colormap by inference from https://github.com/mapbox/rasterio/blob/master/tests/test_colormap.py but seems not to improve things. 
+        # Tried to write a colormap by inference from https://github.com/mapbox/rasterio/blob/master/tests/test_colormap.py but seems not to improve things.
         # the api doc is woefully insufficient: https://rasterio.readthedocs.io/en/latest/api/rasterio.io.html#rasterio.io.BufferedDatasetWriter.write_colormap
         # x_dataset.write_colormap(1, classes_cmap)
         x_dataset.close()

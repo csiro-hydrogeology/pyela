@@ -30,8 +30,8 @@ def test_get_lithology_observations_for_depth():
     obs_colname = 'fake_obs'
     slice_depth = 5.0
     mock_obs = pd.DataFrame(
-    {EASTING_COL:np.array([.0, 1., 1., 0., 0.]), 
-    NORTHING_COL:np.array([2., 2., 3., 3., 12.]), 
+    {EASTING_COL:np.array([.0, 1., 1., 0., 0.]),
+    NORTHING_COL:np.array([2., 2., 3., 3., 12.]),
     DEPTH_TO_AHD_COL:np.array([2., 2., 3., 3., 3.]),
     DEPTH_FROM_AHD_COL:np.array([6., 4., 5., 4., 10.]),
     obs_colname: np.array([.1, .2, .3, .4, np.nan])
@@ -69,8 +69,8 @@ def mock_litho_drill(x, y, obs_colname = 'fake_obs'):
     bottoms = [z for z in zz]
     obs_val = [(z+s) for z in zz]
     mock_obs = pd.DataFrame({
-        EASTING_COL:np.array([x for z in zz]), 
-        NORTHING_COL:np.array([y for z in zz]), 
+        EASTING_COL:np.array([x for z in zz]),
+        NORTHING_COL:np.array([y for z in zz]),
         DEPTH_FROM_AHD_COL:np.array(tops),
         DEPTH_TO_AHD_COL:np.array(bottoms),
         obs_colname: np.array(obs_val, dtype='float64')
@@ -253,10 +253,10 @@ def test_grid_interpolation():
         for j in range(lon_max):
             mock_obs = pd.DataFrame(
             {
-                easting_col:np.full(n_depths, float(i)), 
+                easting_col:np.full(n_depths, float(i)),
                 northing_col:np.full(n_depths, float(j)),
-                depth_from_col: - np.arange(0, n_depths, 1), 
-                depth_to_col: - np.arange(1, n_depths+1, 1), 
+                depth_from_col: - np.arange(0, n_depths, 1),
+                depth_to_col: - np.arange(1, n_depths+1, 1),
                 litho_class_num_code_col: np.full(n_depths, np.floor(i / 3)),
             })
             litho_logs.append(mock_obs)

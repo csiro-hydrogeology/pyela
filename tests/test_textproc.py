@@ -56,7 +56,7 @@ def test_v_word_tokenize():
     descriptions = ['yellow, slightly clayey sand','75% sand, 20% silt, 5% gravel']
     tkns = v_word_tokenize(descriptions)
     assert len(tkns) == 2
-    assert len(tkns[0]) == 5    
+    assert len(tkns[0]) == 5
     assert len(tkns[1]) == 11
 
 

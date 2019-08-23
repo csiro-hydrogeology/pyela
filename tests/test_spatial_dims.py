@@ -88,25 +88,25 @@ def test_burn_volume():
     assert dem[2,2] == 1.0
     burnt = test_vol.copy()
     burn_volume(burnt, dem, z_index_for_ahd, below=False, inclusive=False)
-    assert not np.isnan(burnt[0,0,0]) 
-    assert not np.isnan(burnt[0,0,1]) 
-    assert np.isnan(burnt[0,0,2]) 
+    assert not np.isnan(burnt[0,0,0])
+    assert not np.isnan(burnt[0,0,1])
+    assert np.isnan(burnt[0,0,2])
 
-    assert not np.isnan(burnt[2,2,0]) 
-    assert not np.isnan(burnt[2,2,1]) 
-    assert not np.isnan(burnt[2,2,2]) 
-    assert np.isnan(burnt[2,2,3]) 
+    assert not np.isnan(burnt[2,2,0])
+    assert not np.isnan(burnt[2,2,1])
+    assert not np.isnan(burnt[2,2,2])
+    assert np.isnan(burnt[2,2,3])
 
     burnt = test_vol.copy()
     burn_volume(burnt, dem, z_index_for_ahd, below=False, inclusive=True)
-    assert not np.isnan(burnt[0,0,0]) 
-    assert np.isnan(burnt[0,0,1]) 
-    assert np.isnan(burnt[0,0,2]) 
+    assert not np.isnan(burnt[0,0,0])
+    assert np.isnan(burnt[0,0,1])
+    assert np.isnan(burnt[0,0,2])
 
-    assert not np.isnan(burnt[2,2,0]) 
-    assert not np.isnan(burnt[2,2,1]) 
-    assert np.isnan(burnt[2,2,2]) 
-    assert np.isnan(burnt[2,2,3]) 
+    assert not np.isnan(burnt[2,2,0])
+    assert not np.isnan(burnt[2,2,1])
+    assert np.isnan(burnt[2,2,2])
+    assert np.isnan(burnt[2,2,3])
 
 def test_slice_volume():
     dims = (3,4,5)
@@ -198,8 +198,8 @@ def get_test_bore_df():
     x_min = 383200
     y_max = 6422275
     return pd.DataFrame({
-        EASTING_COL:np.array([x_min-.5,x_min+.5,x_min+1.1,x_min+1.1]), 
-        NORTHING_COL:np.array([y_max-0.1,y_max-0.1,y_max-0.9,y_max-1.1]), 
+        EASTING_COL:np.array([x_min-.5,x_min+.5,x_min+1.1,x_min+1.1]),
+        NORTHING_COL:np.array([y_max-0.1,y_max-0.1,y_max-0.9,y_max-1.1]),
         'fake_obs': np.array([.1, .2, .3, .4]),
         DEPTH_FROM_COL: np.array([1.11, 2.22, 3.33, 4.44]),
         DEPTH_TO_COL: np.array(  [2.22, 3.33, 4.44, 5.55])
@@ -291,9 +291,6 @@ def test_flip():
     assert flip(m, 0)[0,2,3] == 3.14
     assert flip(m, 1)[1,0,3] == 3.14
     assert flip(m, 2)[1,2,0] == 3.14
-    # assert flip(m, (1,2))[0,0,3] == 3.14
-    flip(flip(m, 1),2)[0,0,3] == 3.14
-    # assert flip(m, (1,3))[0,2,0] == 3.14
 
 
 def test_get_coords_from_gpd_shape():
@@ -320,8 +317,8 @@ def test_get_coords_from_gpd_shape():
 def test_rounding_depths():
     n = 6
     df = pd.DataFrame({
-        EASTING_COL:np.full(n, 1.1), 
-        NORTHING_COL:np.full(n, 2.2), 
+        EASTING_COL:np.full(n, 1.1),
+        NORTHING_COL:np.full(n, 2.2),
         'fake_obs': np.array([.1, .2, .3, .4, .5, .6]),
         DEPTH_FROM_COL: np.array([1.11, 1.16, 2.22, 3.33, 3.38, 4.44]),
         DEPTH_TO_COL: np.array(  [1.16, 2.22, 3.33, 3.38, 4.44, 5.55])
@@ -332,7 +329,7 @@ def test_rounding_depths():
 
     f = df_rd[DEPTH_FROM_COL].values
     t = df_rd[DEPTH_TO_COL].values
-    
+
     assert f[0] == 1.0
     assert f[1] == 2.0
     assert f[2] == 3.0

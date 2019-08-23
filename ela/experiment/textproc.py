@@ -19,6 +19,39 @@ from nltk.corpus import stopwords
 
 
 
+
+def preprocessor(data):
+    """
+    Tokenizing the sentences using regular expressions and NLTK library
+
+    Input
+    text: list of descriptions
+
+    Output:
+    alphabet_tokens: list of tokens
+    """
+    __tokenization_pattern = r'''(?x)          # set flag to allow verbose regexps
+        \$?\d+(?:\.\d+)?%?  # currency and percentages, e.g. $12.40, 82%
+        | (?:[A-Z]\.)+        # abbreviations, e.g. U.S.A.
+        | \w+(?:-\w+)*        # words with optional internal hyphens
+        | \.\.\.              # ellipsis
+        | [][.,;"'?():_`-]    # these are separate tokens; includes ], [
+    '''
+
+    ## call it using tokenizer.tokenize
+    tokenizer = nltk.tokenize.regexp.RegexpTokenizer(__tokenization_pattern)
+    tokens = tokenizer.tokenize(data)
+    tokens=[token.lower() for token in tokens if token.isalpha()]
+    alphabet_tokens = [token for token in tokens if token.isalpha()]
+    #en_stopwords = set(nltk.corpus.stopwords.words('english'))
+    #non_stopwords = [word for word in alphabet_tokens if not word in en_stopwords]
+    #stemmer = nltk.stem.snowball.SnowballStemmer("english")
+    #stems = [str(stemmer.stem(word)) for word in non_stopwords]
+    if len(alphabet_tokens)==1:
+        return alphabet_tokens[0]
+    else:
+        return alphabet_tokens
+
 class Model:
     def __init__(self,train_data,maxlen):
         self.train_data=train_data
@@ -65,39 +98,7 @@ class Model:
         plt.imshow(wordcloud)
         plt.show()
 
-        
-    def preprocessor(self,data):
-        """
-        Tokenizing the sentences using regular expressions and NLTK library
-
-        Input
-        text: list of descriptions
-
-        Output:
-        alphabet_tokens: list of tokens
-        """
-        __tokenization_pattern = r'''(?x)          # set flag to allow verbose regexps
-            \$?\d+(?:\.\d+)?%?  # currency and percentages, e.g. $12.40, 82%
-          | (?:[A-Z]\.)+        # abbreviations, e.g. U.S.A.
-          | \w+(?:-\w+)*        # words with optional internal hyphens
-          | \.\.\.              # ellipsis
-          | [][.,;"'?():_`-]    # these are separate tokens; includes ], [
-        '''
-
-        ## call it using tokenizer.tokenize
-        tokenizer = nltk.tokenize.regexp.RegexpTokenizer(__tokenization_pattern)
-        tokens = tokenizer.tokenize(data)
-        tokens=[token.lower() for token in tokens if token.isalpha()]
-        alphabet_tokens = [token for token in tokens if token.isalpha()]
-        #en_stopwords = set(nltk.corpus.stopwords.words('english'))
-        #non_stopwords = [word for word in alphabet_tokens if not word in en_stopwords]
-        #stemmer = nltk.stem.snowball.SnowballStemmer("english")
-        #stems = [str(stemmer.stem(word)) for word in non_stopwords]
-        if len(alphabet_tokens)==1:
-            return alphabet_tokens[0]
-        else:
-            return alphabet_tokens
-    
+            
     
     def transform_data(self):
         """
@@ -110,9 +111,9 @@ class Model:
         tuple containing the transformed data
         """
         self.train_data['Lithology_original']=self.train_data['Lithology_original'].replace(np.nan,'',regex=True)
-        self.train_data['Lithology_original'] =self.train_data['Lithology_original'].apply(self.preprocessor)
+        self.train_data['Lithology_original'] =self.train_data['Lithology_original'].apply(preprocessor)
         self.train_data['Simplified_lithology']=self.train_data['Simplified_lithology'].replace(np.nan,'Unknown',regex=True)
-        self.train_data['Simplified_lithology']=self.train_data['Simplified_lithology'].apply(self.preprocessor).astype(str)
+        self.train_data['Simplified_lithology']=self.train_data['Simplified_lithology'].apply(preprocessor).astype(str)
         self.train_data['Simplified_lithology'],self.label=pd.factorize(self.train_data['Simplified_lithology'])
         self.list_of_descriptions=self.train_data['Lithology_original'].tolist()
         self.list_of_simple_lithology=self.train_data['Simplified_lithology'].tolist()
