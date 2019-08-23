@@ -1,24 +1,15 @@
 import numpy as np
-import string
 import pandas as pd
-import re
 import gensim
-import tensorflow as tf
 from keras import Sequential
 from keras import layers
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from keras import utils
-from keras import regularizers
 from keras import optimizers
 from wordcloud import WordCloud,STOPWORDS
 
-
 import nltk
-from nltk.corpus import stopwords
-
-
-
 
 def preprocessor(data):
     """
@@ -230,7 +221,7 @@ class Model:
         embedding_matrix: matrix depicting the embeddings
         """
         self.embedding_matrix=np.zeros((len(self.embedding_model.wv.vocab),100))
-        for x,y in self.embedding_model.wv.vocab.items():
+        for x,_ in self.embedding_model.wv.vocab.items():
             if x in self.tokenizer.word_counts.keys():
                 self.embedding_matrix[self.tokenizer.word_index[x]]=np.array(self.embedding_model.wv[x], dtype=np.float32)[:100]
 
@@ -289,9 +280,9 @@ class Model:
                             epochs=10,
                             verbose=2,
                            validation_data=(validation_data_X,validation_data_Y))
-        loss, accuracy = self.ml_model.evaluate(self.train_X, self.train_y, verbose=False)
+        _, accuracy = self.ml_model.evaluate(self.train_X, self.train_y, verbose=False)
         print("Training Accuracy: {:.4f}".format(accuracy))
-        loss, accuracy = self.ml_model.evaluate(self.test_X, self.test_y, verbose=False)
+        _, accuracy = self.ml_model.evaluate(self.test_X, self.test_y, verbose=False)
         print("Testing Accuracy:  {:.4f}".format(accuracy))
 
 

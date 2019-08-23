@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 import numpy as np
-import datetime as dt
 import sys
 from datetime import datetime
 
@@ -197,7 +196,7 @@ def test_class_mapping():
     assert np.isnan(mapper.class_code('martian rock','sand'))
 
     dims = (2,3,4)
-    dim_x,dim_y,dim_z = dims
+    #dim_x,dim_y,dim_z = dims
     prim_litho = np.full(dims, np.nan)
     secd_litho = np.full(dims, np.nan)
     sand_code = 0
@@ -238,8 +237,6 @@ def test_extract_single_lithology_class_3d():
 
 
 def test_grid_interpolation():
-    slice_depth = 5.0
-    nlat = nlon = 4
     n_depths = 10
     litho_logs = []
     easting_col = 'lat'

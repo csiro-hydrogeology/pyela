@@ -1,7 +1,5 @@
 import os
-import pandas as pd
 import numpy as np
-import datetime as dt
 import sys
 from datetime import datetime
 
@@ -138,6 +136,7 @@ def test_legend_fig():
         (None, 'class_three', 'red')
     ]
     fig = legend_fig(k_legend_display_info)
+    assert fig is not None
 
 def test_visual_info():
     class_names = ['high_k','low_k']

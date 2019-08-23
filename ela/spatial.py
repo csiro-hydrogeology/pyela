@@ -1,8 +1,7 @@
-import rasterio
 import numpy as np
 import pandas as pd
 
-from ela.textproc import EASTING_COL, NORTHING_COL, DEPTH_FROM_AHD_COL, DEPTH_FROM_COL, DEPTH_TO_AHD_COL, DEPTH_TO_COL, PRIMARY_LITHO_COL, PRIMARY_LITHO_NUM_COL, SECONDARY_LITHO_COL, GEOMETRY_COL
+from ela.textproc import EASTING_COL, NORTHING_COL, DEPTH_FROM_AHD_COL, DEPTH_FROM_COL, DEPTH_TO_AHD_COL, DEPTH_TO_COL, PRIMARY_LITHO_COL, PRIMARY_LITHO_NUM_COL, SECONDARY_LITHO_COL
 
 KNN_WEIGHTING = 'distance'
 
@@ -75,11 +74,6 @@ def get_unique_coordinates(easting, northing):
     b = np.unique(grid_coords[:,0] + 1j * grid_coords[:,1])
     points = np.column_stack((b.real, b.imag))
     return points
-
-
-def _raster_drill(row, easting_col, northing_col):
-    easting=row[easting_col]
-    northing=row[northing_col]
 
 class HeightDatumConverter:
     """
@@ -331,7 +325,7 @@ def slice_volume(volume, slice_surface, height_to_z):
     Returns:
         (float): the value in the volume at the specified point
     """
-    dim_x,dim_y,dim_z=volume.shape
+    dim_x,dim_y,_=volume.shape
     # TODO if surface_raster.shape[0] != dim_x or surface_raster.shape[1] != dim_y
     result = np.empty((dim_x,dim_y))
     for x in np.arange(0,dim_x,1):

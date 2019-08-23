@@ -1,8 +1,6 @@
 import os
 import pandas as pd
-import numpy as np
 import sys
-from datetime import datetime
 from striplog import Lexicon
 
 pkg_dir = os.path.join(os.path.dirname(__file__),'..')

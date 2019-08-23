@@ -2,18 +2,14 @@ from matplotlib import colors
 import matplotlib.pyplot as plt
 
 import cartopy.crs as ccrs
-from cartopy.io.shapereader import Reader
-import cartopy.io.img_tiles as cimgt
 
 from wordcloud import WordCloud,STOPWORDS
 
-from sklearn import neighbors
 import numpy as np
 
 from sys import float_info
 
 from ela.textproc import *
-from ela.classification import KNN_WEIGHTING
 
 DEFAULT_LITHOLOGY_COLORNAMES = ['sandybrown','gold','chocolate','yellow','lightsteelblue','dimgray','darkgoldenrod']
 DEFAULT_LITHOLOGY_COLORNAMES_WITH_UNCLASSIFIED = ['black', 'sandybrown','gold','chocolate','yellow','lightsteelblue','dimgray','darkgoldenrod']
@@ -148,7 +144,7 @@ def legend_fig(k_legend_display_info):
     h = Y / (nrows + 1)
     w = X / ncols
     for i, legend_info in enumerate(k_legend_display_info):
-        rgb_val, k_label, colorname = legend_info
+        _, k_label, colorname = legend_info # rgb_val
         col = i % ncols
         row = i // ncols
         y = Y - (row * h) - h

@@ -1,7 +1,5 @@
-import numpy as np
 import rasterio
-from ela.visual import to_color_image, get_color_component, to_carto
-
+from ela.visual import to_color_image, get_color_component
 
 # TOCHECK: appears unused. What was the intent?
 # # note on generic slicing: something like the following. For now assume some things in the rgba mapping to image interms of dims

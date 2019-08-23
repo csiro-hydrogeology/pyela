@@ -107,9 +107,9 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         """
         mlab.figure(size=(800, 800))
         s = volume
-        x_cut=self.create_plane_cut(s, plane_orientation='x_axes')
-        y_cut=self.create_plane_cut(s, plane_orientation='y_axes')
-        z_cut=self.create_plane_cut(s, plane_orientation='z_axes')
+        self.create_plane_cut(s, plane_orientation='x_axes')
+        self.create_plane_cut(s, plane_orientation='y_axes')
+        self.create_plane_cut(s, plane_orientation='z_axes')
         mlab.outline()
         mlab_label(mlab.xlabel, text=self.dfcn.easting_col)
         mlab_label(mlab.ylabel, text=self.dfcn.northing_col)
@@ -150,9 +150,9 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         # s = np.flip(np.flip(test,axis=2), axis=0)
         s = prob_volume
         colormap='magma'
-        x_cut=self.create_plane_cut(s, plane_orientation='x_axes', colormap=colormap)
-        y_cut=self.create_plane_cut(s, plane_orientation='y_axes', colormap=colormap)
-        z_cut=self.create_plane_cut(s, plane_orientation='z_axes', colormap=colormap)
+        self.create_plane_cut(s, plane_orientation='x_axes', colormap=colormap)
+        self.create_plane_cut(s, plane_orientation='y_axes', colormap=colormap)
+        self.create_plane_cut(s, plane_orientation='z_axes', colormap=colormap)
         mlab.outline()
         mlab_label(mlab.xlabel, text=self.dfcn.easting_col)
         mlab_label(mlab.ylabel, text=self.dfcn.northing_col)
@@ -259,7 +259,7 @@ class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
         surface = mlab.surf(x_dem, y_dem, z_dem, colormap='terrain')
         surface.enable_contours = True
         surface.contour.number_of_contours = 20
-        iso_surface = mlab.contour3d(vol_x, vol_y, vol_z, vol_s, color=to_rgb(vol_colorname))
+        _ = mlab.contour3d(vol_x, vol_y, vol_z, vol_s, color=to_rgb(vol_colorname))
         if not title is None:
             mlab_title(title)
         # iso_surface.actor.property.color = (0.0, 1.0, 0.0)

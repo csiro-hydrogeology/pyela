@@ -1,4 +1,3 @@
-from matplotlib import colors
 import matplotlib.pyplot as plt
 
 import cartopy.crs as ccrs
@@ -98,7 +97,7 @@ def plot_lithologydata_slice_points(df, slice_depth, scatter_layer, fig):
 
 def plot_lithologydata_slice_depth(df, slice_depth, n_neighbours, extent, data_proj, near_field_extents, geoms, gw_subareas, cmap_settings):
     df_slice=df.loc[(df[DEPTH_FROM_AHD_COL] >= slice_depth) & (df[DEPTH_TO_AHD_COL] <= slice_depth)]
-    fig,ax=plt.subplots(1,1,figsize=(15,15),subplot_kw={'projection': data_proj,'extent': extent})
+    _,ax=plt.subplots(1,1,figsize=(15,15),subplot_kw={'projection': data_proj,'extent': extent})
     stamen_terrain = cimgt.Stamen('terrain-background')
     ax.add_image(stamen_terrain, 11)
     ax.add_geometries(geoms[0], ccrs.PlateCarree(),facecolor='none',edgecolor='k',zorder=1)

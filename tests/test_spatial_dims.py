@@ -231,7 +231,6 @@ def test_raster_drill():
     y_max = 6422275
     df = get_test_bore_df()
     dem = rasterio.open(os.path.join(pkg_dir, 'tests', 'data', 'test_raster_drill.tif'))
-    raster_grid = dem.read(1)
     cd = HeightDatumConverter(dem)
     heights = cd.raster_drill_df(df)
     assert np.isnan(heights[0])
@@ -240,8 +239,6 @@ def test_raster_drill():
     assert heights[3] == 4.0
 
 def test_add_ahd():
-    x_min = 383200
-    y_max = 6422275
     df = get_test_bore_df()
     dem = rasterio.open(os.path.join(pkg_dir, 'tests', 'data', 'test_raster_drill.tif'))
     cd = HeightDatumConverter(dem)
