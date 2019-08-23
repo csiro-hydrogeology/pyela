@@ -34,7 +34,9 @@ Get a quick tour of [some legacy visualisations](https://github.com/csiro-hydrog
 
 ## Installation 
 
-The quickest way with conda, on Linux:
+The quickest way with conda. We recommend installing conda packages rather than pip packages whereever possible.
+
+on Linux:
 
 ```bash
 wget https://raw.githubusercontent.com/csiro-hydrogeology/pyela/testing/configs/ela_environment.yml
@@ -73,6 +75,28 @@ This should be all to get a working environment. If you want to use 'ela' from j
 conda install -c conda-forge --name %my_env_name% jupyterlab ipywidgets jupyter
 jupyter-labextension install @jupyter-widgets/jupyterlab-manager
 python -m ipykernel install --user --name %my_env_name% --display-name "Py3 ELA"
+```
+
+### Troubleshooting 
+
+pip packages specified from the `environment.yaml` files may have not installed (under investigation). Check that pvgeo and "our" packages are installed e.g.
+
+```bat
+conda activate %my_env_name%
+conda list | grep pvgeo
+```
+
+if not present:
+
+```bat
+REM make sure you have git in the PATH e.g.
+set PATH=C:\Users\per202\AppData\Local\Atlassian\SourceTree\git_local\mingw32\bin\;%PATH%
+where git
+
+conda activate %my_env_name%
+pip install --no-deps pvgeo
+pip install -e git+https://github.com/jmp75/striplog@master#egg=striplog
+pip install --no-deps -e git+https://github.com/jmp75/pyela@master#egg=ela
 ```
 
 ### Manual installation
