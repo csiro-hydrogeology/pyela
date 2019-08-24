@@ -4,7 +4,7 @@ ela
 Exploratory Lithology Analysis
 ------------------------------
 
-|pypi|\ |license|
+|pypi|\ |license| |Codacy Badge|
 
 master |build-master|\ |codecov-master|
 
@@ -53,7 +53,10 @@ Visualisation features are currently being reengineered.
 Installation
 ------------
 
-The quickest way with conda:
+The quickest way with conda. We recommend installing conda packages
+rather than pip packages whereever possible.
+
+on Linux:
 
 .. code:: bash
 
@@ -71,6 +74,54 @@ This should be all to get a working environment. If you want to use
    conda install --name ${my_env_name} jupyterlab ipywidgets jupyter
    jupyter-labextension install @jupyter-widgets/jupyterlab-manager
    python -m ipykernel install --user --name ${my_env_name} --display-name "Py3 ELA"
+
+Windows:
+
+.. code:: bat
+
+   call C:\Users\xxxyyy\AppData\Local\Continuum\anaconda3\Scripts\activate.bat
+   REM curl should come with anaconda3. Perhaps not with miniconda though.
+   where curl
+   cd c:\tmp
+   curl -o ela_environment.yml https://raw.githubusercontent.com/csiro-hydrogeology/pyela/testing/configs/ela_environment.yml
+   set my_env_name=ELA
+   conda env create -n %my_env_name% -f ela_environment.yml python=3.7
+   conda activate %my_env_name% 
+
+.. code:: bat
+
+   This should be all to get a working environment. If you want to use 'ela' from jupyter lab:
+
+.. code:: bat
+
+   conda install -c conda-forge --name %my_env_name% jupyterlab ipywidgets jupyter
+   jupyter-labextension install @jupyter-widgets/jupyterlab-manager
+   python -m ipykernel install --user --name %my_env_name% --display-name "Py3 ELA"
+
+Troubleshooting
+~~~~~~~~~~~~~~~
+
+pip packages specified from the ``environment.yaml`` files may have not
+installed (under investigation). Check that pvgeo and “our” packages are
+installed e.g.
+
+.. code:: bat
+
+   conda activate %my_env_name%
+   conda list | grep pvgeo
+
+if not present:
+
+.. code:: bat
+
+   REM make sure you have git in the PATH e.g.
+   set PATH=C:\Users\per202\AppData\Local\Atlassian\SourceTree\git_local\mingw32\bin\;%PATH%
+   where git
+
+   conda activate %my_env_name%
+   pip install --no-deps pvgeo
+   pip install -e git+https://github.com/jmp75/striplog@master#egg=striplog
+   pip install --no-deps -e git+https://github.com/jmp75/pyela@master#egg=ela
 
 Manual installation
 ~~~~~~~~~~~~~~~~~~~
@@ -173,6 +224,13 @@ affected by this. Nevertheless this is not a commplete blocker for most
    pip install pyqt5
    pip install mayavi
 
+For users without admin rights，
+
+.. code:: bash
+
+   conda install pyqt5
+   pip install mayavi --user
+
 At this point all mandatory dependencies for ‘ela’ are installed.
 
 Installing ELA
@@ -260,6 +318,8 @@ Known issues
 Linux. This appears to be a low level issue running on laptop with dual
 Intel/NVIDIA Graphic cards.
 
+.. _troubleshooting-1:
+
 Troubleshooting
 ---------------
 
@@ -280,6 +340,8 @@ consider:
    :target: https://pypi.org/project/ela/
 .. |license| image:: http://img.shields.io/badge/license-MIT-blue.svg
    :target: https://github.com/csiro-hydrogeology/pyela/blob/master/LICENSE.txt
+.. |Codacy Badge| image:: https://api.codacy.com/project/badge/Grade/40f01ca659f04fe5832bbfe7f939bf8b
+   :target: https://www.codacy.com/app/jmp75/pyela?utm_source=github.com&utm_medium=referral&utm_content=csiro-hydrogeology/pyela&utm_campaign=Badge_Grade
 .. |build-master| image:: https://img.shields.io/travis/csiro-hydrogeology/pyela.svg?branch=master
    :target: https://travis-ci.org/csiro-hydrogeology/pyela/branches
 .. |codecov-master| image:: https://codecov.io/gh/csiro-hydrogeology/pyela/branch/master/graph/badge.svg
