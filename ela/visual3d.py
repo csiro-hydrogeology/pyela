@@ -99,9 +99,10 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
             cut = mlab.pipeline.image_plane_widget(f,
                 plane_orientation=plane_orientation, slice_index=slice_index, colormap=colormap)
         cut.module_manager.scalar_lut_manager.lut.nan_color = 0, 0, 0, 0
+        cut.ipw.reslice_interpolate = 'nearest_neighbour'
         return cut
 
-    # @mlab.show
+    @mlab.show
     def render_classes_planar(self, volume, title):
         """Create 3 movable plane cuts on a 3d volume
         """
