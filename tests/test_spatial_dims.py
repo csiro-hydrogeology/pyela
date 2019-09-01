@@ -9,7 +9,7 @@ import geopandas as gpd
 
 pkg_dir = os.path.join(os.path.dirname(__file__),'..')
 
-sys.path.append(pkg_dir)
+sys.path.insert(0, pkg_dir)
 
 from ela.textproc import *
 from ela.spatial import *
