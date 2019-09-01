@@ -10,7 +10,7 @@ from pyvista_sample.VisualizeDataProcess import *
 
 pkg_dir = os.path.join(os.path.dirname(__file__), '..')
 
-sys.path.append(pkg_dir)
+sys.path.insert(0, pkg_dir)
 
 # from ela.visual3d import *
 
