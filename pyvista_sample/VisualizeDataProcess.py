@@ -233,7 +233,9 @@ class VisualizeDataProcess:
         dim_z = len(z_coords)
         dims = (dim_x, dim_y, dim_z)
         lithology_3d_array = np.empty(dims)
-        gi = GridInterpolation(easting_col='x', northing_col='y')
+        # hack around https://github.com/csiro-hydrogeology/pyela/issues/19
+        # gi = GridInterpolation(easting_col='x', northing_col='y')
+        gi = GridInterpolation(easting_col='Easting', northing_col='Northing')
         gi.interpolate_volume(lithology_3d_array, drill_data, PRIMARY_LITHO_NUM_COL, z_coords, n_neighbours, m)
         return lithology_3d_array
 
