@@ -1,3 +1,4 @@
+import os
 import pickle
 import PVGeo
 import pyvista as pv
@@ -47,40 +48,62 @@ class VisualizeDataProcess:
         lines_dict = self.add_lithology_based_scalar(well_dict, lines_dict)
         return lines_dict
 
-    def dem_data_process(self, file_path, height_adjustment_factor):
+    def dem_data_process(self, file_path, height_adjustment_factor, dem_mesh_xy='mesh_xy', dem_arrays='dem_array'):
         """The whole data process from dem data to pv.StructuredGrid
 
             Args:
                 file_path (str): dem data file path
                 height_adjustment_factor (int): Height scaling factor, default 20 .
+                dem_mesh_xy(str): set mesh_xy column name according to dem files
+                dem_arrays(str): set dem array column name according to dem files
 
             Returns:
                 Grid(pyvista.core.pointset.StructuredGrid)
+
         """
         dem_array_data = self.dem_file_read(file_path)
-        xx, yy = dem_array_data['mesh_xy']
-        dem_array = dem_array_data['dem_array']
+        xx, yy = dem_array_data[dem_mesh_xy]
+        dem_array = dem_array_data[dem_arrays]
         grid = pv.StructuredGrid(xx, yy, dem_array * height_adjustment_factor)
         return grid
 
-    def lithology_layer_process(self, drill_file_path, dem_file_path, height_adjustment_factor=20, layer_from=0,
-                                layer_to=0):
+    def lithology_layer_process(self, drill_file_path, dem_file_path, storage_file_name, height_adjustment_factor=20,
+                                layer_from=0, layer_to=0, dem_bounds='bounds', dem_grid_res='grid_res',
+                                dem_mesh_xy='mesh_xy', drill_east='Easting', drill_north='Northing',
+                                dem_arrays='dem_array'):
         """add points lithology type, expands lines to tube based on lithology number
             Args:
                 drill_file_path(str): drill file path
                 dem_file_path(str):dem file path
+                storage_file_name(str): set the name of the save path for testing sample's
+                                        lithology classification array
                 height_adjustment_factor(int): height scala factor
                 layer_from (float): set the begin number of layers
                 layer_to (float): set the end number of layers
+                dem_grid_res(str): set grid_res column name according to dem files
+                dem_bounds(str): set bounds column name according to dem files
             Returns:
                 layer_mesh(pyvista.core.pointset.UnstructuredGrid): layer mesh for display use
         """
 
         drill_data = self.drill_file_read(drill_file_path)
-        dem_array_data = self.dem_file_read(dem_file_path)
-        lithology_3d_array = self.build_layer_data(drill_data, dem_array_data)
-        lithology_3d_array = self.clean_over_bound_data(lithology_3d_array, dem_array_data)
-        # lithology_3d_array= self.vag_clean(lithology_3d_array,dem_array_data)
+        dem_array_data = self.dem_file_read(dem_file_path, dem_bounds, dem_grid_res)
+        path = os.path.join(storage_file_name, "lithology_3d_array.pkl")
+        try:
+            with open(path, 'rb') as handle:
+                lithology_3d_array = pickle.load(handle)
+            handle.close()
+        except:
+            lithology_3d_array = self.build_layer_data(drill_data, dem_array_data, dem_mesh_xy, drill_east, drill_north)
+            lithology_3d_array = self.clean_over_bound_data(lithology_3d_array, dem_array_data, dem_arrays)
+            # lithology_3d_array = self.vag_clean(lithology_3d_array, dem_array_data)
+            folder = os.path.exists(path)
+            if not folder:
+                os.makedirs(storage_file_name)
+            with open(path, "wb") as cf:
+                pickle.dump(lithology_3d_array, cf)
+            cf.close()
+
         layer_mesh = self.build_layer_mesh(lithology_3d_array, height_adjustment_factor, layer_from, layer_to)
         return layer_mesh
 
@@ -95,20 +118,23 @@ class VisualizeDataProcess:
         df = pd.read_pickle(file_path)
         self.ahd_max = df[DEPTH_FROM_AHD_COL].max()
         self.ahd_min = df[DEPTH_TO_AHD_COL].min()
+        df.dropna(subset=[DEPTH_TO_AHD_COL, DEPTH_FROM_AHD_COL])  # clean the invalid data
         return df
 
-    def dem_file_read(self, file_path):
+    def dem_file_read(self, file_path, dem_bounds='bounds', dem_grid_res='grid_res'):
         """Read dem data file
             Args:
                 file_path (str): drill data file path
-
+                dem_grid_res(str): set grid_res column name according to dem files
+                dem_bounds(str): set bounds column name according to dem files
             Returns:
                 dem_array_date(pandas.core.frame.DataFrame)
         """
         with open(file_path, 'rb') as handle:
             dem_array_data = pickle.load(handle)
-        self.dem_x_min, self.dem_x_max, self.dem_y_min, self.dem_y_max = dem_array_data['bounds']
-        self.grid_res = dem_array_data['grid_res']
+        handle.close()
+        self.dem_x_min, self.dem_x_max, self.dem_y_min, self.dem_y_max = dem_array_data[dem_bounds]
+        self.grid_res = dem_array_data[dem_grid_res]
         return dem_array_data
 
     def add_scaled_height_column(self, data, height_adjustment_factor):
@@ -146,10 +172,15 @@ class VisualizeDataProcess:
             Returns:
                 well_dict(dict()): modified dictionary
         """
+        bad_well = []
         for well in well_dict.keys():
             origin_well_df = well_dict.get(well)
             after_well_df = origin_well_df.copy()
-            add_index = origin_well_df['scaled_to_height'].idxmin()
+            add_index = origin_well_df[self.scaled_to_height_colname].idxmin()
+            # print(add_index)
+            if np.isnan(add_index):
+                bad_well.append(well)
+                continue
             line = origin_well_df.loc[add_index].copy()
             line.scaled_from_height = line.scaled_to_height
             line = line.to_frame()
@@ -161,6 +192,8 @@ class VisualizeDataProcess:
                     temp.append(0)
             after_well_df.loc["new"] = temp
             well_dict[well] = after_well_df
+        for i in range(len(bad_well)):
+            well_dict.pop(bad_well[i])
         return well_dict
 
     def build_points_dict(self, well_dict):
@@ -208,8 +241,6 @@ class VisualizeDataProcess:
                 lines_dict(dict()): with new attribute "GR" which represent lithology number, and expanded to tube.
         """
         lines_dict_tmp = {}
-        litho_class_col = 'Lithology_1_num'
-        site_ref_colname = 'name'
         for path in lines_dict:
             vals = well_dict[path].Lithology_1_num.values
             lines_dict[path]["GR"] = vals
@@ -219,25 +250,26 @@ class VisualizeDataProcess:
         lines_dict = lines_dict_tmp
         return lines_dict
 
-    def build_layer_data(self, drill_data, dem_array_data):
+    def build_layer_data(self, drill_data, dem_array_data, dem_mesh_xy='mesh_xy', drill_east='Easting',
+                         drill_north='Northing'):
         n_neighbours = 10
         """get the layer data from the function contains in ela
             Args:
                 drill_data (pandas.core.frame.DataFrame): drill data
                 dem_array_data (pandas.core.frame.DataFrame): dem data
         """
-        xg, yg = dem_array_data['mesh_xy']
+        xg, yg = dem_array_data[dem_mesh_xy]
         m = create_meshgrid_cartesian(self.dem_x_min, self.dem_x_max, self.dem_y_min, self.dem_y_max, self.grid_res)
         z_coords = np.arange(self.ahd_min, self.ahd_max, 1)
         dim_x, dim_y = xg.shape
         dim_z = len(z_coords)
         dims = (dim_x, dim_y, dim_z)
         lithology_3d_array = np.empty(dims)
-        gi = GridInterpolation(easting_col='x', northing_col='y')
+        gi = GridInterpolation(easting_col=drill_east, northing_col=drill_north)
         gi.interpolate_volume(lithology_3d_array, drill_data, PRIMARY_LITHO_NUM_COL, z_coords, n_neighbours, m)
         return lithology_3d_array
 
-    def clean_over_bound_data(self, lithology_3d_array, dem_array_data):
+    def clean_over_bound_data(self, lithology_3d_array, dem_array_data, dem_arrays='dem_array'):
         """accurate process data that exceeds limits
         （we suppose that the lithology would not higher than the ground surface),
         accurate but slower
@@ -245,7 +277,7 @@ class VisualizeDataProcess:
                 lithology_3d_array (np.array of dim 3): lithology numeric (lithology class) identifiers
                 dem_array_data (pandas.core.frame.DataFrame): dem data
         """
-        dem_z = dem_array_data['dem_array']
+        dem_z = dem_array_data[dem_arrays]
         for i in range(lithology_3d_array.shape[0]):
             for j in range(lithology_3d_array.shape[1]):
                 for k in range(lithology_3d_array.shape[2]):
@@ -256,7 +288,7 @@ class VisualizeDataProcess:
                         break
         return lithology_3d_array
 
-    def vag_clean(self, lithology_3d_array, dem_array_data):
+    def vag_clean(self, lithology_3d_array, dem_array_data, dem_arrays='dem_array'):
         """Simply process data that exceeds limits（we suppose that the lithology would not higher than the ground surface）,
         not accurate but faster
 
@@ -264,10 +296,13 @@ class VisualizeDataProcess:
                 lithology_3d_array (np.array of dim 3): lithology numeric (lithology class) identifiers
                 dem_array_data (pandas.core.frame.DataFrame: dem data
         """
-        dem_z = dem_array_data['dem_array']
-        for i in range(lithology_3d_array.shape[0]):
-            for j in range(lithology_3d_array.shape[1]):
-                k = int(dem_z[i][j] - self.ahd_min)
+        dem_z = dem_array_data[dem_arrays]
+        for i in range(1, lithology_3d_array.shape[0]):
+            for j in range(1, lithology_3d_array.shape[1]):
+                if np.isnan(dem_z[i][j]):
+                    k = 0
+                else:
+                    k = int(dem_z[i][j] - self.ahd_min)
                 for tep in range(k, lithology_3d_array.shape[2]):
                     lithology_3d_array[i][j][tep] = None
         return lithology_3d_array

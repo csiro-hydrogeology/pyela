@@ -1,11 +1,12 @@
 import time
 import pyvista as pv
+import pandas as pd
 from ela.visual import discrete_classes_colormap
 import numpy as np
 from matplotlib.colors import ListedColormap
 from pyvista_sample.VisualizeDataProcess import VisualizeDataProcess
 
-#start = time.clock()
+# start = time.clock()
 '''
 A sample of 3D image based on pyvista
 
@@ -14,9 +15,10 @@ drill_data_path = r"C:\Users\Dennis.H\Desktop\CSIRO_data\Bungendore\classified_l
 dem_data_path = r"C:\Users\Dennis.H\Desktop\CSIRO_data\Bungendore\dem_array_data.pkl"
 
 dp = VisualizeDataProcess()
+
 lines_dict = dp.drill_data_process(drill_data_path, 25)
 grid = dp.dem_data_process(dem_data_path, 25)
-layer = dp.lithology_layer_process(drill_data_path, dem_data_path, 25, 5, 10)
+layer = dp.lithology_layer_process(drill_data_path, dem_data_path, 'Bungendore', 25, 5, 10)
 print(type(layer))
 
 # ['clay','sand','gravel','granite','shale','silt','topsoil','loam','soil','slate','sandstone']
@@ -53,14 +55,11 @@ lithologies = ['clay', 'sand', 'gravel', 'granite', 'shale', 'silt', 'topsoil', 
 lithology_color_names = ['olive', 'yellow', 'lightgrey', 'dimgray', 'teal', 'cornsilk', 'saddlebrown', 'rosybrown',
                          'chocolate', 'lightslategrey', 'gold']
 lithology_cmap = discrete_classes_colormap(lithology_color_names)
-
 mapping = np.linspace(0, 10, 11)
-# print(mapping)
 newcolors = np.empty((11, 4))
 for i in range(11):
     newcolors[i] = lithology_cmap.get(i)
     newcolors[i] = newcolors[i] / 256
-# print(newcolors)
 my_colourmap = ListedColormap(newcolors)
 
 for well in lines_dict.keys():
@@ -84,7 +83,7 @@ plotter.add_mesh(layer, scalars="Lithology", n_colors=11, clim=[0, 10], show_sca
 plotter.add_mesh(grid, opacity=0.9)
 plotter.show_bounds(grid, show_xaxis=True, show_yaxis=True, show_zaxis=False)
 plotter.show_axes()
-#end = time.clock()
-#print(end - start)
+# end = time.clock()
+# print(end - start)
 plotter.show()
 # ['clay','sand','gravel','granite','shale','silt','topsoil','loam','soil','slate','sandstone']
