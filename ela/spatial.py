@@ -479,12 +479,11 @@ def cookie_cut_gpd(gpd_df, x_min, x_max, y_min, y_max, fractions=None):
         x_max (numeric): upper x coordinate
         y_min (numeric): lower y coordinate
         y_max (numeric): upper y coordinate
-        fractions (list of floats): lists of fractions from the original (x_min, x_max, y_min, y_max) box at which 
-            to clip the data. Defaults to the centered third of original width/height (i.e. 1/9th of the area)
+        fractions (list of floats): lists of fractions from the original (x_min, x_max, y_min, y_max) box at which to clip the data. Defaults to the centered third of original width/height (i.e. 1/9th of the area)
     Return:
         (TBC): a geopandas data frame (or view thereof)
     """
-    if fractions is None: 
+    if fractions is None:
         fractions = [0.33, 0.67, 0.33, 0.67]
     xmin = x_min + fractions[0] * (x_max-x_min)
     xmax = x_min + fractions[1] * (x_max-x_min)
@@ -536,7 +535,7 @@ def intersecting_bounds(bounding_boxes):
         Args:
             bounding_boxes (list): list of bounding boxes
         Returns:
-            (tuple): x_min,x_max,y_min,y_max 
+            (tuple): x_min,x_max,y_min,y_max
 
         Example:
             >>> x_min,x_max,y_min,y_max  = intersecting_bounds( get_bbox(bore_locations), dem.bounds )
@@ -548,7 +547,7 @@ def intersecting_bounds(bounding_boxes):
     x_max = min(x[1])
     y_min = max(x[2])
     y_max = min(x[3])
-    return x_min,x_max,y_min,y_max 
+    return x_min,x_max,y_min,y_max
 
 
 def vstacked_points(xx, yy):
@@ -892,7 +891,7 @@ class DepthCoverage:
     """Helper class to round lithology record classes to the nearest metre of depth
 
     Attributes:
-        df (data frame): 
+        df (data frame):
         depth_from_col (str): Column name  storing "from depth" information
         depth_to_col (str): Column name  storing "to depth" information
         group_col (str):
@@ -913,14 +912,10 @@ class DepthCoverage:
         tops = df_by_boreid[depth_from_col].max()
         bottoms = df_by_boreid[depth_to_col].min()
         self.bore_ahd_depths = pd.concat([tops, bottoms], axis=1).reset_index()
-        
     def bore_at_height(self, datum_height):
         return np.sum( np.logical_and((self.bore_ahd_depths[self.depth_from_col].values >= datum_height), (self.bore_ahd_depths[self.depth_to_col].values < datum_height)) )
-        
     def highest_top(self):
         return self.bore_ahd_depths[self.depth_from_col].max()
-    def lowest_bottom(self):
-        return self.bore_ahd_depths[self.depth_to_col].min()
     def lowest_bottom(self):
         return self.bore_ahd_depths[self.depth_to_col].min()
     def get_counts(self):

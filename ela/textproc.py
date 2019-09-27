@@ -63,7 +63,7 @@ GEOMETRY_COL = u'geometry'
 DEM_ELEVATION_COL = u'DEM_elevation'
 """Default column name expected in lithodescription data frames"""
 
-# columns in the BoM NGIS data model 
+# columns in the BoM NGIS data model
 # http://www.bom.gov.au/water/regulations/dataDelivery/document/NgisDiagramv2.3.pdf
 
 HYDRO_CODE_COL = u'HydroCode'
