@@ -14,6 +14,7 @@ import re
 
 from collections import Counter
 
+import striplog
 import nltk
 from nltk.corpus import stopwords
 
@@ -62,8 +63,19 @@ GEOMETRY_COL = u'geometry'
 DEM_ELEVATION_COL = u'DEM_elevation'
 """Default column name expected in lithodescription data frames"""
 
-# WIN_SITE_ID_COL = u'WIN Site ID'
+# columns in the BoM NGIS data model 
+# http://www.bom.gov.au/water/regulations/dataDelivery/document/NgisDiagramv2.3.pdf
 
+HYDRO_CODE_COL = u'HydroCode'
+"""Jurisdictional bore and pipe identifier within NGIS geodatabase"""
+
+HYDRO_ID_COL = u'HydroID'
+"""Unique feature identifier within NGIS geodatabase"""
+
+BORE_ID_COL = u'BoreID'
+"""Numeric identifier in lithology logs corresponding to the HydroID of NGIS_Bore feature"""
+
+# WIN_SITE_ID_COL = u'WIN Site ID'
 
 def v_find_primary_lithology(v_tokens, lithologies_dict):
     """Vectorised function to find a primary lithology in a list of tokenised sentences.
@@ -240,7 +252,7 @@ def v_replace_punctuations(textlist, replacement=' '):
     """
     return [replace_punctuations(x, replacement) for x in textlist]
 
-def clean_lithology_descriptions(description_series, lex):
+def clean_lithology_descriptions(description_series, lex = None):
     """Preparatory cleanup of lithology descriptions for further analysis
 
     Replace abbreviations and misspelling according to a lexicon,
@@ -253,6 +265,8 @@ def clean_lithology_descriptions(description_series, lex):
     Returns:
         (iterable of str): processed descriptions.
     """
+    if lex is None:
+        lex = striplog.Lexicon.default()
     if isinstance(description_series, list):
         y = [lex.expand_abbreviations(x) for x in description_series]
     else:

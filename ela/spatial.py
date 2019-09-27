@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from ela.textproc import EASTING_COL, NORTHING_COL, DEPTH_FROM_AHD_COL, DEPTH_FROM_COL, DEPTH_TO_AHD_COL, DEPTH_TO_COL
+from ela.textproc import EASTING_COL, NORTHING_COL, DEPTH_FROM_AHD_COL, DEPTH_FROM_COL, DEPTH_TO_AHD_COL, DEPTH_TO_COL, BORE_ID_COL
 
 KNN_WEIGHTING = 'distance'
 
@@ -470,6 +470,29 @@ def get_bbox(geo_pd):
     """
     return (geo_pd.total_bounds[0], geo_pd.total_bounds[1], geo_pd.total_bounds[2], geo_pd.total_bounds[3])
 
+def cookie_cut_gpd(gpd_df, x_min, x_max, y_min, y_max, fractions=None):
+    """Cookie cut a geopandas data frame, typically bore locations.
+
+    Args:
+        gpd_df (geopandas): geopandas data
+        x_min (numeric): lower x coordinate
+        x_max (numeric): upper x coordinate
+        y_min (numeric): lower y coordinate
+        y_max (numeric): upper y coordinate
+        fractions (list of floats): lists of fractions from the original (x_min, x_max, y_min, y_max) box at which 
+            to clip the data. Defaults to the centered third of original width/height (i.e. 1/9th of the area)
+    Return:
+        (TBC): a geopandas data frame (or view thereof)
+    """
+    if fractions is None: 
+        fractions = [0.33, 0.67, 0.33, 0.67]
+    xmin = x_min + fractions[0] * (x_max-x_min)
+    xmax = x_min + fractions[1] * (x_max-x_min)
+    ymin = y_min + fractions[2] * (y_max-y_min)
+    ymax = y_min + fractions[3] * (y_max-y_min)
+    return gpd_df.cx[xmin:xmax, ymin:ymax]
+
+
 def create_meshgrid_cartesian(x_min, x_max, y_min, y_max, grid_res):
     """Create a 2D meshgrid to be used with numpy for vectorized operations and Mayavi visualisation.
 
@@ -506,6 +529,27 @@ def create_meshgrid(geo_pd, grid_res):
     """
     x_min, y_min, x_max, y_max = get_bbox(geo_pd)
     return create_meshgrid_cartesian(x_min, x_max, y_min, y_max, grid_res)
+
+def intersecting_bounds(bounding_boxes):
+    """Gets the bounding box coordinates common to several spatial data sets
+
+        Args:
+            bounding_boxes (list): list of bounding boxes
+        Returns:
+            (tuple): x_min,x_max,y_min,y_max 
+
+        Example:
+            >>> x_min,x_max,y_min,y_max  = intersecting_bounds( get_bbox(bore_locations), dem.bounds )
+    """
+    n_bb = len(bounding_boxes)
+    # Given the order of the values in the bounding boxes, to get xmin,xmax,ymin,ymax we reorder
+    x = [[bounding_boxes[i][j] for i in range(n_bb)] for j in [0, 2, 1, 3]]
+    x_min = max(x[0])
+    x_max = min(x[1])
+    y_min = max(x[2])
+    y_max = min(x[3])
+    return x_min,x_max,y_min,y_max 
+
 
 def vstacked_points(xx, yy):
     g = (xx, yy)
@@ -844,6 +888,51 @@ def interpolate_over_meshgrid(predicting_algorithm, mesh_grid):
         predicted = predicted.reshape(xx.shape)
     return predicted
 
+class DepthCoverage:
+    """Helper class to round lithology record classes to the nearest metre of depth
+
+    Attributes:
+        df (data frame): 
+        depth_from_col (str): Column name  storing "from depth" information
+        depth_to_col (str): Column name  storing "to depth" information
+        group_col (str):
+    """
+    def __init__(self, df, group_col = BORE_ID_COL, depth_from_col=DEPTH_FROM_AHD_COL, depth_to_col=DEPTH_TO_AHD_COL):
+        """Helper class to round lithology record classes to the nearest metre of depth
+
+        Args:
+            group_col (str):
+            depth_from_col (str): Column name  storing "from depth" information
+            depth_to_col (str): Column name  storing "to depth" information
+        """
+        self.depth_from_col = depth_from_col
+        self.depth_to_col = depth_to_col
+        self.group_col = group_col
+        x=df[np.isnan(df[depth_from_col]) == False]
+        df_by_boreid = x.groupby(group_col)
+        tops = df_by_boreid[depth_from_col].max()
+        bottoms = df_by_boreid[depth_to_col].min()
+        self.bore_ahd_depths = pd.concat([tops, bottoms], axis=1).reset_index()
+        
+    def bore_at_height(self, datum_height):
+        return np.sum( np.logical_and((self.bore_ahd_depths[self.depth_from_col].values >= datum_height), (self.bore_ahd_depths[self.depth_to_col].values < datum_height)) )
+        
+    def highest_top(self):
+        return self.bore_ahd_depths[self.depth_from_col].max()
+    def lowest_bottom(self):
+        return self.bore_ahd_depths[self.depth_to_col].min()
+    def lowest_bottom(self):
+        return self.bore_ahd_depths[self.depth_to_col].min()
+    def get_counts(self):
+        r = np.array([ float(i) for i in range( int(np.floor(self.lowest_bottom())), int(np.floor(self.highest_top())) ) ])
+        cc = np.array([ self.bore_at_height(i) for i in r ])
+        return (r, cc)
+    def get_range(self, cutoff):
+        r, cc = self.get_counts()
+        w = np.argwhere(cc > cutoff)
+        lowest_ind = w[0][0]
+        highest_ind = w[-1][0]
+        return r[lowest_ind], r[highest_ind]
 
 
 class GridInterpolation:
