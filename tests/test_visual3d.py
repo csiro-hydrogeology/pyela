@@ -94,7 +94,12 @@ def test_add_lithology_based_scalar():
     # print(point_dict)
     line_dict = vp.Point_to_lines_dict(point_dict)
     lines_dict = vp.add_lithology_based_scalar(well_dict, line_dict)
-    #print(lines_dict['2']["GR"])
-    #print(lines_dict['1']["GR"])
+    # print(lines_dict['2']["GR"])
+    # print(lines_dict['1']["GR"])
     assert 1, 2 in lines_dict['1']["GR"]
     assert 3, 5 in lines_dict['2']["GR"]
+
+
+def test_build_layer_data():
+
+    lithology_3d_array = vp.build_layer_data()

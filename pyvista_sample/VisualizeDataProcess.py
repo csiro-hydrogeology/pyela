@@ -328,7 +328,7 @@ class VisualizeDataProcess:
         threshed = volume.threshold([layer_from, layer_to])
         return threshed
 
-    def extract_single_lithology_class_3d(lithology_3d_classes, class_value):
+    def extract_single_lithology_class_3d(self, lithology_3d_classes, class_value):
         """Transform a 3D volume of lithology class codes by binary bining cells as being either of a class value or
         other. Preprocessing primarily for 3D visualisation for pyvista(not use in the sample ).
 
