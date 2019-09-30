@@ -29,21 +29,25 @@ class VisualizeDataProcess:
         self.ahd_max = 0
         self.ahd_min = 0
 
-    def drill_data_process(self, file_path, height_adjustment_factor=20):
+    def drill_data_process(self, file_path, height_adjustment_factor=20, depth_from_ahd=DEPTH_FROM_AHD_COL,
+                           depth_to_ahd=DEPTH_TO_AHD_COL, east="Easting", north="Northing", boreID='BoreID'):
         """The whole data process from drill data to PolyData dictionary
 
             Args:
                 file_path (str): drill data file path
-                height_adjustment_factor (int): Height scaling factor, default 20 .
+                height_adjustment_factor (int): Height scaling factor, default 20.
+                depth_from_ahd
+                depth_to_ahd
+                boreID
 
             Returns:
                 lines_dict(dict): PolyData dictionary.
         """
-        data = self.drill_file_read(file_path)
-        data = self.add_scaled_height_column(data, height_adjustment_factor)
-        well_dict = self.build_well_dict(data)
+        data = self.drill_file_read(file_path, depth_from_ahd, depth_to_ahd)
+        data = self.add_scaled_height_column(data, height_adjustment_factor, depth_from_ahd, depth_to_ahd)
+        well_dict = self.build_well_dict(data, boreID)
         well_dict = self.add_missing_height_data(well_dict)
-        point_dict = self.build_points_dict(well_dict)
+        point_dict = self.build_points_dict(well_dict, east, north)
         lines_dict = self.Point_to_lines_dict(point_dict)
         lines_dict = self.add_lithology_based_scalar(well_dict, lines_dict)
         return lines_dict
@@ -70,7 +74,8 @@ class VisualizeDataProcess:
     def lithology_layer_process(self, drill_file_path, dem_file_path, storage_file_name, height_adjustment_factor=20,
                                 layer_from=0, layer_to=0, dem_bounds='bounds', dem_grid_res='grid_res',
                                 dem_mesh_xy='mesh_xy', drill_east='Easting', drill_north='Northing',
-                                dem_arrays='dem_array'):
+                                dem_arrays='dem_array', depth_from_ahd=DEPTH_FROM_AHD_COL,
+                                depth_to_ahd=DEPTH_TO_AHD_COL):
         """add points lithology type, expands lines to tube based on lithology number
             Args:
                 drill_file_path(str): drill file path
@@ -86,7 +91,7 @@ class VisualizeDataProcess:
                 layer_mesh(pyvista.core.pointset.UnstructuredGrid): layer mesh for display use
         """
 
-        drill_data = self.drill_file_read(drill_file_path)
+        drill_data = self.drill_file_read(drill_file_path, depth_from_ahd, depth_to_ahd)
         dem_array_data = self.dem_file_read(dem_file_path, dem_bounds, dem_grid_res)
         path = os.path.join(storage_file_name, "lithology_3d_array.pkl")
         try:
@@ -107,18 +112,21 @@ class VisualizeDataProcess:
         layer_mesh = self.build_layer_mesh(lithology_3d_array, height_adjustment_factor, layer_from, layer_to)
         return layer_mesh
 
-    def drill_file_read(self, file_path):
+    def drill_file_read(self, file_path, depth_from_ahd=DEPTH_FROM_AHD_COL, depth_to_ahd=DEPTH_TO_AHD_COL):
+
         """Read drill data file
             Args:
                 file_path (str): drill data file path
+                depth_from_ahd
+                depth_to_ahd
 
             Returns:
                 df(pandas.core.frame.DataFrame)
         """
         df = pd.read_pickle(file_path)
-        self.ahd_max = df[DEPTH_FROM_AHD_COL].max()
-        self.ahd_min = df[DEPTH_TO_AHD_COL].min()
-        df.dropna(subset=[DEPTH_TO_AHD_COL, DEPTH_FROM_AHD_COL])  # clean the invalid data
+        self.ahd_max = df[depth_from_ahd].max()
+        self.ahd_min = df[depth_to_ahd].min()
+        df.dropna(subset=[depth_to_ahd, depth_from_ahd])  # clean the invalid data
         return df
 
     def dem_file_read(self, file_path, dem_bounds='bounds', dem_grid_res='grid_res'):
@@ -137,28 +145,32 @@ class VisualizeDataProcess:
         self.grid_res = dem_array_data[dem_grid_res]
         return dem_array_data
 
-    def add_scaled_height_column(self, data, height_adjustment_factor):
+    def add_scaled_height_column(self, data, height_adjustment_factor, depth_from_ahd=DEPTH_FROM_AHD_COL,
+                                 depth_to_ahd=DEPTH_TO_AHD_COL):
         """Add scaled height columns to data frame
             Args:
                 data (pandas.core.frame.DataFrame):original data
                 height_adjustment_factor (int): Height scaling factor.
+                depth_from_ahd:
+                depth_to_ahd:
             Returns:
                 data(pandas.core.frame.DataFrame): modified data
         """
         # scaled_from_height_colname = 'scaled_from_height'
-        data[self.scaled_from_height_colname] = data[DEPTH_FROM_AHD_COL] * height_adjustment_factor
+        data[self.scaled_from_height_colname] = data[depth_from_ahd] * height_adjustment_factor
         # scaled_to_height_colname = 'scaled_to_height'
-        data[self.scaled_to_height_colname] = data[DEPTH_TO_AHD_COL] * height_adjustment_factor
+        data[self.scaled_to_height_colname] = data[depth_to_ahd] * height_adjustment_factor
         return data
 
-    def build_well_dict(self, data):
+    def build_well_dict(self, data, boreID='BoreID'):
         """build dictionary according to BoreID
             Args:
                 data (pandas.core.frame.DataFrame):original data
+                boreID
             Returns:
                 well_dict(dict()): wells dictionary
         """
-        data['name'] = data.BoreID.values.astype(str)
+        data['name'] = data[boreID].values.astype(str)
         wells = data.name.unique()
         well_dict = {}
         for well in wells:
@@ -177,7 +189,6 @@ class VisualizeDataProcess:
             origin_well_df = well_dict.get(well)
             after_well_df = origin_well_df.copy()
             add_index = origin_well_df[self.scaled_to_height_colname].idxmin()
-            # print(add_index)
             if np.isnan(add_index):
                 bad_well.append(well)
                 continue
@@ -196,10 +207,12 @@ class VisualizeDataProcess:
             well_dict.pop(bad_well[i])
         return well_dict
 
-    def build_points_dict(self, well_dict):
+    def build_points_dict(self, well_dict, east="Easting", north="Northing"):
         """build points dictionary from wells dictionary
             Args:
                 well_dict(dict()): wells dictionary
+                east
+                north
             Returns:
                 points_dict(dict()): zip points axis for points
         """
@@ -208,9 +221,8 @@ class VisualizeDataProcess:
             points_dict["{0}".format(points)] = np.array(
                 list(
                     zip(
-                        well_dict[points].Easting,
-                        well_dict[points].Northing,
-                        # well_dict[points][self.scaled_from_height_colname],
+                        well_dict[points][east],
+                        well_dict[points][north],
                         well_dict[points].scaled_from_height
                     )
                 )
@@ -232,7 +244,7 @@ class VisualizeDataProcess:
             # notice that the building of the lines need to follow the nearest neighbourhood search
         return lines_dict
 
-    def add_lithology_based_scalar(self, well_dict, lines_dict):
+    def add_lithology_based_scalar(self, well_dict, lines_dict, prime_lithology='Lithology_1_num'):
         """add points lithology type, expands lines to tube based on lithology number
             Args:
                 well_dict(dict()): wells dictionary
@@ -242,7 +254,7 @@ class VisualizeDataProcess:
         """
         lines_dict_tmp = {}
         for path in lines_dict:
-            vals = well_dict[path].Lithology_1_num.values
+            vals = well_dict[path][prime_lithology].values
             lines_dict[path]["GR"] = vals
             lines_dict[path].tube(radius=10, scalars="GR", inplace=True)
             if len(vals) > 0:
