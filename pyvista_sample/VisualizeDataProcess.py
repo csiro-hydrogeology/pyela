@@ -30,15 +30,19 @@ class VisualizeDataProcess:
         self.ahd_min = 0
 
     def drill_data_process(self, file_path, height_adjustment_factor=20, depth_from_ahd=DEPTH_FROM_AHD_COL,
-                           depth_to_ahd=DEPTH_TO_AHD_COL, east="Easting", north="Northing", boreID='BoreID'):
+                           depth_to_ahd=DEPTH_TO_AHD_COL, drill_east='Easting', drill_north='Northing',
+                           boreID='BoreID', prime_lithology='Lithology_1_num'):
         """The whole data process from drill data to PolyData dictionary
 
             Args:
                 file_path (str): drill data file path
                 height_adjustment_factor (int): Height scaling factor, default 20.
-                depth_from_ahd
-                depth_to_ahd
-                boreID
+                depth_from_ahd(str):set the column name of depth from AHD, default DEPTH_FROM_AHD_COL
+                depth_to_ahd(str):set the column name of depth to AHD, default DEPTH_TO_AHD_COL
+                drill_east(str):set the column name of  point's x location in drilling data, default "Easting"
+                drill_north(str):set the column name of  point's y's location in drilling data, default "Northing"
+                boreID(str):set the column name of bore hole ID,default "BoreID"
+                prime_lithology():set the prime lithology column name
 
             Returns:
                 lines_dict(dict): PolyData dictionary.
@@ -47,9 +51,9 @@ class VisualizeDataProcess:
         data = self.add_scaled_height_column(data, height_adjustment_factor, depth_from_ahd, depth_to_ahd)
         well_dict = self.build_well_dict(data, boreID)
         well_dict = self.add_missing_height_data(well_dict)
-        point_dict = self.build_points_dict(well_dict, east, north)
+        point_dict = self.build_points_dict(well_dict, drill_east, drill_north)
         lines_dict = self.Point_to_lines_dict(point_dict)
-        lines_dict = self.add_lithology_based_scalar(well_dict, lines_dict)
+        lines_dict = self.add_lithology_based_scalar(well_dict, lines_dict, prime_lithology)
         return lines_dict
 
     def dem_data_process(self, file_path, height_adjustment_factor, dem_mesh_xy='mesh_xy', dem_arrays='dem_array'):
@@ -85,8 +89,16 @@ class VisualizeDataProcess:
                 height_adjustment_factor(int): height scala factor
                 layer_from (float): set the begin number of layers
                 layer_to (float): set the end number of layers
-                dem_grid_res(str): set grid_res column name according to dem files
                 dem_bounds(str): set bounds column name according to dem files
+                dem_grid_res(str): set grid_res column name according to dem files
+                dem_mesh_xy(str): set mesh_xy column name according to dem files
+                drill_east(str):set the column name of  point's x location in drilling data, default "Easting"
+                drill_north(str):set the column name of  point's y's location in drilling data, default "Northing"
+                dem_arrays(str): set dem array column name according to dem files
+                depth_from_ahd(str):set the column name of depth from AHD, default DEPTH_FROM_AHD_COL
+                depth_to_ahd(str):set the column name of depth to AHD, default DEPTH_TO_AHD_COL
+
+
             Returns:
                 layer_mesh(pyvista.core.pointset.UnstructuredGrid): layer mesh for display use
         """
@@ -117,8 +129,8 @@ class VisualizeDataProcess:
         """Read drill data file
             Args:
                 file_path (str): drill data file path
-                depth_from_ahd
-                depth_to_ahd
+                depth_from_ahd(str):set the column name of depth from AHD, default DEPTH_FROM_AHD_COL
+                depth_to_ahd(str):set the column name of depth to AHD, default DEPTH_TO_AHD_COL
 
             Returns:
                 df(pandas.core.frame.DataFrame)
@@ -151,8 +163,8 @@ class VisualizeDataProcess:
             Args:
                 data (pandas.core.frame.DataFrame):original data
                 height_adjustment_factor (int): Height scaling factor.
-                depth_from_ahd:
-                depth_to_ahd:
+                depth_from_ahd(str):set the column name of depth from AHD, default DEPTH_FROM_AHD_COL
+                depth_to_ahd(str):set the column name of depth to AHD, default DEPTH_TO_AHD_COL
             Returns:
                 data(pandas.core.frame.DataFrame): modified data
         """
@@ -166,7 +178,7 @@ class VisualizeDataProcess:
         """build dictionary according to BoreID
             Args:
                 data (pandas.core.frame.DataFrame):original data
-                boreID
+                boreID(str):set the column name of bore hole ID,default "BoreID"
             Returns:
                 well_dict(dict()): wells dictionary
         """
@@ -207,12 +219,12 @@ class VisualizeDataProcess:
             well_dict.pop(bad_well[i])
         return well_dict
 
-    def build_points_dict(self, well_dict, east="Easting", north="Northing"):
+    def build_points_dict(self, well_dict, drill_east="Easting", drill_north="Northing"):
         """build points dictionary from wells dictionary
             Args:
                 well_dict(dict()): wells dictionary
-                east
-                north
+                drill_east(str):set the column name of  point's x location in drilling data, default "Easting"
+                drill_north(str):set the column name of  point's y's location in drilling data, default "Northing"
             Returns:
                 points_dict(dict()): zip points axis for points
         """
@@ -221,8 +233,8 @@ class VisualizeDataProcess:
             points_dict["{0}".format(points)] = np.array(
                 list(
                     zip(
-                        well_dict[points][east],
-                        well_dict[points][north],
+                        well_dict[points][drill_east],
+                        well_dict[points][drill_north],
                         well_dict[points].scaled_from_height
                     )
                 )
@@ -249,6 +261,7 @@ class VisualizeDataProcess:
             Args:
                 well_dict(dict()): wells dictionary
                 lines_dict(dict()):lines dictionary
+                prime_lithology():set the prime lithology column name
             Returns:
                 lines_dict(dict()): with new attribute "GR" which represent lithology number, and expanded to tube.
         """
@@ -307,6 +320,7 @@ class VisualizeDataProcess:
             Args:
                 lithology_3d_array (np.array of dim 3): lithology numeric (lithology class) identifiers
                 dem_array_data (pandas.core.frame.DataFrame: dem data
+                dem_arrays(str): set dem array column name according to dem files
         """
         dem_z = dem_array_data[dem_arrays]
         for i in range(1, lithology_3d_array.shape[0]):
