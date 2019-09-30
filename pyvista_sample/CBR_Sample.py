@@ -14,14 +14,16 @@ drill_data_path = r"C:\Users\Dennis.H\Desktop\CSIRO_data\cbr\classified_logs.pkl
 dem_data_path = r"C:\Users\Dennis.H\Desktop\CSIRO_data\cbr\dem_array_data.pkl"
 
 dp = VisualizeDataProcess()
-lines_dict = dp.drill_data_process(drill_data_path, 25)
+drill_data = dp.drill_file_read(drill_data_path)
+dem_data = dp.dem_file_read(dem_data_path)
+lines_dict = dp.drill_data_process(drill_data, 25)
 # temp = dp.drill_file_read(drill_data_path)
 # pd.set_option('display.max_columns', None)
 # print(temp)
 
-grid = dp.dem_data_process(dem_data_path, 25)
+grid = dp.dem_data_process(dem_data, 25)
 
-layer = dp.lithology_layer_process(drill_data_path, dem_data_path, 'cbr', 25, 7,10)
+layer = dp.lithology_layer_process(drill_data, dem_data, 'cbr', 25, 7, 10)
 
 annotations = {
     0.00: "Sand",

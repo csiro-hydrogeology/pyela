@@ -29,101 +29,6 @@ class VisualizeDataProcess:
         self.ahd_max = 0
         self.ahd_min = 0
 
-    def drill_data_process(self, file_path, height_adjustment_factor=20, depth_from_ahd=DEPTH_FROM_AHD_COL,
-                           depth_to_ahd=DEPTH_TO_AHD_COL, drill_east='Easting', drill_north='Northing',
-                           boreID='BoreID', prime_lithology='Lithology_1_num'):
-        """The whole data process from drill data to PolyData dictionary
-
-            Args:
-                file_path (str): drill data file path
-                height_adjustment_factor (int): Height scaling factor, default 20.
-                depth_from_ahd(str):set the column name of depth from AHD, default DEPTH_FROM_AHD_COL
-                depth_to_ahd(str):set the column name of depth to AHD, default DEPTH_TO_AHD_COL
-                drill_east(str):set the column name of  point's x location in drilling data, default "Easting"
-                drill_north(str):set the column name of  point's y's location in drilling data, default "Northing"
-                boreID(str):set the column name of bore hole ID,default "BoreID"
-                prime_lithology():set the prime lithology column name
-
-            Returns:
-                lines_dict(dict): PolyData dictionary.
-        """
-        data = self.drill_file_read(file_path, depth_from_ahd, depth_to_ahd)
-        data = self.add_scaled_height_column(data, height_adjustment_factor, depth_from_ahd, depth_to_ahd)
-        well_dict = self.build_well_dict(data, boreID)
-        well_dict = self.add_missing_height_data(well_dict)
-        point_dict = self.build_points_dict(well_dict, drill_east, drill_north)
-        lines_dict = self.Point_to_lines_dict(point_dict)
-        lines_dict = self.add_lithology_based_scalar(well_dict, lines_dict, prime_lithology)
-        return lines_dict
-
-    def dem_data_process(self, file_path, height_adjustment_factor, dem_mesh_xy='mesh_xy', dem_arrays='dem_array'):
-        """The whole data process from dem data to pv.StructuredGrid
-
-            Args:
-                file_path (str): dem data file path
-                height_adjustment_factor (int): Height scaling factor, default 20 .
-                dem_mesh_xy(str): set mesh_xy column name according to dem files
-                dem_arrays(str): set dem array column name according to dem files
-
-            Returns:
-                Grid(pyvista.core.pointset.StructuredGrid)
-
-        """
-        dem_array_data = self.dem_file_read(file_path)
-        xx, yy = dem_array_data[dem_mesh_xy]
-        dem_array = dem_array_data[dem_arrays]
-        grid = pv.StructuredGrid(xx, yy, dem_array * height_adjustment_factor)
-        return grid
-
-    def lithology_layer_process(self, drill_file_path, dem_file_path, storage_file_name, height_adjustment_factor=20,
-                                layer_from=0, layer_to=0, dem_bounds='bounds', dem_grid_res='grid_res',
-                                dem_mesh_xy='mesh_xy', drill_east='Easting', drill_north='Northing',
-                                dem_arrays='dem_array', depth_from_ahd=DEPTH_FROM_AHD_COL,
-                                depth_to_ahd=DEPTH_TO_AHD_COL):
-        """add points lithology type, expands lines to tube based on lithology number
-            Args:
-                drill_file_path(str): drill file path
-                dem_file_path(str):dem file path
-                storage_file_name(str): set the name of the save path for testing sample's
-                                        lithology classification array
-                height_adjustment_factor(int): height scala factor
-                layer_from (float): set the begin number of layers
-                layer_to (float): set the end number of layers
-                dem_bounds(str): set bounds column name according to dem files
-                dem_grid_res(str): set grid_res column name according to dem files
-                dem_mesh_xy(str): set mesh_xy column name according to dem files
-                drill_east(str):set the column name of  point's x location in drilling data, default "Easting"
-                drill_north(str):set the column name of  point's y's location in drilling data, default "Northing"
-                dem_arrays(str): set dem array column name according to dem files
-                depth_from_ahd(str):set the column name of depth from AHD, default DEPTH_FROM_AHD_COL
-                depth_to_ahd(str):set the column name of depth to AHD, default DEPTH_TO_AHD_COL
-
-
-            Returns:
-                layer_mesh(pyvista.core.pointset.UnstructuredGrid): layer mesh for display use
-        """
-
-        drill_data = self.drill_file_read(drill_file_path, depth_from_ahd, depth_to_ahd)
-        dem_array_data = self.dem_file_read(dem_file_path, dem_bounds, dem_grid_res)
-        path = os.path.join(storage_file_name, "lithology_3d_array.pkl")
-        try:
-            with open(path, 'rb') as handle:
-                lithology_3d_array = pickle.load(handle)
-            handle.close()
-        except:
-            lithology_3d_array = self.build_layer_data(drill_data, dem_array_data, dem_mesh_xy, drill_east, drill_north)
-            lithology_3d_array = self.clean_over_bound_data(lithology_3d_array, dem_array_data, dem_arrays)
-            # lithology_3d_array = self.vag_clean(lithology_3d_array, dem_array_data)
-            folder = os.path.exists(path)
-            if not folder:
-                os.makedirs(storage_file_name)
-            with open(path, "wb") as cf:
-                pickle.dump(lithology_3d_array, cf)
-            cf.close()
-
-        layer_mesh = self.build_layer_mesh(lithology_3d_array, height_adjustment_factor, layer_from, layer_to)
-        return layer_mesh
-
     def drill_file_read(self, file_path, depth_from_ahd=DEPTH_FROM_AHD_COL, depth_to_ahd=DEPTH_TO_AHD_COL):
 
         """Read drill data file
@@ -156,6 +61,101 @@ class VisualizeDataProcess:
         self.dem_x_min, self.dem_x_max, self.dem_y_min, self.dem_y_max = dem_array_data[dem_bounds]
         self.grid_res = dem_array_data[dem_grid_res]
         return dem_array_data
+
+    def drill_data_process(self, drill_data, height_adjustment_factor=20, depth_from_ahd=DEPTH_FROM_AHD_COL,
+                           depth_to_ahd=DEPTH_TO_AHD_COL, drill_east='Easting', drill_north='Northing',
+                           boreID='BoreID', prime_lithology='Lithology_1_num'):
+        """The whole data process from drill data to PolyData dictionary
+
+            Args:
+                file_path (str): drill data file path
+                height_adjustment_factor (int): Height scaling factor, default 20.
+                depth_from_ahd(str):set the column name of depth from AHD, default DEPTH_FROM_AHD_COL
+                depth_to_ahd(str):set the column name of depth to AHD, default DEPTH_TO_AHD_COL
+                drill_east(str):set the column name of  point's x location in drilling data, default "Easting"
+                drill_north(str):set the column name of  point's y's location in drilling data, default "Northing"
+                boreID(str):set the column name of bore hole ID,default "BoreID"
+                prime_lithology():set the prime lithology column name
+
+            Returns:
+                lines_dict(dict): PolyData dictionary.
+        """
+        # data = self.drill_file_read(file_path, depth_from_ahd, depth_to_ahd)
+        data = self.add_scaled_height_column(drill_data, height_adjustment_factor, depth_from_ahd, depth_to_ahd)
+        well_dict = self.build_well_dict(data, boreID)
+        well_dict = self.add_missing_height_data(well_dict)
+        point_dict = self.build_points_dict(well_dict, drill_east, drill_north)
+        lines_dict = self.Point_to_lines_dict(point_dict)
+        lines_dict = self.add_lithology_based_scalar(well_dict, lines_dict, prime_lithology)
+        return lines_dict
+
+    def dem_data_process(self, dem_data, height_adjustment_factor, dem_mesh_xy='mesh_xy', dem_arrays='dem_array'):
+        """The whole data process from dem data to pv.StructuredGrid
+
+            Args:
+                file_path (str): dem data file path
+                height_adjustment_factor (int): Height scaling factor, default 20 .
+                dem_mesh_xy(str): set mesh_xy column name according to dem files
+                dem_arrays(str): set dem array column name according to dem files
+
+            Returns:
+                Grid(pyvista.core.pointset.StructuredGrid)
+
+        """
+        dem_array_data = dem_data
+        xx, yy = dem_array_data[dem_mesh_xy]
+        dem_array = dem_array_data[dem_arrays]
+        grid = pv.StructuredGrid(xx, yy, dem_array * height_adjustment_factor)
+        return grid
+
+    def lithology_layer_process(self, drill_data, dem_array_data, storage_file_name, height_adjustment_factor=20,
+                                layer_from=0, layer_to=0, dem_bounds='bounds', dem_grid_res='grid_res',
+                                dem_mesh_xy='mesh_xy', drill_east='Easting', drill_north='Northing',
+                                dem_arrays='dem_array', depth_from_ahd=DEPTH_FROM_AHD_COL,
+                                depth_to_ahd=DEPTH_TO_AHD_COL):
+        """add points lithology type, expands lines to tube based on lithology number
+            Args:
+                drill_file_path(str): drill file path
+                dem_file_path(str):dem file path
+                storage_file_name(str): set the name of the save path for testing sample's
+                                        lithology classification array
+                height_adjustment_factor(int): height scala factor
+                layer_from (float): set the begin number of layers
+                layer_to (float): set the end number of layers
+                dem_bounds(str): set bounds column name according to dem files
+                dem_grid_res(str): set grid_res column name according to dem files
+                dem_mesh_xy(str): set mesh_xy column name according to dem files
+                drill_east(str):set the column name of  point's x location in drilling data, default "Easting"
+                drill_north(str):set the column name of  point's y's location in drilling data, default "Northing"
+                dem_arrays(str): set dem array column name according to dem files
+                depth_from_ahd(str):set the column name of depth from AHD, default DEPTH_FROM_AHD_COL
+                depth_to_ahd(str):set the column name of depth to AHD, default DEPTH_TO_AHD_COL
+
+
+            Returns:
+                layer_mesh(pyvista.core.pointset.UnstructuredGrid): layer mesh for display use
+        """
+
+        # drill_data = self.drill_file_read(drill_file_path, depth_from_ahd, depth_to_ahd)
+        # dem_array_data = self.dem_file_read(dem_file_path, dem_bounds, dem_grid_res)
+        path = os.path.join(storage_file_name, "lithology_3d_array.pkl")
+        try:
+            with open(path, 'rb') as handle:
+                lithology_3d_array = pickle.load(handle)
+            handle.close()
+        except:
+            lithology_3d_array = self.build_layer_data(drill_data, dem_array_data, dem_mesh_xy, drill_east, drill_north)
+            lithology_3d_array = self.clean_over_bound_data(lithology_3d_array, dem_array_data, dem_arrays)
+            # lithology_3d_array = self.vag_clean(lithology_3d_array, dem_array_data)
+            folder = os.path.exists(path)
+            if not folder:
+                os.makedirs(storage_file_name)
+            with open(path, "wb") as cf:
+                pickle.dump(lithology_3d_array, cf)
+            cf.close()
+
+        layer_mesh = self.build_layer_mesh(lithology_3d_array, height_adjustment_factor, layer_from, layer_to)
+        return layer_mesh
 
     def add_scaled_height_column(self, data, height_adjustment_factor, depth_from_ahd=DEPTH_FROM_AHD_COL,
                                  depth_to_ahd=DEPTH_TO_AHD_COL):
@@ -354,7 +354,7 @@ class VisualizeDataProcess:
         threshed = volume.threshold([layer_from, layer_to])
         return threshed
 
-    #def exist_3d_lithology(self):
+    # def exist_3d_lithology(self):
 
     def extract_single_lithology_class_3d(self, lithology_3d_classes, class_value):
         """Transform a 3D volume of lithology class codes by binary bining cells as being either of a class value or

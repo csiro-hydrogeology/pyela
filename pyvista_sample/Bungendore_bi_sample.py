@@ -9,9 +9,11 @@ drill_data_path = r"C:\Users\Dennis.H\Desktop\CSIRO_data\Bungendore\classified_l
 dem_data_path = r"C:\Users\Dennis.H\Desktop\CSIRO_data\Bungendore\dem_array_data.pkl"
 
 dp = VisualizeDataProcess()
-lines_dict = dp.drill_data_process(drill_data_path, 25)
-grid = dp.dem_data_process(dem_data_path, 25)
-layer = dp.lithology_layer_process(drill_data_path, dem_data_path, 'Bungendore', 25, 6, 10)
+drill_data = dp.drill_file_read(drill_data_path)
+dem_data = dp.dem_file_read(dem_data_path)
+lines_dict = dp.drill_data_process(drill_data, 25)
+grid = dp.dem_data_process(dem_data, 25)
+layer = dp.lithology_layer_process(drill_data, dem_data, 'Bungendore', 25, 5, 10)
 
 annotations = {
     0.00: "Clay",
