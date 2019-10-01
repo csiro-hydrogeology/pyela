@@ -28,8 +28,9 @@ class VisualizeDataProcess:
         self.dem_y_max = 0
         self.ahd_max = 0
         self.ahd_min = 0
+        self.grid_res = ''
 
-    def drill_file_read(self, file_path, depth_from_ahd=DEPTH_FROM_AHD_COL, depth_to_ahd=DEPTH_TO_AHD_COL):
+    def drill_file_read(self, file_path):
 
         """Read drill data file
             Args:
@@ -41,23 +42,45 @@ class VisualizeDataProcess:
                 df(pandas.core.frame.DataFrame)
         """
         df = pd.read_pickle(file_path)
-        self.ahd_max = df[depth_from_ahd].max()
-        self.ahd_min = df[depth_to_ahd].min()
-        df.dropna(subset=[depth_to_ahd, depth_from_ahd])  # clean the invalid data
         return df
 
-    def dem_file_read(self, file_path, dem_bounds='bounds', dem_grid_res='grid_res'):
+    def dem_file_read(self, file_path):
         """Read dem data file
             Args:
                 file_path (str): drill data file path
-                dem_grid_res(str): set grid_res column name according to dem files
-                dem_bounds(str): set bounds column name according to dem files
             Returns:
                 dem_array_date(pandas.core.frame.DataFrame)
         """
         with open(file_path, 'rb') as handle:
             dem_array_data = pickle.load(handle)
         handle.close()
+        return dem_array_data
+
+    def drill_data_initial(self, drill_data, depth_from_ahd=DEPTH_FROM_AHD_COL, depth_to_ahd=DEPTH_TO_AHD_COL):
+        """initial class variables and clean drilling data
+            Args:
+                drill_data (pandas.core.frame.DataFrame): original drilling data
+                depth_from_ahd(str):set the column name of depth from AHD, default DEPTH_FROM_AHD_COL
+                depth_to_ahd(str):set the column name of depth to AHD, default DEPTH_TO_AHD_COL
+
+            Returns:
+                drill_data(pandas.core.frame.DataFrame)
+        """
+        self.ahd_max = drill_data[depth_from_ahd].max()
+        self.ahd_min = drill_data[depth_to_ahd].min()
+        drill_data.dropna(subset=[depth_to_ahd, depth_from_ahd])
+        return drill_data  # clean the invalid data
+
+    def dem_data_initial(self, dem_array_data, dem_bounds='bounds', dem_grid_res='grid_res'):
+        """initial class variables and clean dem data
+            Args:
+                dem_array_data (pandas.core.frame.DataFrame): original dem data
+                dem_bounds(str): set bounds column name according to dem files
+                dem_grid_res(str): set grid_res column name according to dem files
+
+            Returns:
+                dem_array_data(pandas.core.frame.DataFrame)
+        """
         self.dem_x_min, self.dem_x_max, self.dem_y_min, self.dem_y_max = dem_array_data[dem_bounds]
         self.grid_res = dem_array_data[dem_grid_res]
         return dem_array_data
@@ -68,7 +91,7 @@ class VisualizeDataProcess:
         """The whole data process from drill data to PolyData dictionary
 
             Args:
-                file_path (str): drill data file path
+                drill_data(pandas.core.frame.DataFrame): original drilling data
                 height_adjustment_factor (int): Height scaling factor, default 20.
                 depth_from_ahd(str):set the column name of depth from AHD, default DEPTH_FROM_AHD_COL
                 depth_to_ahd(str):set the column name of depth to AHD, default DEPTH_TO_AHD_COL
@@ -81,7 +104,8 @@ class VisualizeDataProcess:
                 lines_dict(dict): PolyData dictionary.
         """
         # data = self.drill_file_read(file_path, depth_from_ahd, depth_to_ahd)
-        data = self.add_scaled_height_column(drill_data, height_adjustment_factor, depth_from_ahd, depth_to_ahd)
+        fixed_data = self.drill_data_initial(drill_data, depth_from_ahd, depth_to_ahd)
+        data = self.add_scaled_height_column(fixed_data, height_adjustment_factor, depth_from_ahd, depth_to_ahd)
         well_dict = self.build_well_dict(data, boreID)
         well_dict = self.add_missing_height_data(well_dict)
         point_dict = self.build_points_dict(well_dict, drill_east, drill_north)
@@ -89,20 +113,23 @@ class VisualizeDataProcess:
         lines_dict = self.add_lithology_based_scalar(well_dict, lines_dict, prime_lithology)
         return lines_dict
 
-    def dem_data_process(self, dem_data, height_adjustment_factor, dem_mesh_xy='mesh_xy', dem_arrays='dem_array'):
+    def dem_data_process(self, dem_array_data, height_adjustment_factor, dem_mesh_xy='mesh_xy', dem_arrays='dem_array',
+                         dem_bounds='bounds', dem_grid_res='grid_res'):
         """The whole data process from dem data to pv.StructuredGrid
 
             Args:
-                file_path (str): dem data file path
+                dem_array_data (pandas.core.frame.DataFrame): original dem data
                 height_adjustment_factor (int): Height scaling factor, default 20 .
                 dem_mesh_xy(str): set mesh_xy column name according to dem files
                 dem_arrays(str): set dem array column name according to dem files
+                dem_bounds(str): set bounds column name according to dem files
+                dem_grid_res(str): set grid_res column name according to dem files
 
             Returns:
                 Grid(pyvista.core.pointset.StructuredGrid)
 
         """
-        dem_array_data = dem_data
+        dem_array_data = self.dem_data_initial(dem_array_data, dem_bounds, dem_grid_res)
         xx, yy = dem_array_data[dem_mesh_xy]
         dem_array = dem_array_data[dem_arrays]
         grid = pv.StructuredGrid(xx, yy, dem_array * height_adjustment_factor)
@@ -115,8 +142,8 @@ class VisualizeDataProcess:
                                 depth_to_ahd=DEPTH_TO_AHD_COL):
         """add points lithology type, expands lines to tube based on lithology number
             Args:
-                drill_file_path(str): drill file path
-                dem_file_path(str):dem file path
+                drill_data(pandas.core.frame.DataFrame): original drilling data
+                dem_array_data (pandas.core.frame.DataFrame): original dem data
                 storage_file_name(str): set the name of the save path for testing sample's
                                         lithology classification array
                 height_adjustment_factor(int): height scala factor
@@ -144,6 +171,8 @@ class VisualizeDataProcess:
                 lithology_3d_array = pickle.load(handle)
             handle.close()
         except:
+            drill_data = self.drill_data_initial(drill_data, depth_from_ahd, depth_to_ahd)
+            dem_array_data = self.dem_data_initial(dem_array_data, dem_bounds, dem_grid_res)
             lithology_3d_array = self.build_layer_data(drill_data, dem_array_data, dem_mesh_xy, drill_east, drill_north)
             lithology_3d_array = self.clean_over_bound_data(lithology_3d_array, dem_array_data, dem_arrays)
             # lithology_3d_array = self.vag_clean(lithology_3d_array, dem_array_data)
