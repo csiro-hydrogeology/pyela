@@ -43,7 +43,7 @@ grid = dp.dem_data_process(dem_data, 25)
 layer = dp.lithology_layer_process(drill_data, dem_data, 'cbr', 25, 7, 10)
 
 annotations = {
-    00.0: 'shale'      ,
+    00.0: 'shale',
     01.0: 'clay',
     02.0: 'granite',
     03.0: 'soil',

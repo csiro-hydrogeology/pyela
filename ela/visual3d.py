@@ -246,16 +246,20 @@ class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
         self.title_prefix = 'Lithology class: '
 
     @mlab.show
-    def overlay_bore_classes(self, dem_mesh, vol_mesh, bore_data, vol_colorname, z_label='AHD x 50', points_scale_factor=150.0, title=None):
+    def overlay_bore_classes(self, dem_mesh, vol_mesh, bore_data, vol_colorname, z_label=None, points_scale_factor=None, title=None):
         x_dem, y_dem, z_dem = dem_mesh
         vol_x, vol_y, vol_z, vol_s = vol_mesh
         bore_x, bore_y, bore_z, bore_s = bore_data
         f = mlab.figure(size=(1200, 800))
+        if points_scale_factor is None:
+            points_scale_factor = self.POINTS_SCALE_FACTOR
         p3d = mlab.points3d(bore_x, bore_y, bore_z, bore_s, colormap='spectral', scale_factor = points_scale_factor, scale_mode='none')
         self.set_litho_class_colormap_with_unclassified(get_colorscale_lut(p3d))
         mlab.outline()
         mlab_label(mlab.xlabel, text=EASTING_COL)
         mlab_label(mlab.ylabel, text=NORTHING_COL)
+        if z_label is None:
+            z_label = 'AHD x ' + str(self.z_scaling)
         mlab_label(mlab.zlabel, text=z_label)
         surface = mlab.surf(x_dem, y_dem, z_dem, colormap='terrain')
         surface.enable_contours = True
@@ -280,7 +284,7 @@ class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
 def get_colorscale_lut(vis_widget):
     """Retrieve the LUT (lookup table) of a mayavi widget
 
-    not sure this is valid for all mayavi things...
+    not sure this is valid for all mayavi objects...
 
     """
     return vis_widget.module_manager.scalar_lut_manager.lut
