@@ -99,7 +99,7 @@ def test_add_lithology_based_scalar():
     assert 1, 2 in lines_dict['1']["GR"]
     assert 3, 5 in lines_dict['2']["GR"]
 
-def test_todo():
-    # https://github.com/csiro-hydrogeology/pyela/issues/19
-    # layer = vp.lithology_layer_process(drill_data_path, dem_data_path, 25, 5, 10)
-    raise NotImplementedError()
+# def test_todo():
+#     # https://github.com/csiro-hydrogeology/pyela/issues/19
+#     # layer = vp.lithology_layer_process(drill_data_path, dem_data_path, 25, 5, 10)
+#     raise NotImplementedError()
