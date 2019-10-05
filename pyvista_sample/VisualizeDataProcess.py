@@ -87,7 +87,7 @@ class VisualizeDataProcess:
 
     def drill_data_process(self, drill_data, height_adjustment_factor=20, depth_from_ahd=DEPTH_FROM_AHD_COL,
                            depth_to_ahd=DEPTH_TO_AHD_COL, drill_east='Easting', drill_north='Northing',
-                           boreID='BoreID', prime_lithology='Lithology_1_num'):
+                           boreID='BoreID', prime_lithology='Lithology_1_num', min_tube_radius = 10):
         """The whole data process from drill data to PolyData dictionary
 
             Args:
@@ -110,7 +110,7 @@ class VisualizeDataProcess:
         well_dict = self.add_missing_height_data(well_dict)
         point_dict = self.build_points_dict(well_dict, drill_east, drill_north)
         lines_dict = self.Point_to_lines_dict(point_dict)
-        lines_dict = self.add_lithology_based_scalar(well_dict, lines_dict, prime_lithology)
+        lines_dict = self.add_lithology_based_scalar(well_dict, lines_dict, prime_lithology, min_tube_radius)
         return lines_dict
 
     def dem_data_process(self, dem_array_data, height_adjustment_factor, dem_mesh_xy='mesh_xy', dem_arrays='dem_array',
@@ -285,7 +285,7 @@ class VisualizeDataProcess:
             # notice that the building of the lines need to follow the nearest neighbourhood search
         return lines_dict
 
-    def add_lithology_based_scalar(self, well_dict, lines_dict, prime_lithology='Lithology_1_num'):
+    def add_lithology_based_scalar(self, well_dict, lines_dict, prime_lithology='Lithology_1_num', min_tube_radius = 10):
         """add points lithology type, expands lines to tube based on lithology number
             Args:
                 well_dict(dict()): wells dictionary
@@ -298,7 +298,8 @@ class VisualizeDataProcess:
         for path in lines_dict:
             vals = well_dict[path][prime_lithology].values
             lines_dict[path]["GR"] = vals
-            lines_dict[path].tube(radius=10, scalars="GR", inplace=True)
+            lines_dict[path].tube(radius=min_tube_radius, scalars=None, inplace=True)
+            #lines_dict[path].tube(radius=10, scalars="GR", inplace=True)
             if len(vals) > 0:
                 lines_dict_tmp[path] = lines_dict[path]
         lines_dict = lines_dict_tmp

@@ -6,9 +6,13 @@ import os
 import sys
 
 pkg_dir = os.path.join(os.path.dirname(__file__),'..')
+
+pkg_dir = '/home/per202/src/ela/pyela'
+
 sys.path.insert(0, pkg_dir)
 
 from ela.visual import discrete_classes_colormap
+from ela.spatial import create_meshgrid_cartesian
 from pyvista_sample.VisualizeDataProcess import VisualizeDataProcess
 
 if ('ELA_DATA' in os.environ):
@@ -19,48 +23,44 @@ else:
     username = os.environ['USER']
     data_path = os.path.join('/home', username, 'data', 'Lithology')
 
+colnames = ['BoreID', 'Easting', 'Northing', 'Depth From (AHD)', 'Depth To (AHD)', 'Lithology_1_num']
 
-# start = time.clock()
-'''
-A sample of 3D image based on pyvista
 
-'''
-drill_data_path = os.path.join(data_path, 'Canberra','out','classified_logs.pkl')
+h_0 = 630.0
+n = 19
+c = [(101, 1.1, 2.2, h_0 - i * 2, h_0 - 2 - i * 2, float(i)) for i in range(n)]
+drill_data= pd.DataFrame(c, columns=colnames)
+
+# drill_data_path = os.path.join(data_path, 'Canberra','out','classified_logs.pkl')
 dem_data_path = os.path.join(data_path, 'Canberra','out','dem_array_data.pkl')
 # drill_data_path = r"C:\Users\Dennis.H\Desktop\CSIRO_data\cbr\classified_logs.pkl"
 # dem_data_path = r"C:\Users\Dennis.H\Desktop\CSIRO_data\cbr\dem_array_data.pkl"
 
 dp = VisualizeDataProcess()
-drill_data = dp.drill_file_read(drill_data_path)
+# drill_data = dp.drill_file_read(drill_data_path)
 dem_data = dp.dem_file_read(dem_data_path)
-lines_dict = dp.drill_data_process(drill_data, 25, min_tube_radius = 70)
+
+
+x_min = -200.0
+x_max = +200.0
+y_min = -200.0
+y_max = +200.0
+grid_res = 100.0
+m = create_meshgrid_cartesian(x_min, x_max, y_min, y_max, grid_res)
+xx, yy = m
+z = h_0 + 0.01 * xx + 0.01 * yy
+dem_array = z
+
+dem_data = {'bounds': (x_min, x_max, y_min, y_max), 'grid_res': grid_res, 'mesh_xy': m, 'dem_array': dem_array}
+
+lines_dict = dp.drill_data_process(drill_data, 25)
 # temp = dp.drill_file_read(drill_data_path)
 # pd.set_option('display.max_columns', None)
 # print(temp)
 
 grid = dp.dem_data_process(dem_data, 25)
 
-layer = dp.lithology_layer_process(drill_data, dem_data, 'cbr', 25, 7, 10)
-
-annotations = {
-    00.0: 'shale',
-    01.0: 'clay',
-    02.0: 'granite',
-    03.0: 'soil',
-    04.0: 'sand',
-    05.0: 'porphyry',
-    06.0: 'siltstone',
-    07.0: 'dacite',
-    08.0: 'rhyodacite',
-    09.0: 'gravel',
-    10.0: 'limestone',
-    11.0: 'sandstone',
-    12.0: 'slate',
-    13.0: 'mudstone',
-    14.0: 'rock',
-    15.0: 'ignimbrite',
-    16.0: 'tuff'
-}
+annotations =dict([(float(i), str(i)) for i in range(n)] )
 
 sargs = dict(
     n_labels=len(annotations),
@@ -88,7 +88,6 @@ for well in lines_dict.keys():
                      opacity=1,
                      )
 
-# plotter.add_mesh(layer, scalars="Lithology", n_colors=len(annotations), clim=[0, len(annotations)-1], show_scalar_bar=False)
 plotter.add_mesh(grid, opacity=0.9)
 plotter.show_bounds(grid, show_xaxis=True, show_yaxis=True, show_zaxis=False)
 plotter.show_axes()
