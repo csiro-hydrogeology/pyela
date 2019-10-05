@@ -6,7 +6,6 @@ import pandas as pd
 import numpy as np
 
 pkg_dir = os.path.join(os.path.dirname(__file__),'..')
-
 sys.path.insert(0, pkg_dir)
 
 from ela.visual import discrete_classes_colormap
