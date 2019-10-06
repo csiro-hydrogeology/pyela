@@ -37,7 +37,7 @@ dem_data_path = os.path.join(bungendore_datadir, 'dem_array_data.pkl')
 dp = VisualizeDataProcess()
 drill_data = dp.drill_file_read(drill_data_path)
 dem_data = dp.dem_file_read(dem_data_path)
-lines_dict = dp.drill_data_process(drill_data, 25)
+lines_dict = dp.drill_data_process(drill_data, 25, min_tube_radius = 70)
 grid = dp.dem_data_process(dem_data, 25)
 layer = dp.lithology_layer_process(drill_data, dem_data, 'Bungendore', 25, 5, 10)
 print(type(layer))
@@ -85,7 +85,7 @@ my_colourmap = ListedColormap(newcolors)
 
 for well in lines_dict.keys():
     plotter.add_mesh(lines_dict.get(well),
-                     scalars="GR",
+                     scalars=dp.scalar_prop_name,
                      scalar_bar_args=sargs,
                      annotations=annotations,
                      show_edges=False,

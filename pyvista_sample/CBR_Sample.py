@@ -23,8 +23,8 @@ else:
 # start = time.clock()
 '''
 A sample of 3D image based on pyvista
-
 '''
+
 drill_data_path = os.path.join(data_path, 'Canberra','out','classified_logs.pkl')
 dem_data_path = os.path.join(data_path, 'Canberra','out','dem_array_data.pkl')
 # drill_data_path = r"C:\Users\Dennis.H\Desktop\CSIRO_data\cbr\classified_logs.pkl"
@@ -32,6 +32,13 @@ dem_data_path = os.path.join(data_path, 'Canberra','out','dem_array_data.pkl')
 
 dp = VisualizeDataProcess()
 drill_data = dp.drill_file_read(drill_data_path)
+
+# A convoluted way to remove nans
+# vlah = {x for x in drill_data.Lithology_1_num.values if x==x}
+
+# drill_data = drill_data[ drill_data.BoreID == 80000156 ]
+# drill_data = drill_data[ drill_data.Lithology_1_num == 10.0 ]
+
 dem_data = dp.dem_file_read(dem_data_path)
 lines_dict = dp.drill_data_process(drill_data, 25, min_tube_radius = 70)
 # temp = dp.drill_file_read(drill_data_path)
@@ -77,7 +84,7 @@ sargs = dict(
 plotter = pv.Plotter()
 for well in lines_dict.keys():
     plotter.add_mesh(lines_dict.get(well),
-                     scalars="GR",
+                     scalars=dp.scalar_prop_name,
                      scalar_bar_args=sargs,
                      annotations=annotations,
                      show_edges=False,
