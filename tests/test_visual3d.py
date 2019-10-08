@@ -6,11 +6,11 @@ import numpy as np
 import datetime as dt
 import sys
 from datetime import datetime
-from pyvista_sample.VisualizeDataProcess import *
 
 pkg_dir = os.path.join(os.path.dirname(__file__), '..')
+sys.path.insert(0, pkg_dir)
 
-sys.path.append(pkg_dir)
+from pyvista_sample.VisualizeDataProcess import *
 
 # from ela.visual3d import *
 
@@ -59,23 +59,9 @@ def test_build_well_dict():
     assert test1["scaled_from_height"].values[0] == 400
     assert test2['Lithology_1_num'].values[1] == 5
 
-
-# origin_columns = ['','Depth From (AHD)', 'Depth To (AHD)']
-def test_add_missing_height_data():
-    df = vp.add_scaled_height_column(df_1, 20)
-    well_dict = vp.build_well_dict(df)
-    test1 = len(well_dict.get('1')["scaled_from_height"].values)
-    test2 = len(well_dict.get('2')["scaled_from_height"].values)
-    # print(test1)
-    temp = vp.add_missing_height_data(well_dict)
-    assert len(temp.get('1')["scaled_from_height"].values) == test1 + 1
-    assert len(temp.get('2')["scaled_from_height"].values) == test2 + 1
-
-
 def test_build_points_dict():
     df = vp.add_scaled_height_column(df_1, 20)
     well_dict = vp.build_well_dict(df)
-    well_dict = vp.add_missing_height_data(well_dict)
     point_dict = vp.build_points_dict(well_dict)
     test1 = np.array([10, 10, 20])
     test2 = np.array([20, 20, 800])
@@ -84,19 +70,32 @@ def test_build_points_dict():
     assert point_dict.get('1')[0][0] == test1[0]
     assert point_dict.get('2')[1][2] == test2[2]
 
+def test_tubular_info_generation():
+    '''Entries are such that we have entries for the top and bottom of the
+    lithology log entries, so that the visual representation is more faithful to reality'''
+    ordering = [2,0,3,1]
+    litho_class = {0: 0.0, 1: np.nan, 2: 2.0, 3: 3.0}
+    c = [(1234, 0.0, 0.0, -i , -i-1, litho_class[i]) for i in ordering]
+    df_syn = pd.DataFrame(c, columns=origin_columns)
+    df = vp.add_scaled_height_column(df_syn, 20)
+    well_dict = vp.build_well_dict(df)
+    point_dict = vp.build_points_dict(well_dict)
+    assert len(point_dict['1234']) == 2 * len(df_syn)
 
 def test_add_lithology_based_scalar():
     df = vp.add_scaled_height_column(df_1, 20)
     well_dict = vp.build_well_dict(df)
-    well_dict = vp.add_missing_height_data(well_dict)
     point_dict = vp.build_points_dict(well_dict)
     # print(well_dict.get('1'))
     # print(point_dict)
-    line_dict = vp.Point_to_lines_dict(point_dict)
+    line_dict = vp.point_to_lines_dict(point_dict)
     lines_dict = vp.add_lithology_based_scalar(well_dict, line_dict)
     # print(lines_dict['2']["GR"])
     # print(lines_dict['1']["GR"])
     assert 1, 2 in lines_dict['1']["GR"]
     assert 3, 5 in lines_dict['2']["GR"]
 
-
+# def test_todo():
+#     # https://github.com/csiro-hydrogeology/pyela/issues/19
+#     # layer = vp.lithology_layer_process(drill_data_path, dem_data_path, 25, 5, 10)
+#     raise NotImplementedError()

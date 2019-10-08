@@ -14,6 +14,7 @@ import re
 
 from collections import Counter
 
+import striplog
 import nltk
 from nltk.corpus import stopwords
 
@@ -62,15 +63,26 @@ GEOMETRY_COL = u'geometry'
 DEM_ELEVATION_COL = u'DEM_elevation'
 """Default column name expected in lithodescription data frames"""
 
-# WIN_SITE_ID_COL = u'WIN Site ID'
+# columns in the BoM NGIS data model
+# http://www.bom.gov.au/water/regulations/dataDelivery/document/NgisDiagramv2.3.pdf
 
+HYDRO_CODE_COL = u'HydroCode'
+"""Jurisdictional bore and pipe identifier within NGIS geodatabase"""
+
+HYDRO_ID_COL = u'HydroID'
+"""Unique feature identifier within NGIS geodatabase"""
+
+BORE_ID_COL = u'BoreID'
+"""Numeric identifier in lithology logs corresponding to the HydroID of NGIS_Bore feature"""
+
+# WIN_SITE_ID_COL = u'WIN Site ID'
 
 def v_find_primary_lithology(v_tokens, lithologies_dict):
     """Vectorised function to find a primary lithology in a list of tokenised sentences.
 
     Args:
         v_tokens (iterable of iterable of str): the list of tokenised sentences.
-        lithologies_dict (dict): dictionary, where keys are exact markers as match for lithologies. Values are the lithology classes. 
+        lithologies_dict (dict): dictionary, where keys are exact markers as match for lithologies. Values are the lithology classes.
 
     Returns:
         list: list of primary lithologies if dectected. empty string for none.
@@ -84,7 +96,7 @@ def v_find_secondary_lithology(v_tokens, prim_litho, lithologies_adjective_dict,
     Args:
         v_tokens (iterable of iterable of str): the list of tokenised sentences.
         prim_litho (list of str): the list of primary lithologies already detected for v_tokens. The secondary lithology cannot be the same as the primary.
-        lithologies_adjective_dict (dict): dictionary, where keys are exact, "clear" markers for secondary lithologies (e.g. 'clayey'). Keys are the lithology classes. 
+        lithologies_adjective_dict (dict): dictionary, where keys are exact, "clear" markers for secondary lithologies (e.g. 'clayey'). Keys are the lithology classes.
         lithologies_dict (dict): dictionary, where keys are exact markers as match for lithologies. Values are the lithology classes.
 
     Returns:
@@ -97,7 +109,7 @@ def v_find_secondary_lithology(v_tokens, prim_litho, lithologies_adjective_dict,
     return [find_secondary_lithology(x, lithologies_adjective_dict, lithologies_dict) for x in tokens_and_primary]
 
 
-def v_word_tokenize(descriptions): 
+def v_word_tokenize(descriptions):
     """Vectorised tokenisation of lithology descriptions.
 
     Args:
@@ -124,7 +136,7 @@ else:
     """
 
 def token_freq(tokens, n_most_common = 50):
-    """Gets the most frequent (counts) tokens 
+    """Gets the most frequent (counts) tokens
 
     Args:
         tokens (iterable of str): the list of tokens to analyse for frequence.
@@ -157,7 +169,7 @@ def plot_freq(dataframe, y_log = False, x='token', figsize=(15,10), fontsize=14)
     return p
 
 def find_word_from_root(tokens, root):
-    """Filter token (words) to retain only those containing a root term 
+    """Filter token (words) to retain only those containing a root term
 
     Args:
         tokens (iterable of str): the list of tokens.
@@ -192,7 +204,7 @@ def split_composite_term(x, joint_re = 'with'):
 
     Args:
         x (str): the term to split if matching, e.g. 'claywithsand' to 'clay with sand'
-        joint_re (str): regular expression for the word used as fusing join, typically 'with' 
+        joint_re (str): regular expression for the word used as fusing join, typically 'with'
 
     Returns:
         split wording (str): tokens split from the joining term.
@@ -201,7 +213,7 @@ def split_composite_term(x, joint_re = 'with'):
     return re.sub("([a-z]+)(" + joint_re + ")([a-z]+)", r"\1 \2 \3", x, flags=re.DOTALL)
 
 def split_with_term(x):
-    """split words that are joined by a with, i.e. 'sandwithclay' 
+    """split words that are joined by a with, i.e. 'sandwithclay'
     Args:
         x (str): the term to split if matching, e.g. 'claywithsand' to 'clay with sand'
 
@@ -211,7 +223,7 @@ def split_with_term(x):
     return split_composite_term(x, 'with')
 
 def v_split_with_term(xlist):
-    """split words that are joined by a with, i.e. 'sandwithclay' 
+    """split words that are joined by a with, i.e. 'sandwithclay'
     Args:
         xlist (iterable of str): the terms to split if matching, e.g. 'claywithsand' to 'clay with sand'
 
@@ -224,7 +236,7 @@ def v_remove_punctuations(textlist):
     """vectorised function to remove punctuations
     Args:
         textlist (iterable of str): list of terms
-    
+
     Returns:
         (list):
     """
@@ -234,25 +246,27 @@ def v_replace_punctuations(textlist, replacement=' '):
     """vectorised function to replace punctuations
     Args:
         textlist (iterable of str): list of terms
-    
+
     Returns:
         (list):
     """
     return [replace_punctuations(x, replacement) for x in textlist]
 
-def clean_lithology_descriptions(description_series, lex):
+def clean_lithology_descriptions(description_series, lex = None):
     """Preparatory cleanup of lithology descriptions for further analysis
 
-    Replace abbreviations and misspelling according to a lexicon, 
+    Replace abbreviations and misspelling according to a lexicon,
     and transform to lower case
 
     Args:
-        description_series (iterable of str, or pd.Series): lithology descriptions 
+        description_series (iterable of str, or pd.Series): lithology descriptions
         lex (striplog.Lexicon): an instance of striplog's Lexicon
 
     Returns:
         (iterable of str): processed descriptions.
     """
+    if lex is None:
+        lex = striplog.Lexicon.default()
     if isinstance(description_series, list):
         y = [lex.expand_abbreviations(x) for x in description_series]
     else:
@@ -311,7 +325,7 @@ def find_primary_lithology(tokens, lithologies_dict):
 
     Args:
         v_tokens (iterable of iterable of str): the list of tokenised sentences.
-        lithologies_dict (dict): dictionary, where keys are exact markers as match for lithologies. Keys are the lithology classes. 
+        lithologies_dict (dict): dictionary, where keys are exact markers as match for lithologies. Keys are the lithology classes.
 
     Returns:
         list: list of primary lithologies if dectected. empty string for none.
@@ -338,7 +352,7 @@ def find_secondary_lithology(tokens_and_primary, lithologies_adjective_dict, lit
 
     Args:
         tokens_and_primary (tuple ([str],str): tokens and the primary lithology
-        lithologies_adjective_dict (dict): dictionary, where keys are exact, "clear" markers for secondary lithologies (e.g. 'clayey'). Keys are the lithology classes. 
+        lithologies_adjective_dict (dict): dictionary, where keys are exact, "clear" markers for secondary lithologies (e.g. 'clayey'). Keys are the lithology classes.
         lithologies_dict (dict): dictionary, where keys are exact markers as match for lithologies. Keys are the lithology classes.
 
     Returns:
@@ -388,7 +402,7 @@ def match_and_sample_df(df, litho_class_name, colname=PRIMARY_LITHO_COL, out_col
 
         Args:
             df (pandas data frame): bore lithology data  with columns named PRIMARY_LITHO_COL
-    
+
         Returns:
             a list of strings, compound primary+optional_secondary lithology descriptions e.g. 'sand/clay', 'loam/'
     """
@@ -404,7 +418,7 @@ def find_regex_df(df, expression, colname):
 
         Args:
             df (pandas data frame): bore lithology data  with columns named PRIMARY_LITHO_COL
-    
+
         Returns:
             dataframe:
     """
@@ -426,13 +440,14 @@ def as_numeric(x):
     else:
         return float(x)
 
-def columns_as_numeric(df, colnames=[DEPTH_FROM_COL, DEPTH_TO_COL]):
+def columns_as_numeric(df, colnames=None):
     """Process some columns to make sure they are numeric. In-place changes.
 
         Args:
             df (pandas data frame): bore lithology data
             colnames (iterable of str): column names
     """
+    colnames = colnames or [DEPTH_FROM_COL, DEPTH_TO_COL]
     for colname in colnames:
         df[colname] = df[colname].apply(as_numeric)
 

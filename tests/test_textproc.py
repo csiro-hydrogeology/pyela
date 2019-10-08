@@ -1,13 +1,11 @@
 import os
 import pandas as pd
-import numpy as np
 import sys
-from datetime import datetime
 from striplog import Lexicon
 
 pkg_dir = os.path.join(os.path.dirname(__file__),'..')
 
-sys.path.append(pkg_dir)
+sys.path.insert(0, pkg_dir)
 
 from ela.textproc import *
 
@@ -56,7 +54,7 @@ def test_v_word_tokenize():
     descriptions = ['yellow, slightly clayey sand','75% sand, 20% silt, 5% gravel']
     tkns = v_word_tokenize(descriptions)
     assert len(tkns) == 2
-    assert len(tkns[0]) == 5    
+    assert len(tkns[0]) == 5
     assert len(tkns[1]) == 11
 
 

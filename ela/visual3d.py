@@ -5,11 +5,11 @@ from mayavi import mlab
 from ela.classification import extract_single_lithology_class_3d, GeospatialDataFrameColumnNames
 from ela.utils import flip
 from ela.visual import to_rgba_255, to_rgb, LithologiesClassesVisual
-from ela.textproc import EASTING_COL, NORTHING_COL, DEPTH_FROM_AHD_COL, DEPTH_FROM_COL, DEPTH_TO_AHD_COL, DEPTH_TO_COL, PRIMARY_LITHO_NUM_COL, GEOMETRY_COL
+from ela.textproc import EASTING_COL, NORTHING_COL, DEPTH_FROM_AHD_COL, DEPTH_TO_AHD_COL
 
 
 def create_colormap_lut(color_names):
-    """Create a color map usable by a mayavi lookup table, based on a set of matplotlib color names 
+    """Create a color map usable by a mayavi lookup table, based on a set of matplotlib color names
 
     Args:
         color_names(iterable of str): color names recognisable by matplotlib
@@ -33,14 +33,14 @@ def mlab_label(label_func, text, label_format=''):
 
 #@mlab.draw?
 def set_custom_colormap(lut, color_names):
-    """Sets the color map of a mayavi lookup table 
+    """Sets the color map of a mayavi lookup table
 
-    Reference: http://docs.enthought.com/mayavi/mayavi/auto/example_custom_colormap.html 
+    Reference: http://docs.enthought.com/mayavi/mayavi/auto/example_custom_colormap.html
 
     Args:
         lut(mayavi LUT): Mayavi lookup table thing
         color_names(iterable of str): color names recognisable by matplotlib
-    
+
     """
     my_lut = create_colormap_lut(color_names)
     lut.number_of_colors = len(my_lut)
@@ -56,7 +56,7 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
     def __init__(self, class_names, color_names, missing_value_color_name, easting_col=EASTING_COL, northing_col=NORTHING_COL, depth_from_ahd_col=DEPTH_FROM_AHD_COL, depth_to_ahd_col=DEPTH_TO_AHD_COL):
         super(LithologiesClassesVisual3d, self).__init__(class_names, color_names, missing_value_color_name)
         """Define class names of interest in visualised data set, and color coding.
-        
+
         Args:
             class_names (list of str): names of the classes
             color_names (list of str): names of the colors for the classes. See matplotlib doc for suitable names: https://matplotlib.org/examples/color/named_colors.html
@@ -64,27 +64,27 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
             easting_col (str): name of the data frame column for easting
             northing_col (str): name of the data frame column for northing
             depth_from_ahd_col (str): name of the data frame column for the height of the top of the soil column (ahd stands for for australian height datum, but not restricted)
-            depth_to_ahd_col (str): name of the data frame column for the height of the bottom of the soil column (ahd stands for for australian height datum, but not restricted)        
+            depth_to_ahd_col (str): name of the data frame column for the height of the bottom of the soil column (ahd stands for for australian height datum, but not restricted)
         """
         # 1D georeferenced data (bore primary litho data)
         self.dfcn = GeospatialDataFrameColumnNames(easting_col, northing_col, depth_from_ahd_col, depth_to_ahd_col)
 
     def set_litho_class_colormap(self, lut):
-        """Builds a Mayavi compatible LookUpTable given the colormap definition of the present object. 
-        See Reference: http://docs.enthought.com/mayavi/mayavi/auto/example_custom_colormap.html 
-        
+        """Builds a Mayavi compatible LookUpTable given the colormap definition of the present object.
+        See Reference: http://docs.enthought.com/mayavi/mayavi/auto/example_custom_colormap.html
+
         Args:
-            lut (LUTManager): an instance of an LUTManager coming from Mayavi. 
-        """        
+            lut (LUTManager): an instance of an LUTManager coming from Mayavi.
+        """
         set_custom_colormap(lut, self.color_names)
 
     def set_litho_class_colormap_with_unclassified(self, lut):
-        """Builds a Mayavi compatible LookUpTable given the colormap definition of the present object, including the missing value code. 
-        See Reference: http://docs.enthought.com/mayavi/mayavi/auto/example_custom_colormap.html 
-        
+        """Builds a Mayavi compatible LookUpTable given the colormap definition of the present object, including the missing value code.
+        See Reference: http://docs.enthought.com/mayavi/mayavi/auto/example_custom_colormap.html
+
         Args:
-            lut (LUTManager): an instance of an LUTManager coming from Mayavi. 
-        """        
+            lut (LUTManager): an instance of an LUTManager coming from Mayavi.
+        """
         set_custom_colormap(lut, self.color_names_with_missing)
 
     def create_plane_cut(self, volume, plane_orientation='x_axes', slice_index = 20, colormap=None):
@@ -92,24 +92,25 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         """
         f = mlab.pipeline.scalar_field(volume)
         if colormap is None:
-            cut = mlab.pipeline.image_plane_widget(f, 
+            cut = mlab.pipeline.image_plane_widget(f,
                 plane_orientation=plane_orientation, slice_index=slice_index)
             self.set_litho_class_colormap(get_colorscale_lut(cut))
         else:
-            cut = mlab.pipeline.image_plane_widget(f, 
+            cut = mlab.pipeline.image_plane_widget(f,
                 plane_orientation=plane_orientation, slice_index=slice_index, colormap=colormap)
         cut.module_manager.scalar_lut_manager.lut.nan_color = 0, 0, 0, 0
+        cut.ipw.reslice_interpolate = 'nearest_neighbour'
         return cut
 
-    # @mlab.show
+    @mlab.show
     def render_classes_planar(self, volume, title):
         """Create 3 movable plane cuts on a 3d volume
         """
         mlab.figure(size=(800, 800))
         s = volume
-        x_cut=self.create_plane_cut(s, plane_orientation='x_axes')
-        y_cut=self.create_plane_cut(s, plane_orientation='y_axes')
-        z_cut=self.create_plane_cut(s, plane_orientation='z_axes')
+        self.create_plane_cut(s, plane_orientation='x_axes')
+        self.create_plane_cut(s, plane_orientation='y_axes')
+        self.create_plane_cut(s, plane_orientation='z_axes')
         mlab.outline()
         mlab_label(mlab.xlabel, text=self.dfcn.easting_col)
         mlab_label(mlab.ylabel, text=self.dfcn.northing_col)
@@ -123,7 +124,7 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
 
         Args:
             volume_lithologies (3D array): gridded lithology classes
-            class_value (int, or numeric cast to int): the numeric value (code) of the lithology class to render. 
+            class_value (int, or numeric cast to int): the numeric value (code) of the lithology class to render.
         """
         class_index = int(class_value)
         class_name = self.class_names[class_index]
@@ -150,9 +151,9 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         # s = np.flip(np.flip(test,axis=2), axis=0)
         s = prob_volume
         colormap='magma'
-        x_cut=self.create_plane_cut(s, plane_orientation='x_axes', colormap=colormap)
-        y_cut=self.create_plane_cut(s, plane_orientation='y_axes', colormap=colormap)
-        z_cut=self.create_plane_cut(s, plane_orientation='z_axes', colormap=colormap)
+        self.create_plane_cut(s, plane_orientation='x_axes', colormap=colormap)
+        self.create_plane_cut(s, plane_orientation='y_axes', colormap=colormap)
+        self.create_plane_cut(s, plane_orientation='z_axes', colormap=colormap)
         mlab.outline()
         mlab_label(mlab.xlabel, text=self.dfcn.easting_col)
         mlab_label(mlab.ylabel, text=self.dfcn.northing_col)
@@ -161,8 +162,8 @@ class LithologiesClassesVisual3d(LithologiesClassesVisual):
         mlab.scalarbar(nb_labels=11)
 
 def scale_z_bore_pos_points(x, y, z, s, z_scaling):
-    """Scale the vertical values, to avoid a squashed view of borehole logs. 
-    
+    """Scale the vertical values, to avoid a squashed view of borehole logs.
+
     Note that I'd prefer a different scaling but may not be feasible in the composite view of 3D data.
     You probably do not need to call this function from user code.
     """
@@ -180,7 +181,7 @@ def scale_z_bore_pos_points(x, y, z, s, z_scaling):
 #    ss = np.repeat(s, 2)
 #    return xx, yy, zz, ss
 
-#def f(x): 
+#def f(x):
 #    return process_bore_pos(extract_bore_primary_litho_class_num(x))
 #sitesgrp = df_1.groupby(WIN_SITE_ID_COL)
 #b = sitesgrp.apply(f)
@@ -192,7 +193,7 @@ class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
     Attributes:
         dfcn (GeospatialDataFrameColumnNames): data frame column names definition
     """
-    def __init__(self, class_names, color_names, missing_value_color_name, dem_array_data, z_coords, z_scaling, litho_df, column_name, 
+    def __init__(self, class_names, color_names, missing_value_color_name, dem_array_data, z_coords, z_scaling, litho_df, column_name,
         easting_col=EASTING_COL, northing_col=NORTHING_COL, depth_from_ahd_col=DEPTH_FROM_AHD_COL, depth_to_ahd_col=DEPTH_TO_AHD_COL):
         super(LithologiesClassesOverlayVisual3d, self).__init__(class_names, color_names, missing_value_color_name)
         """Facilities for combined visualisation of dem, bore and interpolated lithologies
@@ -205,14 +206,14 @@ class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
             color_names (list of str): names of the colors for the classes. See matplotlib doc for suitable names: https://matplotlib.org/examples/color/named_colors.html
             missing_value_color_name (str): name of the color for missing values (NaN)
             dem_array_data (2D numpy array): grid of DEM values at the volume resolution/shape
-            z_coords(array of heights): list of heights on the z axis 
+            z_coords(array of heights): list of heights on the z axis
             z_scaling(int) : scaling factor for the z axis
             litho_df(pandas dataframe): data frame with heights and geolocation columns compatible with this other function parameters.
             column_name(str): column name in the data frame of the numeric class to visualise in the volume rendering
             easting_col (str): name of the data frame column for easting
             northing_col (str): name of the data frame column for northing
             depth_from_ahd_col (str): name of the data frame column for the height of the top of the soil column (ahd stands for for australian height datum, but not restricted)
-            depth_to_ahd_col (str): name of the data frame column for the height of the bottom of the soil column (ahd stands for for australian height datum, but not restricted)        
+            depth_to_ahd_col (str): name of the data frame column for the height of the bottom of the soil column (ahd stands for for australian height datum, but not restricted)
         """
             # 1D georeferenced data (bore primary litho data)
         self.dfcn = GeospatialDataFrameColumnNames(easting_col, northing_col, depth_from_ahd_col, depth_to_ahd_col)
@@ -242,24 +243,28 @@ class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
         for zi in np.arange(self.dim_z):
             self.zzz[:,:,zi] = z_coords[zi] * z_scaling
         self.POINTS_SCALE_FACTOR = 150
-        self.title_prefix = 'Lithology class: ' 
+        self.title_prefix = 'Lithology class: '
 
     @mlab.show
-    def overlay_bore_classes(self, dem_mesh, vol_mesh, bore_data, vol_colorname, z_label='AHD x 50', points_scale_factor=150.0, title=None):
+    def overlay_bore_classes(self, dem_mesh, vol_mesh, bore_data, vol_colorname, z_label=None, points_scale_factor=None, title=None):
         x_dem, y_dem, z_dem = dem_mesh
         vol_x, vol_y, vol_z, vol_s = vol_mesh
         bore_x, bore_y, bore_z, bore_s = bore_data
         f = mlab.figure(size=(1200, 800))
+        if points_scale_factor is None:
+            points_scale_factor = self.POINTS_SCALE_FACTOR
         p3d = mlab.points3d(bore_x, bore_y, bore_z, bore_s, colormap='spectral', scale_factor = points_scale_factor, scale_mode='none')
         self.set_litho_class_colormap_with_unclassified(get_colorscale_lut(p3d))
         mlab.outline()
         mlab_label(mlab.xlabel, text=EASTING_COL)
         mlab_label(mlab.ylabel, text=NORTHING_COL)
+        if z_label is None:
+            z_label = 'AHD x ' + str(self.z_scaling)
         mlab_label(mlab.zlabel, text=z_label)
         surface = mlab.surf(x_dem, y_dem, z_dem, colormap='terrain')
         surface.enable_contours = True
         surface.contour.number_of_contours = 20
-        iso_surface = mlab.contour3d(vol_x, vol_y, vol_z, vol_s, color=to_rgb(vol_colorname))
+        _ = mlab.contour3d(vol_x, vol_y, vol_z, vol_s, color=to_rgb(vol_colorname))
         if not title is None:
             mlab_title(title)
         # iso_surface.actor.property.color = (0.0, 1.0, 0.0)
@@ -278,9 +283,9 @@ class LithologiesClassesOverlayVisual3d(LithologiesClassesVisual3d):
 
 def get_colorscale_lut(vis_widget):
     """Retrieve the LUT (lookup table) of a mayavi widget
-    
-    not sure this is valid for all mayavi things...
-    
+
+    not sure this is valid for all mayavi objects...
+
     """
     return vis_widget.module_manager.scalar_lut_manager.lut
 

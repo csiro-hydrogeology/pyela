@@ -2,18 +2,14 @@ from matplotlib import colors
 import matplotlib.pyplot as plt
 
 import cartopy.crs as ccrs
-from cartopy.io.shapereader import Reader
-import cartopy.io.img_tiles as cimgt
 
 from wordcloud import WordCloud,STOPWORDS
 
-from sklearn import neighbors
 import numpy as np
 
 from sys import float_info
 
 from ela.textproc import *
-from ela.classification import KNN_WEIGHTING
 
 DEFAULT_LITHOLOGY_COLORNAMES = ['sandybrown','gold','chocolate','yellow','lightsteelblue','dimgray','darkgoldenrod']
 DEFAULT_LITHOLOGY_COLORNAMES_WITH_UNCLASSIFIED = ['black', 'sandybrown','gold','chocolate','yellow','lightsteelblue','dimgray','darkgoldenrod']
@@ -49,7 +45,7 @@ def to_carto(x):
         x (ndarray): numpy array, 2 dims
 
     Returns:
-        ndarray: 2D array 
+        ndarray: 2D array
     """
     return np.flip(np.swapaxes(x, 0, 1), 0)
 
@@ -125,7 +121,7 @@ def to_color_image(x, cmap):
                 if cval_floor == cval:
                     r[i,j] = cmap[cval]
                 else:
-                    # we need to interpolate between two colors. 
+                    # we need to interpolate between two colors.
                     f = cval - cval_floor
                     r[i,j] = interpolate_rgba(cmap, cval_floor, f)
     return r
@@ -137,7 +133,7 @@ def legend_fig(k_legend_display_info):
         k_legend_display_info (list): values are 3-item tuples (rgb_val(not used), k_label, colorname)
 
     Returns:
-        matplotlib Figure: 
+        matplotlib Figure:
     """
     n = len(k_legend_display_info)
     ncols = 1
@@ -148,15 +144,15 @@ def legend_fig(k_legend_display_info):
     h = Y / (nrows + 1)
     w = X / ncols
     for i, legend_info in enumerate(k_legend_display_info):
-        rgb_val, k_label, colorname = legend_info
+        _, k_label, colorname = legend_info # rgb_val
         col = i % ncols
         row = i // ncols
         y = Y - (row * h) - h
-    
+
         xi_line = w * (col + 0.05)
         xf_line = w * (col + 0.25)
         xi_text = w * (col + 0.3)
-    
+
         ax.text(xi_text, y, k_label, fontsize=(h * 0.8),
             horizontalalignment='left',
             verticalalignment='center')
@@ -188,7 +184,7 @@ class LithologiesClassesVisual(object):
     """
     def __init__(self, class_names, color_names, missing_value_color_name):
         """Define class names of interest in visualised data set, and color coding.
-        
+
         Args:
             class_names (list of str): names of the classes
             color_names (list of str): names of the colors for the classes. See matplotlib doc for suitable names: https://matplotlib.org/examples/color/named_colors.html
@@ -249,13 +245,13 @@ def show_wordcloud(text, title = None, max_words=200, max_font_size=40, seed=1, 
         background_color='white',
         stopwords=stopwords,
         max_words=max_words,
-        max_font_size=max_font_size, 
+        max_font_size=max_font_size,
         scale=scale,
         random_state=seed
     ).generate(text)
     fig = plt.figure(1, figsize=figsize)
     plt.axis('off')
-    if title: 
+    if title:
         fig.suptitle(title, fontsize=20)
         fig.subplots_adjust(top=2.3)
     plt.imshow(wordcloud)

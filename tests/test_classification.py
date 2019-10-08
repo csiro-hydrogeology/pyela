@@ -1,13 +1,12 @@
 import os
 import pandas as pd
 import numpy as np
-import datetime as dt
 import sys
 from datetime import datetime
 
 pkg_dir = os.path.join(os.path.dirname(__file__),'..')
 
-sys.path.append(pkg_dir)
+sys.path.insert(0, pkg_dir)
 
 from ela.classification import *
 
@@ -30,8 +29,8 @@ def test_get_lithology_observations_for_depth():
     obs_colname = 'fake_obs'
     slice_depth = 5.0
     mock_obs = pd.DataFrame(
-    {EASTING_COL:np.array([.0, 1., 1., 0., 0.]), 
-    NORTHING_COL:np.array([2., 2., 3., 3., 12.]), 
+    {EASTING_COL:np.array([.0, 1., 1., 0., 0.]),
+    NORTHING_COL:np.array([2., 2., 3., 3., 12.]),
     DEPTH_TO_AHD_COL:np.array([2., 2., 3., 3., 3.]),
     DEPTH_FROM_AHD_COL:np.array([6., 4., 5., 4., 10.]),
     obs_colname: np.array([.1, .2, .3, .4, np.nan])
@@ -69,8 +68,8 @@ def mock_litho_drill(x, y, obs_colname = 'fake_obs'):
     bottoms = [z for z in zz]
     obs_val = [(z+s) for z in zz]
     mock_obs = pd.DataFrame({
-        EASTING_COL:np.array([x for z in zz]), 
-        NORTHING_COL:np.array([y for z in zz]), 
+        EASTING_COL:np.array([x for z in zz]),
+        NORTHING_COL:np.array([y for z in zz]),
         DEPTH_FROM_AHD_COL:np.array(tops),
         DEPTH_TO_AHD_COL:np.array(bottoms),
         obs_colname: np.array(obs_val, dtype='float64')
@@ -197,7 +196,7 @@ def test_class_mapping():
     assert np.isnan(mapper.class_code('martian rock','sand'))
 
     dims = (2,3,4)
-    dim_x,dim_y,dim_z = dims
+    #dim_x,dim_y,dim_z = dims
     prim_litho = np.full(dims, np.nan)
     secd_litho = np.full(dims, np.nan)
     sand_code = 0
@@ -238,8 +237,6 @@ def test_extract_single_lithology_class_3d():
 
 
 def test_grid_interpolation():
-    slice_depth = 5.0
-    nlat = nlon = 4
     n_depths = 10
     litho_logs = []
     easting_col = 'lat'
@@ -253,10 +250,10 @@ def test_grid_interpolation():
         for j in range(lon_max):
             mock_obs = pd.DataFrame(
             {
-                easting_col:np.full(n_depths, float(i)), 
+                easting_col:np.full(n_depths, float(i)),
                 northing_col:np.full(n_depths, float(j)),
-                depth_from_col: - np.arange(0, n_depths, 1), 
-                depth_to_col: - np.arange(1, n_depths+1, 1), 
+                depth_from_col: - np.arange(0, n_depths, 1),
+                depth_to_col: - np.arange(1, n_depths+1, 1),
                 litho_class_num_code_col: np.full(n_depths, np.floor(i / 3)),
             })
             litho_logs.append(mock_obs)

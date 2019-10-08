@@ -2,12 +2,11 @@
 
 ## Exploratory Lithology Analysis
 
-[![pypi](https://img.shields.io/pypi/v/ela.svg?logo=python&logoColor=white)](https://pypi.org/project/ela/)[![license](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/csiro-hydrogeology/pyela/blob/master/LICENSE.txt)
+[![pypi](https://img.shields.io/pypi/v/ela.svg?logo=python&logoColor=white)](https://pypi.org/project/ela/)[![license](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/csiro-hydrogeology/pyela/blob/master/LICENSE.txt) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/40f01ca659f04fe5832bbfe7f939bf8b)](https://www.codacy.com/app/jmp75/pyela?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=csiro-hydrogeology/pyela&amp;utm_campaign=Badge_Grade)
 
 master [![build-master](https://img.shields.io/travis/csiro-hydrogeology/pyela.svg?branch=master)](https://travis-ci.org/csiro-hydrogeology/pyela/branches)[![codecov-master](https://codecov.io/gh/csiro-hydrogeology/pyela/branch/master/graph/badge.svg)](https://codecov.io/gh/csiro-hydrogeology/pyela/branch/master)
 
 testing [![build-testing](https://img.shields.io/travis/csiro-hydrogeology/pyela.svg?branch=testing)](https://travis-ci.org/csiro-hydrogeology/pyela/branches)[![codecov-testing](https://codecov.io/gh/csiro-hydrogeology/pyela/branch/testing/graph/badge.svg)](https://codecov.io/gh/csiro-hydrogeology/pyela/branch/testing)
-
 
 [![Getting started tutorial - Bungendore 3D lithology](https://raw.githubusercontent.com/csiro-hydrogeology/pyela-doc/master/tutorials/img/3d_overlay_bungendore_clay_lithology_small.png "Getting started tutorial - Bungendore 3D lithology")](https://github.com/csiro-hydrogeology/pyela-doc/blob/master/tutorials/getting_started.ipynb)
 
@@ -15,9 +14,9 @@ Analysing driller’s logs is a tedious and repetitive task in many groundwater 
 
 This package combines features to:
 
-* perform natural language processing on lithology descriptions in the logs, to detect primary and secondary lithologies
-* apply supervised machine learning to interpolate lithologies across a 3D grid
-* visualise interactively the 3D data
+*  perform natural language processing on lithology descriptions in the logs, to detect primary and secondary lithologies
+*  apply supervised machine learning to interpolate lithologies across a 3D grid
+*  visualise interactively the 3D data
 
 An introductory [sample workflow](https://github.com/csiro-hydrogeology/pyela-doc/blob/master/tutorials/getting_started.ipynb) gives an overview of some of these capabilities.
 
@@ -35,7 +34,9 @@ Get a quick tour of [some legacy visualisations](https://github.com/csiro-hydrog
 
 ## Installation 
 
-The quickest way with conda:
+The quickest way with conda. We recommend installing conda packages rather than pip packages whereever possible.
+
+on Linux:
 
 ```bash
 wget https://raw.githubusercontent.com/csiro-hydrogeology/pyela/testing/configs/ela_environment.yml
@@ -53,6 +54,50 @@ jupyter-labextension install @jupyter-widgets/jupyterlab-manager
 python -m ipykernel install --user --name ${my_env_name} --display-name "Py3 ELA"
 ```
 
+Windows:
+
+```bat
+call C:\Users\xxxyyy\AppData\Local\Continuum\anaconda3\Scripts\activate.bat
+REM curl should come with anaconda3. Perhaps not with miniconda though.
+where curl
+cd c:\tmp
+curl -o ela_environment.yml https://raw.githubusercontent.com/csiro-hydrogeology/pyela/testing/configs/ela_environment.yml
+set my_env_name=ELA
+conda env create -n %my_env_name% -f ela_environment.yml python=3.7
+conda activate %my_env_name% 
+```
+
+```bat
+This should be all to get a working environment. If you want to use 'ela' from jupyter lab:
+```
+
+```bat
+conda install -c conda-forge --name %my_env_name% jupyterlab ipywidgets jupyter
+jupyter-labextension install @jupyter-widgets/jupyterlab-manager
+python -m ipykernel install --user --name %my_env_name% --display-name "Py3 ELA"
+```
+
+### Troubleshooting 
+
+pip packages specified from the `environment.yaml` files may have not installed (under investigation). Check that pvgeo and "our" packages are installed e.g.
+
+```bat
+conda activate %my_env_name%
+conda list | grep pvgeo
+```
+
+if not present:
+
+```bat
+REM make sure you have git in the PATH e.g.
+set PATH=C:\Users\per202\AppData\Local\Atlassian\SourceTree\git_local\mingw32\bin\;%PATH%
+where git
+
+conda activate %my_env_name%
+pip install --no-deps pvgeo
+pip install -e git+https://github.com/jmp75/striplog@master#egg=striplog
+pip install --no-deps -e git+https://github.com/jmp75/pyela@master#egg=ela
+```
 
 ### Manual installation
 
@@ -138,9 +183,9 @@ At this point all mandatory dependencies for 'ela' are installed.
 
 There are three options to access ela:
 
-* use the latest available on pip, 
-* clone and install with `setup.py`
-* direct import of the package directory (this is done at runtime from e.g. a notebook)
+*  use the latest available on pip, 
+*  clone and install with `setup.py`
+*  direct import of the package directory (this is done at runtime from e.g. a notebook)
 
 ```bash
 pip search ela
