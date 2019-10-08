@@ -88,7 +88,7 @@ class VisualizeDataProcess:
 
     def drill_data_process(self, drill_data, height_adjustment_factor=20, depth_from_ahd=DEPTH_FROM_AHD_COL,
                            depth_to_ahd=DEPTH_TO_AHD_COL, drill_east='Easting', drill_north='Northing',
-                           boreID='BoreID', prime_lithology='Lithology_1_num', min_tube_radius = 10):
+                           boreID='BoreID', prime_lithology='Lithology_1_num', min_tube_radius=10):
         """The whole data process from drill data to PolyData dictionary
 
             Args:
@@ -108,7 +108,7 @@ class VisualizeDataProcess:
         fixed_data = self.drill_data_initial(drill_data, depth_from_ahd, depth_to_ahd)
         data = self.add_scaled_height_column(fixed_data, height_adjustment_factor, depth_from_ahd, depth_to_ahd)
         well_dict = self.build_well_dict(data, boreID)
-        # well_dict = self.add_missing_height_data(well_dict)
+        # = self.add_missing_height_data(well_dict)
         point_dict = self.build_points_dict(well_dict, drill_east, drill_north)
         lines_dict = self.point_to_lines_dict(point_dict)
         lines_dict = self.add_lithology_based_scalar(well_dict, lines_dict, prime_lithology, min_tube_radius)
@@ -199,9 +199,9 @@ class VisualizeDataProcess:
                 data(pandas.core.frame.DataFrame): modified data
         """
         # scaled_from_height_colname = 'scaled_from_height'
-        data[self.scaled_from_height_colname] = data[depth_from_ahd] * height_adjustment_factor
+        data.loc[:, self.scaled_from_height_colname] = data[depth_from_ahd].values * height_adjustment_factor
         # scaled_to_height_colname = 'scaled_to_height'
-        data[self.scaled_to_height_colname] = data[depth_to_ahd] * height_adjustment_factor
+        data.loc[:, self.scaled_to_height_colname] = data[depth_to_ahd].values * height_adjustment_factor
         return data
 
     def build_well_dict(self, data, boreID='BoreID'):
@@ -212,7 +212,7 @@ class VisualizeDataProcess:
             Returns:
                 well_dict(dict()): wells dictionary
         """
-        data['name'] = data[boreID].values.astype(str)
+        data.loc[:, 'name'] = data.loc[:, boreID].values.astype(str)
         wells = data.name.unique()
         well_dict = {}
         for well in wells:
@@ -226,28 +226,28 @@ class VisualizeDataProcess:
     #         Returns:
     #             well_dict(dict()): modified dictionary
     #     """
-    #     bad_well = []
-    #     for well in well_dict.keys():
-    #         origin_well_df = well_dict.get(well)
-    #         after_well_df = origin_well_df.copy()
-    #         add_index = origin_well_df[self.scaled_to_height_colname].idxmin()
-    #         if np.isnan(add_index):
-    #             bad_well.append(well)
-    #             continue
-    #         line = origin_well_df.loc[add_index].copy()
-    #         line.scaled_from_height = line.scaled_to_height
-    #         line = line.to_frame()
-    #         temp = []
-    #         for value in line.values:
-    #             if value[0]:
-    #                 temp.append(value[0])
-    #             else:
-    #                 temp.append(0)
-    #         after_well_df.loc["new"] = temp
-    #         well_dict[well] = after_well_df
-    #     for i in range(len(bad_well)):
-    #         well_dict.pop(bad_well[i])
-    #     return well_dict
+    # bad_well = []
+    # for well in well_dict.keys():
+    #    origin_well_df = well_dict.get(well)
+    #    after_well_df = origin_well_df.copy()
+    #    add_index = origin_well_df[self.scaled_to_height_colname].idxmin()
+    #    if np.isnan(add_index):
+    #        bad_well.append(well)
+    #        continue
+    #    line = origin_well_df.loc[add_index].copy()
+    #    line.scaled_from_height = line.scaled_to_height
+    #    line = line.to_frame()
+    #    temp = []
+    #    for value in line.values:
+    #        if value[0]:
+    #            temp.append(value[0])
+    #        else:
+    #            temp.append(0)
+    #    after_well_df.loc["new"] = temp
+    #    well_dict[well] = after_well_df
+    # for i in range(len(bad_well)):
+    #    well_dict.pop(bad_well[i])
+    # return well_dict
 
     def build_points_dict(self, well_dict, drill_east="Easting", drill_north="Northing"):
         """build points dictionary from wells dictionary
@@ -269,8 +269,8 @@ class VisualizeDataProcess:
                         c((e, e)),
                         c((n, n)),
                         c((
-                            well_dict[points][self.scaled_from_height_colname].values, 
-                            well_dict[points][self.scaled_to_height_colname].values + 1.0 )) 
+                            well_dict[points][self.scaled_from_height_colname].values,
+                            well_dict[points][self.scaled_to_height_colname].values + 1.0))
                     )
                 )
             )
@@ -290,12 +290,13 @@ class VisualizeDataProcess:
             # notice that the building of the lines need to follow the nearest neighbourhood search
         return lines_dict
 
-    def add_lithology_based_scalar(self, well_dict, lines_dict, prime_lithology='Lithology_1_num', min_tube_radius = 10):
+    def add_lithology_based_scalar(self, well_dict, lines_dict, prime_lithology='Lithology_1_num', min_tube_radius=10):
         """add points lithology type, expands lines to tube based on lithology number
             Args:
                 well_dict(dict()): wells dictionary
                 lines_dict(dict()):lines dictionary
                 prime_lithology():set the prime lithology column name
+                min_tube_radius(): set the min radius of borehole tube
             Returns:
                 lines_dict(dict()): with new attribute "GR" which represent lithology number, and expanded to tube.
         """
@@ -304,11 +305,11 @@ class VisualizeDataProcess:
             try:
                 vals = well_dict[bore_id][prime_lithology].values
                 bore_vis = lines_dict[bore_id]
-                bore_vis[self.scalar_prop_name] = np.concatenate( (vals, vals) ) # tops then bottoms of cylinders.   
+                bore_vis[self.scalar_prop_name] = np.concatenate((vals, vals))  # tops then bottoms of cylinders.
                 bore_vis.tube(radius=min_tube_radius, scalars=None, inplace=True)
-                #lines_dict[bore_id].tube(radius=10, scalars=dp.scalar_prop_name, inplace=True)
+                # lines_dict[bore_id].tube(radius=10, scalars=dp.scalar_prop_name, inplace=True)
             except Exception as e:
-                raise Exception("Lithology attribute processed for visualisation failed for bore ID %s"%(bore_id))
+                raise Exception("Lithology attribute processed for visualisation failed for bore ID %s" % (bore_id))
             if len(vals) > 0:
                 lines_dict_tmp[bore_id] = lines_dict[bore_id]
         lines_dict = lines_dict_tmp
@@ -415,3 +416,4 @@ class VisualizeDataProcess:
         single_litho[:, :, 0] = other_value
         single_litho[:, :, -1] = other_value
         return single_litho
+    # burn_volume
