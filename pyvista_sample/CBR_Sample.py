@@ -2,16 +2,15 @@ import pyvista as pv
 import pandas as pd
 import numpy as np
 from matplotlib.colors import ListedColormap
+from ela.visual import discrete_classes_colormap
+from pyvista_sample.VisualizeDataProcess import VisualizeDataProcess
 import os
 import sys
 
 pkg_dir = os.path.join(os.path.dirname(__file__), '..')
 sys.path.insert(0, pkg_dir)
 
-from ela.visual import discrete_classes_colormap
-from pyvista_sample.VisualizeDataProcess import VisualizeDataProcess
-
-if ('ELA_DATA' in os.environ):
+if 'ELA_DATA' in os.environ:
     data_path = os.environ['ELA_DATA']
 elif sys.platform == 'win32':
     data_path = r'C:\data\Lithology'
@@ -46,7 +45,7 @@ lines_dict = dp.drill_data_process(drill_data, 25, min_tube_radius=70)
 
 grid = dp.dem_data_process(dem_data, 25)
 
-layer = dp.lithology_layer_process(drill_data, dem_data, 'cbr', 25, 7, 10)
+layer = dp.lithology_layer_process(drill_data, dem_data, 'cbr', 25, 0, 2)
 
 annotations = {
     00.0: 'shale',
@@ -94,7 +93,8 @@ for well in lines_dict.keys():
                      opacity=1,
                      )
 
-# plotter.add_mesh(layer, scalars="Lithology", n_colors=len(annotations), clim=[0, len(annotations)-1], show_scalar_bar=False)
+plotter.add_mesh(layer, scalars="Lithology", n_colors=len(annotations), clim=[0, len(annotations) - 1],
+                 show_scalar_bar=False)
 plotter.add_mesh(grid, opacity=0.9)
 plotter.show_bounds(grid, show_xaxis=True, show_yaxis=True, show_zaxis=False)
 plotter.show_axes()

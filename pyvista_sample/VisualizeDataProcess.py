@@ -11,9 +11,7 @@ from ela.visual import *
 '''
 @author: Guanjie Huang
 @date: Aug 16th,2019
-
 This class is used to process data before generating the 3D images
-
 '''
 
 
@@ -36,8 +34,6 @@ class VisualizeDataProcess:
         """Read drill data file
             Args:
                 file_path (str): drill data file path
-                depth_from_ahd(str):set the column name of depth from AHD, default DEPTH_FROM_AHD_COL
-                depth_to_ahd(str):set the column name of depth to AHD, default DEPTH_TO_AHD_COL
 
             Returns:
                 df(pandas.core.frame.DataFrame)
@@ -99,7 +95,8 @@ class VisualizeDataProcess:
                 drill_east(str):set the column name of  point's x location in drilling data, default "Easting"
                 drill_north(str):set the column name of  point's y's location in drilling data, default "Northing"
                 boreID(str):set the column name of bore hole ID,default "BoreID"
-                prime_lithology():set the prime lithology column name
+                prime_lithology(str):set the prime lithology column name
+                min_tube_radius(int):set the min radius of borehole tube
 
             Returns:
                 lines_dict(dict): PolyData dictionary.
@@ -295,8 +292,8 @@ class VisualizeDataProcess:
             Args:
                 well_dict(dict()): wells dictionary
                 lines_dict(dict()):lines dictionary
-                prime_lithology():set the prime lithology column name
-                min_tube_radius(): set the min radius of borehole tube
+                prime_lithology(str):set the prime lithology column name
+                min_tube_radius(int): set the min radius of borehole tube
             Returns:
                 lines_dict(dict()): with new attribute "GR" which represent lithology number, and expanded to tube.
         """
@@ -317,12 +314,15 @@ class VisualizeDataProcess:
 
     def build_layer_data(self, drill_data, dem_array_data, dem_mesh_xy='mesh_xy', drill_east='Easting',
                          drill_north='Northing'):
-        n_neighbours = 10
         """get the layer data from the function contains in ela
             Args:
                 drill_data (pandas.core.frame.DataFrame): drill data
                 dem_array_data (pandas.core.frame.DataFrame): dem data
+                dem_mesh_xy(str): set mesh_xy column name according to dem files
+                drill_east(str):set the column name of  point's x location in drilling data, default "Easting"
+                drill_north(str):set the column name of  point's y's location in drilling data, default "Northing"
         """
+        n_neighbours = 10
         xg, yg = dem_array_data[dem_mesh_xy]
         m = create_meshgrid_cartesian(self.dem_x_min, self.dem_x_max, self.dem_y_min, self.dem_y_max, self.grid_res)
         z_coords = np.arange(self.ahd_min, self.ahd_max, 1)
@@ -341,6 +341,7 @@ class VisualizeDataProcess:
             Args:
                 lithology_3d_array (np.array of dim 3): lithology numeric (lithology class) identifiers
                 dem_array_data (pandas.core.frame.DataFrame): dem data
+                dem_arrays(str): set dem array column name according to dem files
         """
         dem_z = dem_array_data[dem_arrays]
         for i in range(lithology_3d_array.shape[0]):
@@ -410,7 +411,7 @@ class VisualizeDataProcess:
         single_litho = np.copy(lithology_3d_classes)
         other_value = None
         single_litho[(single_litho != class_value)] = other_value
-        # We burn the edges of the volume, as I suspect this is necessary to have a more intuitive viz (otherwuse non
+        # We burn the edges of the volume, as I suspect this is necessary to have a more intuitive viz (otherwise non
         # closed volumes)
         single_litho[0, :, :] = other_value
         single_litho[-1, :, :] = other_value
