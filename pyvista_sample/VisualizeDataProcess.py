@@ -345,6 +345,9 @@ class VisualizeDataProcess:
         dem_z = dem_array_data[dem_arrays]
         for i in range(lithology_3d_array.shape[0]):
             for j in range(lithology_3d_array.shape[1]):
+                if np.isnan(dem_z[i][j]):
+                    lithology_3d_array[i][j] = None
+                    continue
                 for k in range(lithology_3d_array.shape[2]):
                     height = k * (self.ahd_max - self.ahd_min) / lithology_3d_array.shape[2] + self.ahd_min
                     if height >= dem_z[i][j]:
