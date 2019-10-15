@@ -1,10 +1,8 @@
-import pyvista as pv
 import os
 import sys
-import pandas as pd
-from ela.visual import discrete_classes_colormap
-import numpy as np
-from matplotlib.colors import ListedColormap
+
+import pyvista as pv
+
 from pyvista_sample.VisualizeDataProcess import VisualizeDataProcess
 
 # start = time.clock()
@@ -16,7 +14,7 @@ pkg_dir = os.path.join(os.path.dirname(__file__), '..')
 sys.path.insert(0, pkg_dir)
 # drill_data_path = r"C:\Users\Dennis.H\Desktop\CSIRO_data\swan_coastal\classified_logs.pkl"
 # dem_data_path = r"C:\Users\Dennis.H\Desktop\CSIRO_data\swan_coastal\dem_array_data.pkl"
-if ('ELA_DATA' in os.environ):
+if 'ELA_DATA' in os.environ:
     data_path = os.environ['ELA_DATA']
 elif sys.platform == 'win32':
     data_path = r'C:\data\Lithology'
