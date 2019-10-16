@@ -9,6 +9,8 @@ pkg_dir = os.path.join(os.path.dirname(__file__),'..')
 sys.path.insert(0, pkg_dir)
 
 from ela.visual import discrete_classes_colormap
+from ela.visual3d import create_colormap_lut
+
 from pyvista_sample.VisualizeDataProcess import VisualizeDataProcess
 
 if ('ELA_DATA' in os.environ):
@@ -82,6 +84,31 @@ sargs = dict(
     height=0.5,
 )
 plotter = pv.Plotter()
+
+
+# Prep for visualisation
+lithology_color_names = [
+    'lightslategrey', # Shale
+    'olive', # clay
+    'dimgray', # granite
+    'chocolate',  # soil
+    'gold', # sand
+    'tomato', # porphyry
+    'teal', # siltstone
+    'darkgrey', # dacite
+    'whitesmoke', # rhyodacite
+    'powderblue', # gravel 
+    'yellow', #limestone
+    'papayawhip', #sandstone
+    'dimgray', #slate
+    'darkred', #mudstone
+    'grey', #rock
+    'khaki', #ignimbrite
+    'lemonchiffon' #tuff
+]
+lut = create_colormap_lut(lithology_color_names)
+
+
 for well in lines_dict.keys():
     plotter.add_mesh(lines_dict.get(well),
                      scalars=dp.scalar_prop_name,
@@ -93,9 +120,10 @@ for well in lines_dict.keys():
                      nan_color="black",
                      clim=[0, len(annotations)-1],
                      opacity=1,
+                     cmap='tab20'
                      )
 
-# plotter.add_mesh(layer, scalars="Lithology", n_colors=len(annotations), clim=[0, len(annotations)-1], show_scalar_bar=False)
+plotter.add_mesh(layer, scalars="Lithology", n_colors=len(annotations), clim=[0, len(annotations)-1], show_scalar_bar=False, cmap='tab20')
 plotter.add_mesh(grid, opacity=0.9)
 plotter.show_bounds(grid, show_xaxis=True, show_yaxis=True, show_zaxis=False)
 plotter.show_axes()

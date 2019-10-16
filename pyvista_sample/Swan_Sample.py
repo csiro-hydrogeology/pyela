@@ -54,7 +54,7 @@ sargs = dict(
 plotter = pv.Plotter()
 for well in lines_dict.keys():
     plotter.add_mesh(lines_dict.get(well),
-                     scalars="GR",
+                     scalars=dp.scalar_prop_name,
                      scalar_bar_args=sargs,
                      annotations=annotations,
                      show_edges=False,
