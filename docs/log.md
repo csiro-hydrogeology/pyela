@@ -1,5 +1,39 @@
 # Log
 
+## 2019-10-20
+
+Checking whether we can use mayavi in the notebook. I think the extension is for notebook, not jupyter lab.
+
+* [blog post on Enthought Inc.](http://blog.enthought.com/general/mayavi-python-3d-data-visualization-and-plotting-library-adds-major-new-features-in-recent-release/#.XavZd5xxUUE)
+* [tips and tricks page](https://docs.enthought.com/mayavi/mayavi/tips.html)
+
+Needed to do a `conda install -c conda-forge ipyevents` to call `init_notebook` with no argument.
+
+The following from the Bungendore data set does create something sensible and interactive. Zooming and rotating behavior different though and not too difficult to loose the scene and end up with a grey fame.
+
+```python
+mlab.init_notebook('x3d', 800, 800)
+f = view_class(1.0)
+f
+```
+
+```python
+mlab.init_notebook()
+f = view_class(1.0)
+f
+```
+
+produces a static image. 
+
+Curiously, the following just after the litho x3d scene seems to include... the lithology display! All looks a bit buggy.
+
+```py
+mlab.init_notebook('x3d', 800, 800)
+s = mlab.test_plot3d()
+s
+```
+
+
 ## 2019-08-23
 
 
