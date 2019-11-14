@@ -1,17 +1,16 @@
-import pyvista as pv
-import pandas as pd
-import numpy as np
-from matplotlib.colors import ListedColormap
 import os
 import sys
 
-pkg_dir = os.path.join(os.path.dirname(__file__),'..')
+import numpy as np
+import pandas as pd
+import pyvista as pv
+
+pkg_dir = os.path.join(os.path.dirname(__file__), '..')
 
 pkg_dir = '/home/per202/src/ela/pyela'
 
 sys.path.insert(0, pkg_dir)
 
-from ela.visual import discrete_classes_colormap
 from ela.spatial import create_meshgrid_cartesian
 from pyvista_sample.VisualizeDataProcess import VisualizeDataProcess
 
@@ -35,8 +34,11 @@ y_max = +200.0
 grid_res = 50.0
 m = create_meshgrid_cartesian(x_min, x_max, y_min, y_max, grid_res)
 xx, yy = m
+
+
 def dem_height(x, y):
     return h_0 + 0.01 * x + 0.01 * y
+
 
 dem_array = dem_height(xx, yy)
 dem_data = {'bounds': (x_min, x_max, y_min, y_max), 'grid_res': grid_res, 'mesh_xy': m, 'dem_array': dem_array}
@@ -44,36 +46,35 @@ dem_data = {'bounds': (x_min, x_max, y_min, y_max), 'grid_res': grid_res, 'mesh_
 c = [(101, 0.0, 0.0, h_0 - i * 2, h_0 - 2 - i * 2, float(i)) for i in range(n)]
 
 h_1 = dem_height(100, 100)
-c = c + [(202, 100.0, 100.0, h_1 - i * 2, h_1 - 2 - i * 2, float(i)) for i in range(n//2)]
+c = c + [(202, 100.0, 100.0, h_1 - i * 2, h_1 - 2 - i * 2, float(i)) for i in range(n // 2)]
 
 h_2 = dem_height(-100, -100)
 # Craft test to check the interpolation (non contiguous colors)
 c = c + [
-    (303, -100.0, -100.0, h_2 - 0 * 2, h_2 - 2 - 0 * 2, 00.0), 
-    (303, -100.0, -100.0, h_2 - 1 * 2, h_2 - 2 - 1 * 2, 18.0), 
-    (303, -100.0, -100.0, h_2 - 2 * 2, h_2 - 2 - 2 * 2, 9.0), 
-    ]
+    (303, -100.0, -100.0, h_2 - 0 * 2, h_2 - 2 - 0 * 2, 00.0),
+    (303, -100.0, -100.0, h_2 - 1 * 2, h_2 - 2 - 1 * 2, 18.0),
+    (303, -100.0, -100.0, h_2 - 2 * 2, h_2 - 2 - 2 * 2, 9.0),
+]
 
 # Craft test to check the interpolation with missing data
 h_3 = dem_height(-100, -100)
 c = c + [
-    (404, -50.0, -100.0, h_3 - 0 * 2, h_3 - 2 - 0 * 2, 00.0), 
-    (404, -50.0, -100.0, h_3 - 1 * 2, h_3 - 2 - 1 * 2, 18.0), 
-    (404, -50.0, -100.0, h_3 - 2 * 2, h_3 - 2 - 2 * 2, np.nan), 
-    (404, -50.0, -100.0, h_3 - 3 * 2, h_3 - 2 - 3 * 2, 00.0), 
-    (404, -50.0, -100.0, h_3 - 4 * 2, h_3 - 2 - 4 * 2, 18.0), 
-    (404, -50.0, -100.0, h_3 - 5 * 2, h_3 - 2 - 5 * 2, 09.0), 
-    ]
-
+    (404, -50.0, -100.0, h_3 - 0 * 2, h_3 - 2 - 0 * 2, 00.0),
+    (404, -50.0, -100.0, h_3 - 1 * 2, h_3 - 2 - 1 * 2, 18.0),
+    (404, -50.0, -100.0, h_3 - 2 * 2, h_3 - 2 - 2 * 2, np.nan),
+    (404, -50.0, -100.0, h_3 - 3 * 2, h_3 - 2 - 3 * 2, 00.0),
+    (404, -50.0, -100.0, h_3 - 4 * 2, h_3 - 2 - 4 * 2, 18.0),
+    (404, -50.0, -100.0, h_3 - 5 * 2, h_3 - 2 - 5 * 2, 09.0),
+]
 
 h_4 = dem_height(-50, -50)
 
 # Craft test to check the benavior with unordered data
-ordering = [2,0,1,3]
+ordering = [2, 0, 1, 3]
 litho_class = {0: 0.0, 1: np.nan, 2: 2.0, 3: 3.0}
 c = c + [(505, -50.0, -50.0, h_4 - i * 2, h_4 - 2 - i * 2, litho_class[i]) for i in ordering]
 
-drill_data= pd.DataFrame(c, columns=colnames)
+drill_data = pd.DataFrame(c, columns=colnames)
 
 # drill_data_path = os.path.join(data_path, 'Canberra','out','classified_logs.pkl')
 # dem_data_path = os.path.join(data_path, 'Canberra','out','dem_array_data.pkl')
@@ -91,7 +92,7 @@ lines_dict = dp.drill_data_process(drill_data, 25)
 
 grid = dp.dem_data_process(dem_data, 25)
 
-annotations =dict([(float(i), str(i)) for i in range(n)] )
+annotations = dict([(float(i), str(i)) for i in range(n)])
 
 sargs = dict(
     n_labels=len(annotations),
@@ -115,7 +116,7 @@ for well in lines_dict.keys():
                      edge_color="white",
                      n_colors=len(annotations),
                      nan_color="black",
-                     clim=[0, len(annotations)-1],
+                     clim=[0, len(annotations) - 1],
                      opacity=1,
                      )
 

@@ -2,10 +2,12 @@ import pyvista as pv
 import pandas as pd
 import numpy as np
 from matplotlib.colors import ListedColormap
+from ela.visual import discrete_classes_colormap
+from pyvista_sample.VisualizeDataProcess import VisualizeDataProcess
 import os
 import sys
 
-pkg_dir = os.path.join(os.path.dirname(__file__),'..')
+pkg_dir = os.path.join(os.path.dirname(__file__), '..')
 sys.path.insert(0, pkg_dir)
 
 from ela.visual import discrete_classes_colormap
@@ -21,14 +23,13 @@ else:
     username = os.environ['USER']
     data_path = os.path.join('/home', username, 'data', 'Lithology')
 
-
 # start = time.clock()
 '''
 A sample of 3D image based on pyvista
 '''
 
-drill_data_path = os.path.join(data_path, 'Canberra','out','classified_logs.pkl')
-dem_data_path = os.path.join(data_path, 'Canberra','out','dem_array_data.pkl')
+drill_data_path = os.path.join(data_path, 'Canberra', 'out', 'classified_logs.pkl')
+dem_data_path = os.path.join(data_path, 'Canberra', 'out', 'dem_array_data.pkl')
 # drill_data_path = r"C:\Users\Dennis.H\Desktop\CSIRO_data\cbr\classified_logs.pkl"
 # dem_data_path = r"C:\Users\Dennis.H\Desktop\CSIRO_data\cbr\dem_array_data.pkl"
 
@@ -42,14 +43,14 @@ drill_data = dp.drill_file_read(drill_data_path)
 # drill_data = drill_data[ drill_data.Lithology_1_num == 10.0 ]
 
 dem_data = dp.dem_file_read(dem_data_path)
-lines_dict = dp.drill_data_process(drill_data, 25, min_tube_radius = 70)
+lines_dict = dp.drill_data_process(drill_data, 25, min_tube_radius=70)
 # temp = dp.drill_file_read(drill_data_path)
 # pd.set_option('display.max_columns', None)
 # print(temp)
 
 grid = dp.dem_data_process(dem_data, 25)
 
-layer = dp.lithology_layer_process(drill_data, dem_data, 'cbr', 25, 7, 10)
+layer = dp.lithology_layer_process(drill_data, dem_data, 'cbr', 25, 0, 2)
 
 annotations = {
     00.0: 'shale',
@@ -118,7 +119,7 @@ for well in lines_dict.keys():
                      edge_color="white",
                      n_colors=len(annotations),
                      nan_color="black",
-                     clim=[0, len(annotations)-1],
+                     clim=[0, len(annotations) - 1],
                      opacity=1,
                      cmap='tab20'
                      )
