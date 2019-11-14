@@ -1,0 +1,24 @@
+name: ela_test
+channels:
+  - conda
+  - conda-forge
+dependencies: 
+  - rasterio
+  - cartopy
+  - geopandas
+  - pandas
+  - nltk
+  - scikit-learn
+  - matplotlib
+  - vtk
+  - pytest-cov
+  - cython
+  - coverage
+  - wordcloud
+  - pyqt
+  - mayavi
+  - codecov
+  - pip
+  - pip:
+    #  - mayavi
+    - git+https://github.com/jmp75/striplog@master#egg

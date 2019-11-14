@@ -10,7 +10,7 @@ from pyvista_sample.VisualizeDataProcess import *
 
 pkg_dir = os.path.join(os.path.dirname(__file__), '..')
 
-sys.path.append(pkg_dir)
+sys.path.insert(0, pkg_dir)
 
 # from ela.visual3d import *
 
@@ -98,3 +98,8 @@ def test_add_lithology_based_scalar():
     #print(lines_dict['1']["GR"])
     assert 1, 2 in lines_dict['1']["GR"]
     assert 3, 5 in lines_dict['2']["GR"]
+
+def test_todo():
+    # https://github.com/csiro-hydrogeology/pyela/issues/19
+    # layer = vp.lithology_layer_process(drill_data_path, dem_data_path, 25, 5, 10)
+    raise NotImplementedError()
