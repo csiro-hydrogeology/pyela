@@ -20,7 +20,7 @@ Welcome to ela!
 .. |codecov-testing| image:: https://codecov.io/gh/csiro-hydrogeology/pyela/branch/testing/graph/badge.svg
    :target: https://codecov.io/gh/csiro-hydrogeology/pyela/branch/testing
 .. |Getting started tutorial - Bungendore 3D lithology| image:: https://raw.githubusercontent.com/csiro-hydrogeology/pyela-doc/master/tutorials/img/3d_overlay_bungendore_clay_lithology_small.png
-   :target: https://github.com/csiro-hydrogeology/pyela-doc/blob/master/tutorials/getting_started.ipynb
+   :target: https://nbviewer.jupyter.org/github/csiro-hydrogeology/pyela-doc/blob/master/tutorials/getting_started.ipynb
 
 
 +----------------------+------------------------+

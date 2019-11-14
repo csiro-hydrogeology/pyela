@@ -8,7 +8,7 @@ master [![build-master](https://img.shields.io/travis/csiro-hydrogeology/pyela/m
 
 testing [![build-testing](https://img.shields.io/travis/csiro-hydrogeology/pyela/testing.svg)](https://travis-ci.org/csiro-hydrogeology/pyela/branches)[![codecov-testing](https://codecov.io/gh/csiro-hydrogeology/pyela/branch/testing/graph/badge.svg)](https://codecov.io/gh/csiro-hydrogeology/pyela/branch/testing)
 
-[![Getting started tutorial - Bungendore 3D lithology](https://raw.githubusercontent.com/csiro-hydrogeology/pyela-doc/master/tutorials/img/3d_overlay_bungendore_clay_lithology_small.png "Getting started tutorial - Bungendore 3D lithology")](https://github.com/csiro-hydrogeology/pyela-doc/blob/master/tutorials/getting_started.ipynb)
+[![Getting started tutorial - Bungendore 3D lithology](https://raw.githubusercontent.com/csiro-hydrogeology/pyela-doc/master/tutorials/img/3d_overlay_bungendore_clay_lithology_small.png "Getting started tutorial - Bungendore 3D lithology")](https://nbviewer.jupyter.org/github/csiro-hydrogeology/pyela-doc/blob/master/tutorials/getting_started.ipynb)
 
 Analysing driller’s logs is a tedious and repetitive task in many groundwater modelling projects. Automating the process of extracting useful information from driller's logs allows spending less time on manual data wrangling, more time on its interpretation, and enhances the reproducibility of the analysis.
 
@@ -18,7 +18,7 @@ This package combines features to:
 *  apply supervised machine learning to interpolate lithologies across a 3D grid
 *  visualise interactively the 3D data
 
-An introductory [sample workflow](https://github.com/csiro-hydrogeology/pyela-doc/blob/master/tutorials/getting_started.ipynb) gives an overview of some of these capabilities.
+An introductory [sample workflow](https://nbviewer.jupyter.org/github/csiro-hydrogeology/pyela-doc/blob/master/tutorials/getting_started.ipynb) gives an overview of some of these capabilities.
 
 ## License
 
