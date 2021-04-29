@@ -1,6 +1,5 @@
 name: ela_test
 channels:
-  - conda
   - conda-forge
 dependencies: 
   - rasterio

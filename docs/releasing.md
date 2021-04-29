@@ -65,8 +65,6 @@ cd docs
 make html
 ```
 
-
-
 ## Troubleshooting
 
 ```bash

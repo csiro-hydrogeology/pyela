@@ -396,6 +396,22 @@ def flat_list_tokens(descriptions):
     flat = [word for word in flat if word not in exclude]
     return flat
 
+def find_regex_df(df, expression, colname=PRIMARY_LITHO_COL):
+    """Subset a dataframe based on regex pattern matching on one of its columns.
+
+        Args:
+            df (pandas data frame): bore lithology data with column named 'colname'
+            expression (str): a regular expression
+            colname (str): the column name to use for pattern matching 
+    
+        Returns:
+            (pandas data frame): subset data frame
+    """
+    tested = df[colname].values
+    regex = re.compile(expression)
+    xx = [(regex.match(x) is not None) for x in tested]
+    df_test = df.loc[xx]
+    return df_test
 
 def match_and_sample_df(df, litho_class_name, colname=PRIMARY_LITHO_COL, out_colname=None, size=50, seed=None):
     """Sample a random subset of rows where the lithology column matches a particular class name.
@@ -411,22 +427,6 @@ def match_and_sample_df(df, litho_class_name, colname=PRIMARY_LITHO_COL, out_col
     if not out_colname is None:
         y = y[LITHO_DESC_COL]
     return y
-
-
-def find_regex_df(df, expression, colname):
-    """Sample a random subset of rows where the lithology column matches a particular class name.
-
-        Args:
-            df (pandas data frame): bore lithology data  with columns named PRIMARY_LITHO_COL
-
-        Returns:
-            dataframe:
-    """
-    tested = df[colname].values
-    regex = re.compile(expression)
-    xx = [(regex.match(x) is not None) for x in tested]
-    df_test = df.loc[xx]
-    return df_test
 
 def as_numeric(x):
     if isinstance(x, float):
@@ -451,3 +451,9 @@ def columns_as_numeric(df, colnames=None):
     for colname in colnames:
         df[colname] = df[colname].apply(as_numeric)
 
+
+def summary_regex_tokens(regex_matches):
+    zero_mark = len([x for x in regex_matches if len(x) == 0 ])
+    at_least_one_mark = len([x for x in regex_matches if len(x) >= 1])
+    at_least_two_mark = len([x for x in regex_matches if len(x) >= 2])
+    return 'There are %s entries with no regex match, %s entries with at least one, %s with at least two'%(zero_mark,at_least_one_mark,at_least_two_mark)

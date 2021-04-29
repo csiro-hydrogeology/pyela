@@ -356,20 +356,11 @@ class Model:
         self.create_embedding_matrix()
         self.define_learning_model()
         self.calculate_accuracy()
-        
-        
-        
-        
-        
-        
-        
-        
+
     def predict(self,data):
         """
         Predict simplified lithologies for input data
-        
         """
-        
         data['Description']=data['Description'].replace(np.nan,'',regex=True)
         data['Description']=data['Description'].astype(str)
         predict_X=self.tokenizer.texts_to_sequences(data['Description'])
@@ -394,10 +385,4 @@ class Model:
         output=self.ml_model.predict_proba(predict_X)
         
         return output
-            
-        
-        
-        
-        
-        
 

@@ -94,9 +94,9 @@ setup(
     packages=['ela', 'ela.experiment'],
     install_requires=REQUIREMENTS,
     extras_require={
-        ':python_version >= "3.6"': [
-            'PyQt5',
-        ]
+        # ':python_version >= "3.6"': [
+        #     'PyQt5',
+        # ]
     # extras_require={  # Optional
     #     'dev': ['check-manifest'],
     #     'test': ['coverage'],
