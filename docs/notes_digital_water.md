@@ -30,7 +30,7 @@ call C:\Users\per202\AppData\Local\Continuum\anaconda3\Scripts\activate.bat
 call conda activate ELA
 :: setting ELA_SRC probably optional
 :: set ELA_SRC=c:\src\github_jm\pyela
-:: mapping "\\fs1-cbr.nexus.csiro.au\{lw-digwat-1}\work\lithology" to the Z: drive
+:: mapping "\\fs1-cbr.nexus.csiro.au\{lw-digwat-1}\work" to the Z: drive
 set ELA_DATA=Z:\lithology
 cd C:\src\github_jm\pyela-doc\tutorials
 call jupyter-lab .
