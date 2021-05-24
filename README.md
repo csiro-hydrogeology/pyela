@@ -63,8 +63,37 @@ where curl
 cd c:\tmp
 curl -o ela_environment.yml https://raw.githubusercontent.com/csiro-hydrogeology/pyela/testing/configs/ela_environment.yml
 set my_env_name=ELA
+```
+
+```bat
 conda env create -n %my_env_name% -f ela_environment.yml python=3.7
 conda activate %my_env_name% 
+```
+
+Manual way (experimental only, when upgrading dependency versions) 
+
+```bat
+REM conda update conda
+conda create -c conda-forge -n %my_env_name%  python=3.8
+conda activate %my_env_name% 
+conda install -c conda-forge mamba
+mamba install -c conda-forge  rasterio cartopy geopandas pandas nltk scikit-learn matplotlib vtk wordcloud pyqt mayavi pip ipykernel ipywidgets ipyevents
+REM (because we need to install the labextensions???) http://docs.enthought.com/mayavi/mayavi/tips.html#using-mayavi-in-jupyter-notebooks
+mamba install -c conda-forge jupyterlab 
+
+jupyter lab build
+
+python -m ipykernel install --user --name %my_env_name% --display-name "Lithology"
+
+:: maybe need striplog fork of mine??
+:: pip install my_striplog      - git+https://github.com/jmp75/striplog@master::egg
+
+:: data_proj=ccrs.epsg(28350)
+:: ModuleNotFoundError: No module named 'pyepsg', and other new dependencies
+mamba install -c conda-forge xlrd openpyxl pyepsg
+
+pip install ela
+
 ```
 
 ```bat
