@@ -1,0 +1,7 @@
+add_missing_height_data  needs clarification/documentation/rename
+
+build_points_dict and/or related functions may have an assumption that log entries are sorted by heights. This may be dangerous.
+
+point_to_lines_dict is a method without any need (seems stateless). Same for add_lithology_based_scalar
+
+GR was probably an acronym for gamma rays. Rename.
