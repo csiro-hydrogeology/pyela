@@ -73,7 +73,8 @@ conda activate %my_env_name%
 Manual way (experimental only, when upgrading dependency versions) 
 
 ```bat
-REM conda update conda
+call C:\Users\xxxyyy\AppData\Local\Continuum\anaconda3\Scripts\activate.bat
+set my_env_name=ELA
 conda create -c conda-forge -n %my_env_name%  python=3.8
 conda activate %my_env_name% 
 conda install -c conda-forge mamba
@@ -93,7 +94,6 @@ python -m ipykernel install --user --name %my_env_name% --display-name "Litholog
 mamba install -c conda-forge xlrd openpyxl pyepsg
 
 pip install ela
-
 ```
 
 ```bat
