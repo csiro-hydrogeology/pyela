@@ -72,7 +72,7 @@ Idea: consider using "binder" for interactive tut. See [spaCy doc](https://spacy
 
 ```cmd
 call C:\Users\XXXYYY\AppData\Local\Continuum\anaconda3\Scripts\activate.bat
-set my_env_name=ELA3
+set my_env_name=ela3
 conda create --name %my_env_name% python=3.6
 REM later : conda install --name %my_env_name% xarray netCDF4 rasterio cartopy jupyterlab ipywidgets jupyter geopandas pandas scikit-learn scikit-image matplotlib python=3.6
 conda install --name %my_env_name% jupyterlab ipywidgets jupyter pandas scikit-learn matplotlib python=3.6
@@ -157,7 +157,7 @@ conda config --remove channels conda-forge
 ```
 
 ```bash
-my_env_name=ELA
+my_env_name=ela
 ```
 
 ```bash

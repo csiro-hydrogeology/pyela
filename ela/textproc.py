@@ -18,6 +18,23 @@ import striplog
 import nltk
 from nltk.corpus import stopwords
 
+# Prevent the error "Resource punkt not found" likely for new users. Unnecessary bad first impression.
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
+
+# try:
+#     nltk.data.find('tokenizers/averaged_perceptron_tagger')
+# except LookupError:
+#     nltk.download('averaged_perceptron_tagger')
+
+try:
+    nltk.data.find('tokenizers/stopwords')
+except LookupError:
+    nltk.download('stopwords')
+
+
 
 def replace_punctuations(text, replacement=' '):
     """Replace the punctuations (``string.punctuation``) in a string."""

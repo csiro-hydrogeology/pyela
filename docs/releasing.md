@@ -10,7 +10,7 @@ source ~/anaconda3/bin/activate
 ```
 
 ```bash
-my_env_name=ELA
+my_env_name=ela
 conda activate ${my_env_name}
 conda install wheel twine six pytest
 ```

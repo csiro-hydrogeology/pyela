@@ -61,7 +61,7 @@ on Linux:
 .. code:: bash
 
    wget https://raw.githubusercontent.com/csiro-hydrogeology/pyela/testing/configs/ela_environment.yml
-   my_env_name=ELA
+   my_env_name=ela
    # my_env_name=elauser
    conda env create -n $my_env_name -f ./ela_environment.yml python=3.7
    conda activate $my_env_name 
@@ -84,7 +84,7 @@ Windows:
    where curl
    cd c:\tmp
    curl -o ela_environment.yml https://raw.githubusercontent.com/csiro-hydrogeology/pyela/testing/configs/ela_environment.yml
-   set my_env_name=ELA
+   set my_env_name=ela
    conda env create -n %my_env_name% -f ela_environment.yml python=3.7
    conda activate %my_env_name% 
 
@@ -177,7 +177,7 @@ To create the conda environment for ela on Linux:
 .. code:: bash
 
    # source ~/anaconda3/bin/activate
-   my_env_name=ELA
+   my_env_name=ela
    conda create --name ${my_env_name} python=3.7
    conda install --name ${my_env_name} rasterio cartopy geopandas pandas nltk scikit-learn scikit-image matplotlib vtk
    conda activate  ${my_env_name}
@@ -188,7 +188,7 @@ user mode.
 .. code:: bat
 
    call %userprofile%\AppData\Local\Continuum\anaconda3\Scripts\activate.bat
-   set my_env_name=ELA
+   set my_env_name=ela
    conda create --name %my_env_name% python=3.7
    REM if using conda activate  %my_env_name%  I seem to loose conda from the command line, so:
    conda install --name %my_env_name% conda 
@@ -284,7 +284,7 @@ Linux:
 
 .. code:: bash
 
-   my_env_name=ELA
+   my_env_name=ela
    conda install --name ${my_env_name} jupyterlab ipywidgets jupyter
    jupyter-labextension install @jupyter-widgets/jupyterlab-manager
    python -m ipykernel install --user --name ${my_env_name} --display-name "Py3 ELA"
@@ -293,7 +293,7 @@ Windows:
 
 .. code:: bat
 
-   set my_env_name=ELA
+   set my_env_name=ela
    conda install --name %my_env_name% jupyterlab ipywidgets jupyter
    jupyter-labextension install @jupyter-widgets/jupyterlab-manager
    python -m ipykernel install --user --name %my_env_name% --display-name "Py3 ELA"

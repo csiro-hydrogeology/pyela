@@ -14,9 +14,9 @@ Analysing driller’s logs is a tedious and repetitive task in many groundwater 
 
 This package combines features to:
 
-*  perform natural language processing on lithology descriptions in the logs, to detect primary and secondary lithologies
-*  apply supervised machine learning to interpolate lithologies across a 3D grid
-*  visualise interactively the 3D data
+* perform natural language processing on lithology descriptions in the logs, to detect primary and secondary lithologies
+* apply supervised machine learning to interpolate lithologies across a 3D grid
+* visualise interactively the 3D data
 
 An introductory [sample workflow](https://nbviewer.jupyter.org/github/csiro-hydrogeology/pyela-doc/blob/master/tutorials/getting_started.ipynb) gives an overview of some of these capabilities.
 
@@ -32,7 +32,7 @@ Some notebook tutorials are hosted [in a separate github repository pyela-doc](h
 
 Get a quick tour of [some legacy visualisations](https://github.com/csiro-hydrogeology/pyela/blob/master/docs/visual_tour.md). Visualisation features are currently being reengineered.
 
-## Installation 
+## Installation
 
 The quickest way with conda. We recommend installing conda packages rather than pip packages whereever possible.
 
@@ -40,7 +40,7 @@ on Linux:
 
 ```bash
 wget https://raw.githubusercontent.com/csiro-hydrogeology/pyela/testing/configs/ela_environment.yml
-my_env_name=ELA
+my_env_name=ela
 # my_env_name=elauser
 conda env create -n $my_env_name -f ./ela_environment.yml python=3.7
 conda activate $my_env_name 
@@ -62,7 +62,7 @@ REM curl should come with anaconda3. Perhaps not with miniconda though.
 where curl
 cd c:\tmp
 curl -o ela_environment.yml https://raw.githubusercontent.com/csiro-hydrogeology/pyela/testing/configs/ela_environment.yml
-set my_env_name=ELA
+set my_env_name=ela
 ```
 
 ```bat
@@ -70,11 +70,11 @@ conda env create -n %my_env_name% -f ela_environment.yml python=3.7
 conda activate %my_env_name% 
 ```
 
-Manual way (experimental only, when upgrading dependency versions) 
+Manual way (experimental only, when upgrading dependency versions)
 
 ```bat
 call C:\Users\xxxyyy\AppData\Local\Continuum\anaconda3\Scripts\activate.bat
-set my_env_name=ELA
+set my_env_name=ela
 conda create -c conda-forge -n %my_env_name%  python=3.8
 conda activate %my_env_name% 
 conda install -c conda-forge mamba
@@ -106,7 +106,7 @@ jupyter-labextension install @jupyter-widgets/jupyterlab-manager
 python -m ipykernel install --user --name %my_env_name% --display-name "Py3 ELA"
 ```
 
-### Troubleshooting 
+### Troubleshooting installation
 
 pip packages specified from the `environment.yaml` files may have not installed (under investigation). Check that pvgeo and "our" packages are installed e.g.
 
@@ -162,7 +162,7 @@ To create the conda environment for ela on Linux:
 
 ```bash
 # source ~/anaconda3/bin/activate
-my_env_name=ELA
+my_env_name=ela
 conda create --name ${my_env_name} python=3.7
 conda install --name ${my_env_name} rasterio cartopy geopandas pandas nltk scikit-learn scikit-image matplotlib vtk
 conda activate  ${my_env_name}
@@ -172,7 +172,7 @@ On Windows, using the DOS CMD prompt, assuming you installed Anaconda in user mo
 
 ```bat
 call %userprofile%\AppData\Local\Continuum\anaconda3\Scripts\activate.bat
-set my_env_name=ELA
+set my_env_name=ela
 conda create --name %my_env_name% python=3.7
 REM if using conda activate  %my_env_name%  I seem to loose conda from the command line, so:
 conda install --name %my_env_name% conda 
@@ -199,6 +199,7 @@ pip search mayavi
 pip install pyqt5
 pip install mayavi
 ```
+
 For users without admin rights，
 
 ```bash
@@ -212,9 +213,9 @@ At this point all mandatory dependencies for 'ela' are installed.
 
 There are three options to access ela:
 
-*  use the latest available on pip, 
-*  clone and install with `setup.py`
-*  direct import of the package directory (this is done at runtime from e.g. a notebook)
+* use the latest available on pip,
+* clone and install with `setup.py`
+* direct import of the package directory (this is done at runtime from e.g. a notebook)
 
 ```bash
 pip search ela
@@ -241,23 +242,23 @@ If reading xls files using pandas, need pkg `xlrd` with e.g. `conda install xlrd
 
 ### using Jupyter-lab
 
-You may use ela as you prefer; we recomment using "Jupyter Lab" to write notebooks. See the [Jupyter lab doc](https://jupyterlab.readthedocs.io/en/stable/) for official information. 
+You may use ela as you prefer; we recomment using "Jupyter Lab" to write notebooks. See the [Jupyter lab doc](https://jupyterlab.readthedocs.io/en/stable/) for official information.
 
 The following should be enough otherwise to use 'ela'
 
 Linux:
 
 ```bash
-my_env_name=ELA
+my_env_name=ela
 conda install --name ${my_env_name} jupyterlab ipywidgets jupyter
 jupyter-labextension install @jupyter-widgets/jupyterlab-manager
 python -m ipykernel install --user --name ${my_env_name} --display-name "Py3 ELA"
 ```
 
-Windows: 
+Windows:
 
 ```bat
-set my_env_name=ELA
+set my_env_name=ela
 conda install --name %my_env_name% jupyterlab ipywidgets jupyter
 jupyter-labextension install @jupyter-widgets/jupyterlab-manager
 python -m ipykernel install --user --name %my_env_name% --display-name "Py3 ELA"
